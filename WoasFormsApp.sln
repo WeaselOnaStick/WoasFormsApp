@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoasFormsApp", "WoasFormsApp\WoasFormsApp.csproj", "{E92E3A40-B6B4-4DF7-8181-B2ACB90B501E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoasFormsApp.Client", "WoasFormsApp.Client\WoasFormsApp.Client.csproj", "{20C74B45-1C21-4A20-AC27-AFECD5F10C11}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E92E3A40-B6B4-4DF7-8181-B2ACB90B501E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E92E3A40-B6B4-4DF7-8181-B2ACB90B501E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E92E3A40-B6B4-4DF7-8181-B2ACB90B501E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E92E3A40-B6B4-4DF7-8181-B2ACB90B501E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20C74B45-1C21-4A20-AC27-AFECD5F10C11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20C74B45-1C21-4A20-AC27-AFECD5F10C11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20C74B45-1C21-4A20-AC27-AFECD5F10C11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20C74B45-1C21-4A20-AC27-AFECD5F10C11}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

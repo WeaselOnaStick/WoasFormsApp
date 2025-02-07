@@ -1,7 +1,23 @@
 ﻿@page "/"
+@inject WoasFormsApp.Data.WoasFormsDbContext db
 
 <PageTitle>Home</PageTitle>
 
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
+<br />
+
+<textarea style="min-width:400px; width:fit-content">
+    @debugString
+</textarea>
+
+@code{
+    public string debugString;
+
+    protected override void OnInitialized()
+    {
+        debugString = db.Model.ToDebugString(Microsoft.EntityFrameworkCore.Infrastructure.MetadataDebugStringOptions.LongDefault);
+        StateHasChanged();
+    }
+}

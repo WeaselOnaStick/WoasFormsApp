@@ -2,23 +2,34 @@
 {
     public class Template
     {
+        public required int Id { get; set; }
+
+        public WoasFormsAppUser Owner { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+        public DateTime LastModifiedAt { get; set; }
+
         public required string Title { get; set; }
         public string? Description { get; set; }
 
         public string? CoverImageUrl { get; set; }
 
         public required int TopicId { get; set; } = 0;
-        public Topic topic { get; set; }
+        public TemplateTopic Topic { get; set; }
 
-        public List<string>? UserIdsWhoLiked { get; set; }
-        public List<WoasFormsAppUser>? UsersWhoLiked { get; set; }
+        public ICollection<TemplateTag>? Tags {  get; set; }
+
+        public ICollection<WoasFormsAppUser>? UsersWhoLiked { get; set; }
+
+        public ICollection<TemplateComment>? Comments { get; set; }
 
         // if NOT Public refer to trusted list
         public bool Public { get; set; } = true;
+        public ICollection<WoasFormsAppUser> AllowedUsers {  get; set; }
 
-        public List<string> AllowedUserIds { get; set; }
-        public List<WoasFormsAppUser> AllowedUsers {  get; set; }
 
-        public List<>
+        public ICollection<Response> Responses { get; set; }
+
+        public ICollection<TemplateField> Fields { get; set; }
     }
 }

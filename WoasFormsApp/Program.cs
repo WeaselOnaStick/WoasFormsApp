@@ -38,11 +38,9 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddDbContext<WoasFormsDbContext>(options =>
 {
-    options.UseInMemoryDatabase("TestDB");
+    options.UseInMemoryDatabase("TempDB");
     //options.UseSqlite(connectionString)
-}
-    
-);
+});
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 

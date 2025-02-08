@@ -12,7 +12,7 @@
         public required string Title { get; set; }
         public string? Description { get; set; }
 
-        public string? CoverImageUrl { get; set; }
+        public string? CoverImageUrl { get; set; } = "https://placehold.co/300x200";
 
         public required int TopicId { get; set; } = 0;
         public TemplateTopic Topic { get; set; }

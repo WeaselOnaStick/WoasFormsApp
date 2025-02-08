@@ -1,0 +1,58 @@
+﻿@using Bogus
+@using WoasFormsApp.Data
+
+@if (showLoading){
+    @for (int i = 0; i < skeletonsCount; i++)
+    {
+        <MudCard>
+            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" />
+            <MudCardContent>
+                <MudSkeleton Width="30%" Height="42px;" />
+                <MudSkeleton Width="80%" />
+                <MudSkeleton Width="100%" />
+            </MudCardContent>
+            <MudCardActions>
+                <MudSkeleton Width="64px" Height="40px" Class="ml-2" />
+                <MudSkeleton Width="105px" Height="40px" Class="ml-3" />
+            </MudCardActions>
+        </MudCard>
+    }
+}
+
+<MudGrid>
+    @foreach (var template in templates)
+    {
+        <MudCard>
+            <MudCardMedia Image="@template.CoverImageUrl" Height="300"/>
+            <MudCardContent>
+                <MudText Typo="Typo.h4">@template.Title</MudText>
+                <MudText Typo="Typo.body2">@template.Owner.UserName</MudText>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Variant="Variant.Filled">Fill out</MudButton>
+            </MudCardActions>
+        </MudCard>
+    }
+</MudGrid>
+
+@code {
+    int skeletonsCount = 6;
+
+    bool showLoading = true;
+
+    List<Template> templates = new List<Template>();
+
+    protected override void OnInitialized()
+    {
+        var startID = 0;
+        var f = new Faker<Template>()
+        .StrictMode(true)
+        .RuleFor(t => t.Id, f => startID++)
+        .RuleFor(t => t.Title, f => $"{f.Hacker.Adjective} {f.Hacker.Noun}")
+        .RuleFor(t => t.TopicId, f => 0);
+
+        templates = f.Generate(16);
+        showLoading = false;
+        StateHasChanged();
+    }
+}

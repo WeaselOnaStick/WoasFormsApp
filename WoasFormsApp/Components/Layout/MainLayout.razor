@@ -1,7 +1,41 @@
 ﻿@inherits LayoutComponentBase
 
+@inject Blazored.LocalStorage.ILocalStorageService storage
+
 @* Required *@
-<MudThemeProvider />
+<MudThemeProvider @bind-IsDarkMode="_isDarkMode"/>
+
+@code {
+    private bool defaultDarkMode = true;
+    public bool _isDarkMode;
+
+    protected override void OnInitialized()
+    {
+        _isDarkMode = defaultDarkMode;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        bool userThemeMode = await storage.GetItemAsync<bool>("isDarkMode");
+        if (userThemeMode == null)
+        {
+            await storage.SetItemAsync<bool>("isDarkMode", defaultDarkMode);
+            _isDarkMode = defaultDarkMode;
+        }
+        else
+        {
+            _isDarkMode = userThemeMode;
+        }
+        StateHasChanged();
+    }
+    public async Task FlipThemeMode(){
+        _isDarkMode ^= true;
+        await storage.SetItemAsync<bool>("isDarkMode", _isDarkMode);
+    }
+}
+
 <MudPopoverProvider />
 
 @* Needed for dialogs *@
@@ -11,12 +45,25 @@
 <MudSnackbarProvider />
 
 <MudLayout>
-    <MudAppBar>
-        WoasForms
+    <MudAppBar Color="Color.Primary" Style="p-10">
+        <MudMenu Icon="@Icons.Material.Sharp.Menu" Size="Size.Large" Dense=true>
+            <AccountMenuButtons />
+            <MudMenuItem>
+                <MudButton OnClick="() => FlipThemeMode()"
+                           StartIcon="@(_isDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)"
+                           Variant="Variant.Text"
+                           Color="Color.Primary">
+                           @(_isDarkMode ? "Light Mode" : "Dark Mode")
+                       </MudButton>
+            </MudMenuItem>
+        </MudMenu>
+        <MudSpacer />
+        <TemplatesSearchBar />
+        <MudSpacer />
+        <a href="/">
+            <MudText Typo="Typo.h6">WoasForms</MudText>
+        </a>
     </MudAppBar>
-    <MudDrawer Open="true">
-
-    </MudDrawer>
     <MudMainContent>
         @Body
     </MudMainContent>

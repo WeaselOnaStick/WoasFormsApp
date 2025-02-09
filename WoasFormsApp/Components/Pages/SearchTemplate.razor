@@ -1,0 +1,11 @@
+﻿@page "/SearchTemplate"
+
+<PageTitle>Search for template</PageTitle>
+
+You have entered "@searchString"
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "search")]
+    public string searchString { get; set; }
+}

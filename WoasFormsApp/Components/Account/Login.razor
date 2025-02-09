@@ -1,0 +1,70 @@
+﻿@page "/Account/Login"
+
+<PageTitle>Login</PageTitle>
+
+@inject NavigationManager nav
+@inject SignInManager<WoasFormsAppUser> sign
+@inject ISnackbar snack
+
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Identity
+@using WoasFormsApp.Data
+<MudContainer>
+    <MudPaper Class="mx-auto p-4 align-content-center flex-direction-column" Style="max-width:500px">
+        <MudText Typo="Typo.h3">Log in</MudText>
+        <MudLink Href="/Account/Register">
+            Don't have an account? Click to create
+        </MudLink>
+        <MudForm @ref="form" @bind-IsValid="@valid" @bind-Errors="@errors">
+            <MudTextField T="string" Label="Username" Required="true" RequiredError="User name is required!" @bind-Value="Username" />
+
+            <MudTextField T="string" Label="Password" HelperText="Choose a strong password" @bind-Value="Password"
+            InputType="InputType.Password"
+            RequiredError="Password is required!" />
+
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!valid)" Class="ml-auto" OnClick="LoginUser">Register</MudButton>
+        </MudForm>
+        @foreach (var error in errors)
+        {
+            <MudText Color="@Color.Error">@error</MudText>
+        }
+    </MudPaper>
+</MudContainer>
+
+@code {
+    string debugText;
+
+    bool valid;
+    string[] errors = { };
+    MudTextField<string> pwField1;
+    MudForm form;
+
+    private string Username;
+    private string Password;
+
+    private async Task LoginUser()
+    {
+        var user = await sign.UserManager.FindByNameAsync(Username);
+        if (user != null && user.IsBlocked)
+        {
+            errors = new string[] {"Account blocked!"};
+            snack.Add("Account blocked!", Severity.Error);
+            return;
+        }
+        bool success = user != null && sign.PasswordSignInAsync(user, Password, true, false).Result.Succeeded;
+
+        if (!success)
+        {
+            errors = new string[] { "User name or password is incorrect!" };
+            snack.Add("User name or password is incorrect!", Severity.Error);
+            return;
+        }
+
+        if (success)
+        {
+            snack.Add("Successfully logged in!", Severity.Success);
+            nav.NavigateTo("/");
+        }
+
+    }
+}

@@ -1,0 +1,34 @@
+﻿@inject NavigationManager nav
+@rendermode InteractiveServer
+
+<MudTextField
+@bind-Value="searchText"
+@ref="searchField"
+Label="Search"
+Variant="Variant.Filled"
+Adornment="Adornment.End"
+AdornmentIcon="@Icons.Material.Filled.Search"
+Placeholder="Search for templates"
+OnAdornmentClick="Search"
+Color="@Color.Inherit"
+/>
+
+@code {
+    string searchText;
+    MudTextField<string> searchField;
+
+    public void Search()
+    {
+        if (string.IsNullOrWhiteSpace(searchText)) {
+            searchField.Error = true;
+            StateHasChanged();
+            return;
+        }
+        var baseUri = "/SearchTemplate";
+        var searchParams = new Dictionary<string, object>{
+            {"search" , searchText },
+        };
+        var uriWithParams = nav.GetUriWithQueryParameters(baseUri, searchParams);
+        nav.NavigateTo(uriWithParams, forceLoad: true);
+    }
+}

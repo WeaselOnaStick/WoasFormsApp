@@ -1,0 +1,30 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using WoasFormsApp.Data
+
+@inject SignInManager<WoasFormsAppUser> SignInManager;
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <MudMenuItem>
+            <MudButton Href="/Admin" StartIcon="@Icons.Material.Filled.AdminPanelSettings">Admin Panel</MudButton>
+        </MudMenuItem>
+    </Authorized>
+</AuthorizeView>
+
+<AuthorizeView>
+    <Authorized>
+        <MudText>@context.User.Identity?.Name</MudText>
+        <MudMenuItem>
+            <MudButton OnClick="async () => await SignInManager.SignOutAsync()" Variant="Variant.Text" StartIcon="@Icons.Material.TwoTone.Logout">Log Out</MudButton>
+        </MudMenuItem>
+        <MudItem>
+            <MudButton Href="/MyTemplates" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Inventory">My Templates</MudButton>
+        </MudItem>
+    </Authorized>
+
+    <NotAuthorized>
+        <MudMenuItem>
+            <MudButton Href="Account/Login" Variant="Variant.Text" StartIcon="@Icons.Material.TwoTone.Login">Sign In</MudButton>
+        </MudMenuItem>
+    </NotAuthorized>
+</AuthorizeView>

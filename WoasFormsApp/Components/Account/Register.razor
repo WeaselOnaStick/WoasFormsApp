@@ -1,0 +1,82 @@
+﻿@page "/Account/Register"
+
+@inject NavigationManager nav
+@inject AuthenticationStateProvider asp
+@inject SignInManager<WoasFormsAppUser> sign
+@inject ISnackbar snack
+
+<PageTitle>Register</PageTitle>
+
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Identity
+@using WoasFormsApp.Data
+<MudContainer>
+    <MudPaper Class="mx-auto p-4" Style="max-width:500px">
+        <MudText Typo="Typo.h3">Create an Account</MudText>
+
+        <MudLink Href="/Account/Login">
+            Already have an account? Log in
+        </MudLink>
+
+        <MudForm @ref="form" @bind-IsValid="@valid" @bind-Errors="@errors">
+            <MudTextField T="string" Label="Username" Required="true" RequiredError="User name is required!" @bind-Value="Username"/>
+
+            <MudTextField T="string" Label="Email" Required="true" RequiredError="Email is required!" @bind-Value="Email"
+            Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})" />
+
+            <MudTextField T="string" Label="Password" HelperText="Choose a strong password" @ref="pwField1" @bind-Value="Password"
+            InputType="InputType.Password"
+            RequiredError="Password is required!" />
+
+            <MudTextField T="string"
+            Label="Password" HelperText="Repeat the password" InputType="InputType.Password"
+            Validation="@(new Func<string, string>(PasswordMatch))" />
+
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!valid)" Class="ml-auto" OnClick="RegisterUser">Register</MudButton>
+        </MudForm>
+        @foreach (var error in errors)
+        {
+            <MudText Color="@Color.Error">@error</MudText>
+        }
+    </MudPaper>
+</MudContainer>
+
+@code {
+    string debugText;
+
+    bool valid;
+    string[] errors = { };
+    MudTextField<string> pwField1;
+    MudForm form;
+
+    private string Username;
+    private string Email;
+    private string Password;
+
+    private string PasswordMatch(string arg)
+    {
+        if (pwField1.Value != arg)
+            return "Passwords don't match";
+        return null;
+    }
+
+    private async Task RegisterUser(){
+        WoasFormsAppUser newUser = new WoasFormsAppUser {
+                UserName = Username,
+                Email = Email,
+                IsBlocked = false,
+            };
+        var res = await sign.UserManager.CreateAsync(newUser, Password);
+        if (res.Succeeded)
+        {
+            snack.Add("Account created!", Severity.Success);
+            nav.NavigateTo("/Account/Login");
+        }
+        else
+        {
+            snack.Add("There were errors creating the account!", Severity.Error);
+            errors = res.Errors.Select(e => e.Description).ToArray();
+        }
+        
+    }
+}

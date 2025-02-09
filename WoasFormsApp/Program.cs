@@ -1,10 +1,10 @@
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 using WoasFormsApp.Client.Pages;
 using WoasFormsApp.Components;
-using WoasFormsApp.Components.Account;
 using WoasFormsApp.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,12 +13,11 @@ builder.Services.AddMudServices();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents()
     .AddAuthenticationStateSerialization();
 
 builder.Services.AddCascadingAuthenticationState();
-builder.Services.AddScoped<IdentityUserAccessor>();
-builder.Services.AddScoped<IdentityRedirectManager>();
 
 builder.Services.AddAuthentication(options =>
     {
@@ -38,8 +37,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddDbContext<WoasFormsDbContext>(options =>
 {
-    options.UseInMemoryDatabase("TempDB");
-    //options.UseSqlite(connectionString)
+    options.UseSqlite(connectionString);
 });
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -65,7 +63,7 @@ builder.Services.AddIdentityCore<WoasFormsAppUser>(options =>
     .AddSignInManager()
     .AddDefaultTokenProviders();
 
-builder.Services.AddSingleton<IEmailSender<WoasFormsAppUser>, IdentityNoOpEmailSender>();
+builder.Services.AddBlazoredLocalStorage();
 
 var app = builder.Build();
 
@@ -89,10 +87,9 @@ app.UseAntiforgery();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(WoasFormsApp.Client._Imports).Assembly);
 
-// Add additional endpoints required by the Identity /Account Razor components.
-app.MapAdditionalIdentityEndpoints();
 
 app.Run();

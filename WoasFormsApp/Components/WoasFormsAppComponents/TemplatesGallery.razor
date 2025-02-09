@@ -1,58 +1,84 @@
 ﻿@using Bogus
 @using WoasFormsApp.Data
 
-@if (showLoading){
-    @for (int i = 0; i < skeletonsCount; i++)
-    {
-        <MudCard>
-            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" />
-            <MudCardContent>
-                <MudSkeleton Width="30%" Height="42px;" />
-                <MudSkeleton Width="80%" />
-                <MudSkeleton Width="100%" />
-            </MudCardContent>
-            <MudCardActions>
-                <MudSkeleton Width="64px" Height="40px" Class="ml-2" />
-                <MudSkeleton Width="105px" Height="40px" Class="ml-3" />
-            </MudCardActions>
-        </MudCard>
-    }
+@inject NavigationManager nav
+@attribute [StreamRendering]
+
+@if (templates != null && templates.Count == 0) // 0 Templates loaded
+{
+    <MudPaper Class="d-flex flex-column pa-4 mx-auto align-center gap-4" Style="max-width: fit-content">
+        <MudText Typo="Typo.h4">No templates yet...</MudText>
+        <MudText Typo="Typo.h5">Be the first one to create!</MudText>
+        <MudButton Variant="Variant.Filled">Create Template</MudButton>
+    </MudPaper>
+}
+else
+{
+    <MudGrid Spacing=6 Justify="Justify.Center">
+        @if (templates == null) // Loading templates...
+        {
+            @for (int i = 0; i < skeletonsCount; i++)
+            {
+                <MudItem>
+                    <MudCard Style="max-width:300px">
+                        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" Width="300px" />
+                        <MudCardContent>
+                            <MudSkeleton Width="30%" Height="42px;" />
+                            <MudSkeleton Width="80%" />
+                            <MudSkeleton Width="100%" />
+                        </MudCardContent>
+                        <MudCardActions style="flex-direction: column; align-items: center">
+                            <MudSkeleton Width="64px" Height="40px" Class="ml-2" />
+                            <MudSkeleton Width="105px" Height="40px" Class="ml-3" />
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            }
+        }
+
+        @if (templates != null && templates.Count > 0) // Templates loaded
+        {
+            @for (int i = 0; i<templates.Count; i++)
+            {
+                var template = templates[i];
+                int realIndex = i;
+
+                <MudItem>
+                    <MudCard Style="max-width:300px">
+                        <MudCardMedia Image="@template.CoverImageUrl" Height="200" Style="width:300px"/>
+                        <MudCardContent>
+                            <MudText Typo="Typo.h6">@template.Title</MudText>
+                            <MudText Typo="Typo.body2">Some Douchebag</MudText>
+                        </MudCardContent>
+                        <MudCardActions style="flex-direction: column; align-items: center">
+                            <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="() => OpenTemplate(realIndex)">Fill out</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            }
+        }
+    </MudGrid>
 }
 
-<MudGrid>
-    @foreach (var template in templates)
-    {
-        <MudCard>
-            <MudCardMedia Image="@template.CoverImageUrl" Height="300"/>
-            <MudCardContent>
-                <MudText Typo="Typo.h4">@template.Title</MudText>
-                <MudText Typo="Typo.body2">@template.Owner.UserName</MudText>
-            </MudCardContent>
-            <MudCardActions>
-                <MudButton Variant="Variant.Filled">Fill out</MudButton>
-            </MudCardActions>
-        </MudCard>
-    }
-</MudGrid>
-
 @code {
-    int skeletonsCount = 6;
+    int bogusTemplatesAmt = 32;
+    int skeletonsCount = 12;
 
-    bool showLoading = true;
+    List<Template> templates;
 
-    List<Template> templates = new List<Template>();
-
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         var startID = 0;
         var f = new Faker<Template>()
-        .StrictMode(true)
         .RuleFor(t => t.Id, f => startID++)
-        .RuleFor(t => t.Title, f => $"{f.Hacker.Adjective} {f.Hacker.Noun}")
+        .RuleFor(t => t.Title, f => $"{f.Hacker.Adjective()} {f.Hacker.Noun()}")
         .RuleFor(t => t.TopicId, f => 0);
 
-        templates = f.Generate(16);
-        showLoading = false;
+        templates = f.Generate(bogusTemplatesAmt);
         StateHasChanged();
+    }
+
+    public void OpenTemplate(int idx){
+        nav.NavigateTo($"/FillForm/{templates[idx].Id}");
     }
 }

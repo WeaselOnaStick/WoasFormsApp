@@ -1,4 +1,5 @@
 ﻿@page "/Account/Register"
+@attribute [ExcludeFromInteractiveRouting]
 
 @inject NavigationManager nav
 @inject AuthenticationStateProvider asp
@@ -10,36 +11,38 @@
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Identity
 @using WoasFormsApp.Data
-<MudContainer>
-    <MudPaper Class="mx-auto p-4" Style="max-width:500px">
-        <MudText Typo="Typo.h3">Create an Account</MudText>
+
+<MudGrid Class="m-6" Justify="Justify.Center">
+    <MudItem md="6">
+
+        <MudText Align="Align.Center" Typo="Typo.h3">Create an Account</MudText>
 
         <MudLink Href="/Account/Login">
             Already have an account? Log in
         </MudLink>
 
         <MudForm @ref="form" @bind-IsValid="@valid" @bind-Errors="@errors">
-            <MudTextField T="string" Label="Username" Required="true" RequiredError="User name is required!" @bind-Value="Username"/>
+            <MudTextField T="string" Label="Username" Required="true" RequiredError="User name is required!" @bind-Value="Username" Variant="Variant.Outlined" />
 
-            <MudTextField T="string" Label="Email" Required="true" RequiredError="Email is required!" @bind-Value="Email"
+            <MudTextField T="string" Label="Email" Required="true" RequiredError="Email is required!" @bind-Value="Email" Variant="Variant.Outlined"
             Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})" />
 
             <MudTextField T="string" Label="Password" HelperText="Choose a strong password" @ref="pwField1" @bind-Value="Password"
-            InputType="InputType.Password"
+                          InputType="InputType.Password" Variant="Variant.Outlined"
             RequiredError="Password is required!" />
 
-            <MudTextField T="string"
+            <MudTextField T="string" Variant="Variant.Outlined"
             Label="Password" HelperText="Repeat the password" InputType="InputType.Password"
             Validation="@(new Func<string, string>(PasswordMatch))" />
 
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!valid)" Class="ml-auto" OnClick="RegisterUser">Register</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="RegisterUser">Register</MudButton>
         </MudForm>
         @foreach (var error in errors)
         {
             <MudText Color="@Color.Error">@error</MudText>
         }
-    </MudPaper>
-</MudContainer>
+    </MudItem>
+</MudGrid>
 
 @code {
     string debugText;

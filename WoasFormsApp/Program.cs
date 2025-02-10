@@ -6,6 +6,7 @@ using MudBlazor.Services;
 using WoasFormsApp.Client.Pages;
 using WoasFormsApp.Components;
 using WoasFormsApp.Data;
+using WoasFormsApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +40,8 @@ builder.Services.AddDbContext<WoasFormsDbContext>(options =>
 {
     options.UseSqlite(connectionString);
 });
+
+builder.Services.AddScoped<IDatabaseAccessorService, DatabaseAccessorService>();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -90,6 +93,7 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(WoasFormsApp.Client._Imports).Assembly);
+
 
 
 app.Run();

@@ -1,70 +1,99 @@
 ﻿@page "/Account/Login"
 
+@inject SignInManager<WoasFormsAppUser> SignInManager
+@inject AuthenticationStateProvider asp
+@inject ILogger<Login> Logger
+@inject NavigationManager NavigationManager
+@inject ISnackbar SnackBar
+
 <PageTitle>Login</PageTitle>
 
-@inject NavigationManager nav
-@inject SignInManager<WoasFormsAppUser> sign
-@inject ISnackbar snack
+<MudGrid Class="m-6" Justify="Justify.Center"> 
+    <MudItem md="6">
+        <StatusMessage Message="@errorMessage" />
+        <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
+            <DataAnnotationsValidator />
 
-@using System.ComponentModel.DataAnnotations
-@using Microsoft.AspNetCore.Identity
-@using WoasFormsApp.Data
-<MudContainer>
-    <MudPaper Class="mx-auto p-4 align-content-center flex-direction-column" Style="max-width:500px">
-        <MudText Typo="Typo.h3">Log in</MudText>
-        <MudLink Href="/Account/Register">
-            Don't have an account? Click to create
-        </MudLink>
-        <MudForm @ref="form" @bind-IsValid="@valid" @bind-Errors="@errors">
-            <MudTextField T="string" Label="Username" Required="true" RequiredError="User name is required!" @bind-Value="Username" />
+            <MudText Align="Align.Center" GutterBottom="true" Typo="Typo.h2">Log in</MudText>
 
-            <MudTextField T="string" Label="Password" HelperText="Choose a strong password" @bind-Value="Password"
-            InputType="InputType.Password"
-            RequiredError="Password is required!" />
+            <MudGrid>
+                <MudItem md="12">
+                    <MudStaticTextField For="@(() => Input.Username)" @bind-Value="Input.Username"
+                    Label="User name"
+                    UserAttributes="@(new() { { "autocomplete", "username" }, { "aria-required", "true" } } )" />
+                </MudItem>
+                <MudItem md="12">
+                    <MudStaticTextField For="@(() => Input.Password)" @bind-Value="Input.Password" 
+                    Label="Password" InputType="InputType.Password" Placeholder="password" 
+                    UserAttributes="@(new() { { "autocomplete", "current-password" }, { "aria-required", "true" } } )" />
+                </MudItem>
+                <MudItem md="12">
+                    <MudStaticCheckBox For="@(() => Input.RememberMe)" @bind-Value="Input.RememberMe">Remember me</MudStaticCheckBox>
+                </MudItem>
+                <MudItem md="12">
+                    <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" FormAction="FormAction.Submit">Log in</MudStaticButton>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
 
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!valid)" Class="ml-auto" OnClick="LoginUser">Register</MudButton>
-        </MudForm>
-        @foreach (var error in errors)
-        {
-            <MudText Color="@Color.Error">@error</MudText>
-        }
-    </MudPaper>
-</MudContainer>
+        <MudGrid Class="mt-4">
+            <MudItem md="12">
+                @* <MudLink Href="Account/ForgotPassword">Forgot your password?</MudLink><br /> *@
+                <MudLink Href="/Account/Register">Don't have an account? Click to register.</MudLink>
+                @* <MudLink Href="Account/ResendEmailConfirmation">Resend email confirmation</MudLink> *@
+            </MudItem>
+        </MudGrid>
+    </MudItem>
+</MudGrid>
+
+
 
 @code {
-    string debugText;
+    private string? errorMessage;
 
-    bool valid;
-    string[] errors = { };
-    MudTextField<string> pwField1;
-    MudForm form;
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
 
-    private string Username;
-    private string Password;
+    [SupplyParameterFromForm]
+    private LoginViewModel Input { get; set; } = new();
 
-    private async Task LoginUser()
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    protected override async Task OnInitializedAsync()
     {
-        var user = await sign.UserManager.FindByNameAsync(Username);
-        if (user != null && user.IsBlocked)
-        {
-            errors = new string[] {"Account blocked!"};
-            snack.Add("Account blocked!", Severity.Error);
-            return;
-        }
-        bool success = user != null && sign.PasswordSignInAsync(user, Password, true, false).Result.Succeeded;
+        var user = (await asp.GetAuthenticationStateAsync()).User;
 
-        if (!success)
+        if (user.Identity.IsAuthenticated)
         {
-            errors = new string[] { "User name or password is incorrect!" };
-            snack.Add("User name or password is incorrect!", Severity.Error);
-            return;
+            await SignInManager.SignOutAsync();
+            NavigationManager.Refresh(forceReload: true);
         }
+    }
 
-        if (success)
+    public async Task LoginUser()
+    {
+        var result = await SignInManager.PasswordSignInAsync(Input.Username, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+        if (result.Succeeded)
         {
-            snack.Add("Successfully logged in!", Severity.Success);
-            nav.NavigateTo("/");
+            Logger.LogInformation("User logged in.");
+            NavigationManager.NavigateTo("/", forceLoad: true);
         }
+        else
+        {
+            SnackBar.Add("Login failed", Severity.Error);
+            errorMessage = "Error: Invalid login attempt.";
+        }
+    }
+
+    private sealed class LoginViewModel
+    {
+
+        public string Username { get; set; } = "";
+
+        public string Password { get; set; } = "";
+
+        public bool RememberMe { get; set; } = true;
 
     }
 }

@@ -1,6 +1,7 @@
-﻿@inherits LayoutComponentBase
+﻿@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inherits LayoutComponentBase
 
-@inject Blazored.LocalStorage.ILocalStorageService storage
+@inject ProtectedLocalStorage store
 
 @* Required *@
 <MudThemeProvider @bind-IsDarkMode="_isDarkMode"/>
@@ -8,6 +9,8 @@
 @code {
     private bool defaultDarkMode = true;
     public bool _isDarkMode;
+
+    public bool _drawerOpen = true;
 
     protected override void OnInitialized()
     {
@@ -18,21 +21,25 @@
     {
         if (!firstRender) return;
 
-        bool userThemeMode = await storage.GetItemAsync<bool>("isDarkMode");
-        if (userThemeMode == null)
+        var userThemeModeRes = await store.GetAsync<bool>("isDarkMode");
+
+        if (!userThemeModeRes.Success)
         {
-            await storage.SetItemAsync<bool>("isDarkMode", defaultDarkMode);
+            await store.SetAsync("isDarkMode", defaultDarkMode);
             _isDarkMode = defaultDarkMode;
         }
         else
         {
-            _isDarkMode = userThemeMode;
+            _isDarkMode = userThemeModeRes.Value;
         }
         StateHasChanged();
     }
-    public async Task FlipThemeMode(){
-        _isDarkMode ^= true;
-        await storage.SetItemAsync<bool>("isDarkMode", _isDarkMode);
+    public async Task<bool> FlipThemeMode(){
+        Console.WriteLine("FlipFlop!");
+        //_isDarkMode ^= true;
+        //await store.SetAsync("isDarkMode", _isDarkMode);
+        //StateHasChanged();
+        return _isDarkMode;
     }
 }
 
@@ -44,19 +51,11 @@
 @* Needed for snackbars *@
 <MudSnackbarProvider />
 
+
+
 <MudLayout>
     <MudAppBar Color="Color.Primary" Style="p-10">
-        <MudMenu Icon="@Icons.Material.Sharp.Menu" Size="Size.Large" Dense=true>
-            <AccountMenuButtons />
-            <MudMenuItem>
-                <MudButton OnClick="() => FlipThemeMode()"
-                           StartIcon="@(_isDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)"
-                           Variant="Variant.Text"
-                           Color="Color.Primary">
-                           @(_isDarkMode ? "Light Mode" : "Dark Mode")
-                       </MudButton>
-            </MudMenuItem>
-        </MudMenu>
+        <MudStaticNavDrawerToggle DrawerId="nav-drawer" Icon="@Icons.Material.Filled.MoreVert" Edge="Edge.Start"/>
         <MudSpacer />
         <TemplatesSearchBar />
         <MudSpacer />
@@ -64,6 +63,15 @@
             <MudText Typo="Typo.h6">WoasForms</MudText>
         </a>
     </MudAppBar>
+
+    <MudDrawer id="nav-drawer" Elevation="2" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always">
+        <MudContainer Class="justify-center">
+
+            <AccountDrawerButtons />
+            <MudStaticSwitch Size="Size.Medium" ThumbIcon="@Icons.Material.Outlined.DarkMode">Dark Mode (TBD)</MudStaticSwitch>       
+        </MudContainer>
+    </MudDrawer>
+
     <MudMainContent>
         @Body
     </MudMainContent>

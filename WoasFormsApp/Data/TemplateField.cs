@@ -1,6 +1,6 @@
 ﻿namespace WoasFormsApp.Data
 {
-    abstract public class TemplateField
+    public class TemplateField
     {
         public required int Id { get; set; }
 

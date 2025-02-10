@@ -29,6 +29,8 @@ namespace WoasFormsApp.Data
             builder.Entity<Template>().HasMany(t => t.Responses).WithOne(r => r.Template);
             builder.Entity<Template>().HasMany(t => t.Fields).WithOne(f => f.Template);
 
+            
+
             base.OnModelCreating(builder);
         }
 

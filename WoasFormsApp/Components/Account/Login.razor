@@ -1,6 +1,7 @@
 ﻿@page "/Account/Login"
 
 @inject SignInManager<WoasFormsAppUser> SignInManager
+@inject UserManager<WoasFormsAppUser> UserManager
 @inject AuthenticationStateProvider asp
 @inject ILogger<Login> Logger
 @inject NavigationManager NavigationManager
@@ -73,6 +74,13 @@
 
     public async Task LoginUser()
     {
+        var user = await UserManager.FindByNameAsync(Input.Username);
+        if (user != null && user.IsBlocked)
+        {
+            SnackBar.Add("User is Blocked", Severity.Error);
+            errorMessage = "Error: User is blocked.";
+            return;
+        }
         var result = await SignInManager.PasswordSignInAsync(Input.Username, Input.Password, Input.RememberMe, lockoutOnFailure: false);
         if (result.Succeeded)
         {

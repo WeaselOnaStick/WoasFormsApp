@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using MudBlazor
 @inherits LayoutComponentBase
 
 @inject ProtectedLocalStorage store
@@ -8,7 +9,7 @@
 
 @code {
     private bool defaultDarkMode = true;
-    public bool _isDarkMode;
+    public bool _isDarkMode { get; set; } = true;
 
     public bool _drawerOpen = true;
 
@@ -65,10 +66,13 @@
     </MudAppBar>
 
     <MudDrawer id="nav-drawer" Elevation="2" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always">
-        <MudContainer Class="justify-center">
-
+        <MudContainer Class="justify-center gap-4 p-1 m-1">
             <AccountDrawerButtons />
-            <MudStaticSwitch Size="Size.Medium" ThumbIcon="@Icons.Material.Outlined.DarkMode">Dark Mode (TBD)</MudStaticSwitch>       
+            <MudToggleIconButton @bind-Toggled="_isDarkMode" ToggledIcon="@Icons.Material.Filled.DarkMode" Icon="@Icons.Material.Outlined.LightMode"/>
+            <!-- 
+                MudToggleIconButton can't do anything because the MainLayout is static and Theme Provider can't update without interactivity
+            -->
+            @* <MudStaticSwitch Size="Size.Medium" ThumbIcon="@Icons.Material.Outlined.DarkMode">Dark Mode (TBD)</MudStaticSwitch>        *@
         </MudContainer>
     </MudDrawer>
 

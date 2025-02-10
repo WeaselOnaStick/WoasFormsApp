@@ -5,7 +5,7 @@ namespace WoasFormsApp.Services
     public interface IDatabaseAccessorService
     {
         Task CreateTemplate(Template template);
-        Task<List<Template>> GetAvailableTemplates();
+        Task<List<Template>?> GetAvailableTemplates();
         Task UpdateTemplate(int templateId, Template newTemplate);
         Task DeleteTemplate(int templateId);
         Task LikeTemplate(int templateId);

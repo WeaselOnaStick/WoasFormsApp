@@ -7,19 +7,19 @@
 
 <AuthorizeView Roles="Admin">
     <Authorized>
-        <MudButton Href="/Admin" Variant="Variant.Text" Color="@Color.Error" StartIcon="@Icons.Material.Filled.AdminPanelSettings" Style="p-2">Admin Panel</MudButton>
+        <MudButton Href="/AdminPanel" Variant="Variant.Filled" Color="@Color.Error" StartIcon="@Icons.Material.Filled.AdminPanelSettings" Style="p-2">Admin Panel</MudButton>
     </Authorized>
 </AuthorizeView>
 
 <AuthorizeView>
     <Authorized>
         <MudText>Logged in as @context.User.Identity?.Name</MudText>
-        <MudButton Href="/Account/Logout" Variant="Variant.Text" StartIcon="@Icons.Material.TwoTone.Logout" Style="p-2">Log Out</MudButton>
-        <MudButton Href="/MyTemplates" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Inventory" Style="p-2">My Templates</MudButton>
+        <MudButton Href="/Account/Logout" Variant="Variant.Filled" StartIcon="@Icons.Material.TwoTone.Logout" Style="p-2">Log Out</MudButton>
+        <MudButton Href="/MyTemplates" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Inventory" Style="p-2">My Templates</MudButton>
     </Authorized>
 
     <NotAuthorized>
-        <MudButton Href="Account/Login" Variant="Variant.Text" StartIcon="@Icons.Material.TwoTone.Login" Style="p-2">Sign In</MudButton>
+        <MudButton Href="Account/Login" Variant="Variant.Filled" StartIcon="@Icons.Material.TwoTone.Login" Style="p-2">Sign In</MudButton>
     </NotAuthorized>
 </AuthorizeView>
 

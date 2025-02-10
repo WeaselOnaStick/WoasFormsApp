@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using WoasFormsApp.Data;
 
 namespace WoasFormsApp.Services
@@ -8,45 +10,61 @@ namespace WoasFormsApp.Services
     {
         WoasFormsDbContext _ctx;
         AuthenticationStateProvider _asp;
+        UserManager<WoasFormsAppUser> _users;
 
-        public DatabaseAccessorService(WoasFormsDbContext context, AuthenticationStateProvider authenticationStateProvider)
+        public DatabaseAccessorService(
+            WoasFormsDbContext context, 
+            AuthenticationStateProvider authenticationStateProvider,
+            UserManager<WoasFormsAppUser> userManager)
         {
             _ctx = context;
             _asp = authenticationStateProvider;
+            _users = userManager;
         }
 
 
-        public Task CreateTemplate(Template template)
+        public async Task CreateTemplate(Template template)
         {
             throw new NotImplementedException();
         }
 
-        public Task<List<Template>> GetAvailableTemplates()
+        public async Task<List<Template>> GetAvailableTemplates()
+        {
+            
+            List<Template> res = await _ctx.Templates.Where(t => t.Public).ToListAsync();
+            var user = (await _asp.GetAuthenticationStateAsync()).User;
+            if (user.Identity.IsAuthenticated)
+            {
+                string userName = user.Identity.Name;
+                WoasFormsAppUser appUser = await _users.FindByNameAsync(userName);
+                Console.WriteLine($"Found user by id {appUser.UserName}");
+                res.Concat(_ctx.Templates.Where(t => !t.Public && t.AllowedUsers.Contains(appUser)));
+            }
+
+            return res;
+        }
+
+        public async Task UpdateTemplate(int templateId, Template newTemplate)
         {
             throw new NotImplementedException();
         }
 
-        public Task UpdateTemplate(int templateId, Template newTemplate)
+        public async Task DeleteTemplate(int templateId)
         {
             throw new NotImplementedException();
         }
 
-        public Task DeleteTemplate(int templateId)
+        public async Task LikeTemplate(int templateId)
         {
             throw new NotImplementedException();
         }
 
-        public Task LikeTemplate(int templateId)
+        public async Task UnLikeTemplate(int templateId)
         {
             throw new NotImplementedException();
         }
 
-        public Task UnLikeTemplate(int templateId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task CommentOnTemplate(int templateId, string commentText)
+        public async Task CommentOnTemplate(int templateId, string commentText)
         {
             throw new NotImplementedException();
         }

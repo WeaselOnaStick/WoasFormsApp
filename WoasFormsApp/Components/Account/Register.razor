@@ -1,9 +1,8 @@
 ﻿@page "/Account/Register"
-@attribute [ExcludeFromInteractiveRouting]
 
 @inject NavigationManager nav
 @inject AuthenticationStateProvider asp
-@inject SignInManager<WoasFormsAppUser> sign
+@inject UserManager<WoasFormsAppUser> userManager
 @inject ISnackbar snack
 
 <PageTitle>Register</PageTitle>
@@ -21,22 +20,34 @@
             Already have an account? Log in
         </MudLink>
 
-        <MudForm @ref="form" @bind-IsValid="@valid" @bind-Errors="@errors">
-            <MudTextField T="string" Label="Username" Required="true" RequiredError="User name is required!" @bind-Value="Username" Variant="Variant.Outlined" />
+        <EditForm Model="Input" method="post" OnValidSubmit="RegisterUser" FormName="register">
+            <MudGrid>
+                <MudItem md="12">
+                    <MudStaticTextField For="@(() => Input.Username)" @bind-Value="Input.Username"
+                                        Label="Username" Variant="Variant.Outlined"
+                                        UserAttributes="@(new() { { "autocomplete", "username" }, { "aria-required", "true" } } )" />
+                </MudItem>
+                <MudItem md="12">
+                    <MudStaticTextField For="@(() => Input.Email)" @bind-Value="Input.Email"
+                                        Label="Email" Placeholder="name@example.com" Variant="Variant.Outlined"
+                                        UserAttributes="@(new() { { "autocomplete", "username" }, { "aria-required", "true" } } )" />
+                </MudItem>
+                <MudItem md="12">
+                    <MudStaticTextField For="@(() => Input.Password)" @bind-Value="Input.Password"
+                                        Label="Password" InputType="InputType.Password" Placeholder="password" Variant="Variant.Outlined"
+                                        UserAttributes="@(new() { { "autocomplete", "new-password" }, { "aria-required", "true" } } )" />
+                </MudItem>
+                <MudItem md="12">
+                    <MudStaticTextField For="@(() => Input.ConfirmPassword)" @bind-Value="Input.ConfirmPassword"
+                                        Label="Confirm Password" InputType="InputType.Password" Placeholder="confirm password" Variant="Variant.Outlined"
+                                        UserAttributes="@(new() { { "autocomplete", "new-password" }, { "aria-required", "true" } } )" />
+                </MudItem>
+                <MudItem md="12">
+                    <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" FormAction="FormAction.Submit">Register</MudStaticButton>
+                </MudItem>
+            </MudGrid>
 
-            <MudTextField T="string" Label="Email" Required="true" RequiredError="Email is required!" @bind-Value="Email" Variant="Variant.Outlined"
-            Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})" />
-
-            <MudTextField T="string" Label="Password" HelperText="Choose a strong password" @ref="pwField1" @bind-Value="Password"
-                          InputType="InputType.Password" Variant="Variant.Outlined"
-            RequiredError="Password is required!" />
-
-            <MudTextField T="string" Variant="Variant.Outlined"
-            Label="Password" HelperText="Repeat the password" InputType="InputType.Password"
-            Validation="@(new Func<string, string>(PasswordMatch))" />
-
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="RegisterUser">Register</MudButton>
-        </MudForm>
+        </EditForm>
         @foreach (var error in errors)
         {
             <MudText Color="@Color.Error">@error</MudText>
@@ -47,29 +58,20 @@
 @code {
     string debugText;
 
+    [SupplyParameterFromForm]
+    RegisterViewModel Input { get; set; } = new();
+
     bool valid;
     string[] errors = { };
-    MudTextField<string> pwField1;
-    MudForm form;
 
-    private string Username;
-    private string Email;
-    private string Password;
-
-    private string PasswordMatch(string arg)
+    private async Task RegisterUser()
     {
-        if (pwField1.Value != arg)
-            return "Passwords don't match";
-        return null;
-    }
-
-    private async Task RegisterUser(){
         WoasFormsAppUser newUser = new WoasFormsAppUser {
-                UserName = Username,
-                Email = Email,
+                UserName = Input.Username,
+                Email = Input.Email,
                 IsBlocked = false,
             };
-        var res = await sign.UserManager.CreateAsync(newUser, Password);
+        var res = await userManager.CreateAsync(newUser, Input.Password);
         if (res.Succeeded)
         {
             snack.Add("Account created!", Severity.Success);
@@ -80,6 +82,29 @@
             snack.Add("There were errors creating the account!", Severity.Error);
             errors = res.Errors.Select(e => e.Description).ToArray();
         }
-        
+
+    }
+
+    private class RegisterViewModel
+    {
+        [Required]
+        [Display(Name = "Username")]
+        public string Username { get; set; } = "";
+
+        [Required]
+        [EmailAddress]
+        [Display(Name = "Email")]
+        public string Email { get; set; } = "";
+
+        [Required]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 3)]
+        [DataType(DataType.Password)]
+        [Display(Name = "Password")]
+        public string Password { get; set; } = "";
+
+        [DataType(DataType.Password)]
+        [Display(Name = "Confirm password")]
+        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        public string ConfirmPassword { get; set; } = "";
     }
 }

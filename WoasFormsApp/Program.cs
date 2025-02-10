@@ -3,14 +3,17 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
-using WoasFormsApp.Client.Pages;
+using WoasFormsApp;
 using WoasFormsApp.Components;
 using WoasFormsApp.Data;
 using WoasFormsApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddMudServices();
+builder.Services.AddMudServices(config =>
+{
+    config.SnackbarConfiguration.PositionClass = MudBlazor.Defaults.Classes.Position.BottomStart;
+});
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -63,6 +66,8 @@ builder.Services.AddIdentityCore<WoasFormsAppUser>(options =>
     .AddEntityFrameworkStores<WoasFormsDbContext>()
     .AddRoles<IdentityRole>()
     .AddRoleManager<RoleManager<IdentityRole>>()
+    .AddRoleStore<RoleStore<IdentityRole, WoasFormsDbContext>>()
+    .AddUserStore<UserStore<WoasFormsAppUser, IdentityRole, WoasFormsDbContext>>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
 
@@ -91,9 +96,11 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
-    .AddInteractiveWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(WoasFormsApp.Client._Imports).Assembly);
+    .AddInteractiveWebAssemblyRenderMode();
 
-
+using (var scope = app.Services.CreateScope())
+{
+    await Seeder.SeedRoles(scope.ServiceProvider);
+}
 
 app.Run();

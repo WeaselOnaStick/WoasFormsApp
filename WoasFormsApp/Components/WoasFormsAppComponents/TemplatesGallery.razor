@@ -1,15 +1,23 @@
-﻿@using Bogus
-@using WoasFormsApp.Data
+﻿@using WoasFormsApp.Data
+@using WoasFormsApp.Services
 
 @inject NavigationManager nav
+@inject IDatabaseAccessorService dba
 @attribute [StreamRendering]
 
 @if (templates != null && templates.Count == 0) // 0 Templates loaded
 {
-    <MudPaper Class="d-flex flex-column pa-4 mx-auto align-center gap-4" Style="max-width: fit-content">
+    <MudPaper Class="d-flex flex-column pa-4 mx-auto align-center gap-4 justify-center text-center" Style="max-width: fit-content" Elevation="2">
         <MudText Typo="Typo.h4">No templates yet...</MudText>
         <MudText Typo="Typo.h5">Be the first one to create!</MudText>
-        <MudButton Variant="Variant.Filled">Create Template</MudButton>
+        <AuthorizeView>
+            <Authorized>
+                <MudButton Href="/Template/Create" Variant="Variant.Filled">Create Template</MudButton>
+            </Authorized>
+            <NotAuthorized>
+                <MudButton Href="/Account/Login" Variant="Variant.Filled" Color="Color.Info">Log in to Create Template</MudButton>
+            </NotAuthorized>
+        </AuthorizeView>
     </MudPaper>
 }
 else
@@ -51,7 +59,12 @@ else
                             <MudText Typo="Typo.body2">Some Douchebag</MudText>
                         </MudCardContent>
                         <MudCardActions style="flex-direction: column; align-items: center">
-                            <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="() => OpenTemplate(realIndex)">Fill out</MudButton>
+                            <AuthorizeView Roles="Admin">
+                                <Authorized>
+                                    <MudButton Variant="Variant.Filled" Color="Color.Error" Href="@($"/Template/Edit/{templates[realIndex].Id}")">Edit</MudButton>
+                                </Authorized>
+                            </AuthorizeView>
+                            <MudButton Variant="Variant.Filled" Color="Color.Info" Href="@($"/Template/Fill/{templates[realIndex].Id}")">Fill out</MudButton>
                         </MudCardActions>
                     </MudCard>
                 </MudItem>
@@ -61,24 +74,15 @@ else
 }
 
 @code {
-    int bogusTemplatesAmt = 32;
     int skeletonsCount = 12;
 
-    List<Template> templates;
+    List<Template> templates = new();
 
     protected override async Task OnInitializedAsync()
     {
-        var startID = 0;
-        var f = new Faker<Template>()
-        .RuleFor(t => t.Id, f => startID++)
-        .RuleFor(t => t.Title, f => $"{f.Hacker.Adjective()} {f.Hacker.Noun()}")
-        .RuleFor(t => t.TopicId, f => 0);
-
-        templates = f.Generate(bogusTemplatesAmt);
+        await base.OnInitializedAsync();
+        var foundTemplates = await dba.GetAvailableTemplates();
+        templates = foundTemplates == null ? new List<Template>() : foundTemplates;
         StateHasChanged();
-    }
-
-    public void OpenTemplate(int idx){
-        nav.NavigateTo($"/FillForm/{templates[idx].Id}");
     }
 }

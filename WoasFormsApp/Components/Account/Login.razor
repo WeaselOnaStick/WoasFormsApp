@@ -13,7 +13,6 @@
     <MudItem md="6">
         <StatusMessage Message="@errorMessage" />
         <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
-            <AntiforgeryToken />
             <DataAnnotationsValidator />
 
             <MudText Align="Align.Center" GutterBottom="true" Typo="Typo.h2">Log in</MudText>

@@ -1,0 +1,69 @@
+﻿@inject Blazored.LocalStorage.ILocalStorageService storage
+@inject NavigationManager nav
+@rendermode InteractiveServer
+
+<MudThemeProvider @bind-IsDarkMode="_isDarkMode" @rendermode="InteractiveServer" />
+
+<MudStack Row="true" Justify="Justify.Center">
+    <MudToggleIconButton hidden="@isButtonHidden" @onclick="OnModeToggleClick" @bind-Toggled="_isDarkMode" ToggledIcon="@Icons.Material.Filled.DarkMode" Icon="@Icons.Material.Outlined.LightMode" />
+</MudStack>
+
+@code {
+    private bool _isDarkMode { get; set; } = true;
+    private bool _siteBlacklisted;
+
+    private bool isButtonHidden { get; set; }
+
+    private void BlacklistEnforce()
+    {
+        bool isBlacklisted = nav.ToBaseRelativePath(nav.Uri).StartsWith("Account/", StringComparison.OrdinalIgnoreCase);
+        isButtonHidden = isBlacklisted;
+        _siteBlacklisted = isBlacklisted;
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        BlacklistEnforce();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        if (_siteBlacklisted) return;
+
+        bool storedMode = await storage.GetItemAsync<bool>("DarkMode");
+        if (storedMode == null) 
+        {
+            await storage.SetItemAsync("DarkMode", _isDarkMode);
+            storedMode = _isDarkMode;
+        }
+        _isDarkMode = storedMode;
+        StateHasChanged();
+    }
+
+    private async Task OnModeToggleClick(MouseEventArgs e)
+    {
+        if (_siteBlacklisted) return;
+        bool storedMode = await storage.GetItemAsync<bool>("DarkMode");
+        if (storedMode == null)
+        {
+            await storage.SetItemAsync("DarkMode", _isDarkMode);
+            storedMode = _isDarkMode;
+        }
+        _isDarkMode = !storedMode;
+        await storage.SetItemAsync("DarkMode", _isDarkMode);
+        StateHasChanged();
+    }
+
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (!firstRender) return;
+    //     bool storedMode = await storage.GetItemAsync<bool>("DarkMode");
+    //     if (storedMode == null) await storage.SetItemAsync<bool>("DarkMode", DefaultDarkMode);
+
+    //     _isDarkMode = storedMode;
+    //     StateHasChanged();
+    // }
+
+}

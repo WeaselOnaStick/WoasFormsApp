@@ -3,58 +3,40 @@
 @using WoasFormsApp.Services
 @inherits LayoutComponentBase
 
-@inject ThemeService themeService
+@inject Blazored.LocalStorage.ILocalStorageService storage;
 @inject NavigationManager nav
 
-@* Required *@
-<MudThemeProvider @bind-IsDarkMode="_isDarkMode" />
 
 @code {
-    private bool _isDarkMode = true;
-
     public bool _drawerOpen = true;
-
-    protected override async Task OnInitializedAsync()
-    {
-        bool storedMode = themeService.GetDarkMode();
-        _isDarkMode = storedMode;
-    }
 }
 
-<MudPopoverProvider />
+<MudPopoverProvider @rendermode="InteractiveServer"/>
 
 @* Needed for dialogs *@
-<MudDialogProvider />
+<MudDialogProvider @rendermode="InteractiveServer" />
 
 @* Needed for snackbars *@
-<MudSnackbarProvider />
+<MudSnackbarProvider @rendermode="InteractiveServer" />
 
 
 
 <MudLayout>
     <MudAppBar Color="Color.Primary" Style="p-10">
-        <MudStaticNavDrawerToggle DrawerId="nav-drawer" Icon="@Icons.Material.Filled.MoreVert" Edge="Edge.Start"/>
+        <MudStaticNavDrawerToggle DrawerId="nav-drawer" Icon="@Icons.Material.Filled.Menu" Edge="Edge.Start"/>
         <MudSpacer />
         <TemplatesSearchBar />
         <MudSpacer />
-        <a href="/">
+        <a href="/" data-enhance-nav="false">
             <MudText Typo="Typo.h6">WoasForms</MudText>
         </a>
     </MudAppBar>
 
-    <MudDrawer id="nav-drawer" Elevation="2" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Class="pa-4">
+    <MudDrawer id="nav-drawer" Elevation="2" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Class="pa-4" data-enhance-nav="false">
         <MudStack>
             <MudButton Href="/" StartIcon="@Icons.Material.Filled.Home" Variant="Variant.Filled">Browse Templates</MudButton>
-            <AccountDrawerButtons />
-            <a href="/FlipTheme">
-                <MudToggleIconButton @bind-Toggled="_isDarkMode" ToggledIcon="@Icons.Material.Filled.DarkMode" Icon="@Icons.Material.Outlined.LightMode"/>
-            </a>
-            <!-- 
-            MudToggleIconButton can't do anything because the MainLayout is static and Theme Provider can't update without interactivity
-            
-            <MudButton @onclick="() => OnThemeClick()" StartIcon="@Icons.Material.Filled.DarkMode">Flip Theme</MudButton>
-            <MudStaticSwitch @bind-Value="@IsDarkMode" Size="Size.Medium" ThumbIcon="@Icons.Material.Outlined.DarkMode">Dark Mode (TBD)</MudStaticSwitch>
-            -->
+            <AccountDrawerButtons @rendermode="InteractiveServer"/>
+            <ThemeToggleButton />
         </MudStack>
     </MudDrawer>
 

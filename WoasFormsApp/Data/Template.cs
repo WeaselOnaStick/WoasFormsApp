@@ -1,8 +1,10 @@
-﻿namespace WoasFormsApp.Data
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace WoasFormsApp.Data
 {
     public class Template
     {
-        public required int Id { get; set; }
+        public int Id { get; set; }
 
         public WoasFormsAppUser Owner { get; set; }
 

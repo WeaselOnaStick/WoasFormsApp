@@ -2,7 +2,7 @@
 {
     public class TemplateComment
     {
-        public required int Id { get; set; }
+        public int Id{ get; set; }
         
         public required WoasFormsAppUser User { get; set; }
 

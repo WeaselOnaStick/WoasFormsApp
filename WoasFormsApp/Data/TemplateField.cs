@@ -2,7 +2,7 @@
 {
     public class TemplateField
     {
-        public required int Id { get; set; }
+        public int Id{ get; set; }
 
         public required Template Template { get; set; }
         
@@ -18,7 +18,7 @@
 
     public class TemplateFieldType
     {
-        public required int Id { get; set; }
+        public int Id{ get; set; }
         public required string Name { get; set; }
     }
 }

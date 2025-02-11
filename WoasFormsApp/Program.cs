@@ -92,6 +92,8 @@ else
 
 //app.UseHttpsRedirection();
 
+app.UseStatusCodePagesWithRedirects("/404");
+
 
 app.UseAntiforgery();
 

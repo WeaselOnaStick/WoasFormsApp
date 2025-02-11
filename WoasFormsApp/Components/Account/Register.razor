@@ -21,6 +21,7 @@
         </MudLink>
 
         <EditForm Model="Input" method="post" OnValidSubmit="RegisterUser" FormName="register">
+            <AntiforgeryToken />
             <MudGrid>
                 <MudItem md="12">
                     <MudStaticTextField For="@(() => Input.Username)" @bind-Value="Input.Username"

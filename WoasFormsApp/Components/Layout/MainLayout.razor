@@ -1,46 +1,23 @@
 ﻿@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using MudBlazor
+@using WoasFormsApp.Services
 @inherits LayoutComponentBase
 
-@inject ProtectedLocalStorage store
+@inject ThemeService themeService
+@inject NavigationManager nav
 
 @* Required *@
-<MudThemeProvider @bind-IsDarkMode="_isDarkMode"/>
+<MudThemeProvider @bind-IsDarkMode="_isDarkMode" />
 
 @code {
-    private bool defaultDarkMode = true;
-    public bool _isDarkMode { get; set; } = true;
+    private bool _isDarkMode = true;
 
     public bool _drawerOpen = true;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        _isDarkMode = defaultDarkMode;
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!firstRender) return;
-
-        var userThemeModeRes = await store.GetAsync<bool>("isDarkMode");
-
-        if (!userThemeModeRes.Success)
-        {
-            await store.SetAsync("isDarkMode", defaultDarkMode);
-            _isDarkMode = defaultDarkMode;
-        }
-        else
-        {
-            _isDarkMode = userThemeModeRes.Value;
-        }
-        StateHasChanged();
-    }
-    public async Task<bool> FlipThemeMode(){
-        Console.WriteLine("FlipFlop!");
-        //_isDarkMode ^= true;
-        //await store.SetAsync("isDarkMode", _isDarkMode);
-        //StateHasChanged();
-        return _isDarkMode;
+        bool storedMode = themeService.GetDarkMode();
+        _isDarkMode = storedMode;
     }
 }
 
@@ -65,15 +42,20 @@
         </a>
     </MudAppBar>
 
-    <MudDrawer id="nav-drawer" Elevation="2" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always">
-        <MudContainer Class="justify-center gap-4 p-1 m-1">
+    <MudDrawer id="nav-drawer" Elevation="2" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Class="pa-4">
+        <MudStack>
+            <MudButton Href="/" StartIcon="@Icons.Material.Filled.Home" Variant="Variant.Filled">Browse Templates</MudButton>
             <AccountDrawerButtons />
-            <MudToggleIconButton @bind-Toggled="_isDarkMode" ToggledIcon="@Icons.Material.Filled.DarkMode" Icon="@Icons.Material.Outlined.LightMode"/>
+            <a href="/FlipTheme">
+                <MudToggleIconButton @bind-Toggled="_isDarkMode" ToggledIcon="@Icons.Material.Filled.DarkMode" Icon="@Icons.Material.Outlined.LightMode"/>
+            </a>
             <!-- 
-                MudToggleIconButton can't do anything because the MainLayout is static and Theme Provider can't update without interactivity
+            MudToggleIconButton can't do anything because the MainLayout is static and Theme Provider can't update without interactivity
+            
+            <MudButton @onclick="() => OnThemeClick()" StartIcon="@Icons.Material.Filled.DarkMode">Flip Theme</MudButton>
+            <MudStaticSwitch @bind-Value="@IsDarkMode" Size="Size.Medium" ThumbIcon="@Icons.Material.Outlined.DarkMode">Dark Mode (TBD)</MudStaticSwitch>
             -->
-            @* <MudStaticSwitch Size="Size.Medium" ThumbIcon="@Icons.Material.Outlined.DarkMode">Dark Mode (TBD)</MudStaticSwitch>        *@
-        </MudContainer>
+        </MudStack>
     </MudDrawer>
 
     <MudMainContent>

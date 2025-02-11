@@ -13,7 +13,10 @@
 
 <AuthorizeView>
     <Authorized>
-        <MudText>Logged in as @context.User.Identity?.Name</MudText>
+        <MudStack Row="true">
+            <MudIcon Icon="@Icons.Material.Filled.Person"/>
+            <MudText Align="Align.Center">Logged in as @context.User.Identity?.Name</MudText>
+        </MudStack>
         <MudButton Href="/Account/Logout" Variant="Variant.Filled" StartIcon="@Icons.Material.TwoTone.Logout" Style="p-2">Log Out</MudButton>
         <MudButton Href="/MyTemplates" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Inventory" Style="p-2">My Templates</MudButton>
     </Authorized>

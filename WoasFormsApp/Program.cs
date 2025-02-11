@@ -46,6 +46,8 @@ builder.Services.AddDbContext<WoasFormsDbContext>(options =>
 
 builder.Services.AddScoped<IDatabaseAccessorService, DatabaseAccessorService>();
 
+builder.Services.AddScoped<ThemeService>();
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddScoped<IRoleStore<IdentityRole>, RoleStore<IdentityRole, WoasFormsDbContext>>();

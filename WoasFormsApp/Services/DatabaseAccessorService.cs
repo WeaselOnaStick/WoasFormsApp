@@ -22,6 +22,16 @@ namespace WoasFormsApp.Services
             _users = userManager;
         }
 
+        private async Task<WoasFormsAppUser> GetCurrentUserAsync()
+        {
+            var user = (await _asp.GetAuthenticationStateAsync()).User;
+            string userName = user.Identity.Name;
+            return await _users.FindByNameAsync(userName);
+        }
+
+        private async Task<WoasFormsAppUser> GetUserById(string userId) => await _users.FindByIdAsync(userId);
+
+        private async Task<Template> GetTemplateById(int templateId) => await _ctx.Templates.FindAsync(templateId);
 
         public async Task CreateTemplate(Template template)
         {
@@ -30,17 +40,13 @@ namespace WoasFormsApp.Services
 
         public async Task<List<Template>> GetAvailableTemplates()
         {
-            
             List<Template> res = await _ctx.Templates.Where(t => t.Public).ToListAsync();
-            var user = (await _asp.GetAuthenticationStateAsync()).User;
-            if (user.Identity.IsAuthenticated)
+            var appUser = await GetCurrentUserAsync();
+            if (appUser != null)
             {
-                string userName = user.Identity.Name;
-                WoasFormsAppUser appUser = await _users.FindByNameAsync(userName);
-                Console.WriteLine($"Found user by id {appUser.UserName}");
+                Console.WriteLine($"Found user by id {appUser.UserName}. Adding allowed private templates.");
                 res.Concat(_ctx.Templates.Where(t => !t.Public && t.AllowedUsers.Contains(appUser)));
             }
-
             return res;
         }
 
@@ -51,22 +57,91 @@ namespace WoasFormsApp.Services
 
         public async Task DeleteTemplate(int templateId)
         {
-            throw new NotImplementedException();
+            var template = GetTemplateById(templateId);
+            if (template == null) return;
+            _ctx.Remove(template);
+            await _ctx.SaveChangesAsync();
+            
+            //Soft delete. Enabling would require migration (currently owner can't be null)
+            //var owner = template.Owner;
+            //if (owner == null) return;
+            //template.Owner = null;
+        }
+
+        private async Task ToggleTemplateLike(int templateId, bool liked)
+        {
+            var appUser = await GetCurrentUserAsync();
+            if (appUser == null) return;
+            var template = await GetTemplateById(templateId);
+            if (template == null) return;
+            
+            if (liked)
+                template.UsersWhoLiked.Add(appUser);
+            else
+                template.UsersWhoLiked.Remove(appUser);
+
+            await _ctx.SaveChangesAsync();
         }
 
         public async Task LikeTemplate(int templateId)
         {
-            throw new NotImplementedException();
+            ToggleTemplateLike(templateId, true);
         }
 
         public async Task UnLikeTemplate(int templateId)
         {
-            throw new NotImplementedException();
+            ToggleTemplateLike(templateId, false);
         }
 
         public async Task CommentOnTemplate(int templateId, string commentText)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(commentText)) return;
+            var appUser = await GetCurrentUserAsync();
+            if (appUser == null) return;
+            var template = await GetTemplateById(templateId);
+            if (template == null) return;
+
+            template.Comments.Add(new TemplateComment
+            {
+                PostedAt = DateTime.UtcNow,
+                User = appUser,
+                Template = template,
+                Text = commentText,
+            });
+            await _ctx.SaveChangesAsync();
         }
+
+        public async Task<List<WoasFormsAppUser>> GetAllUsers()
+        {
+            return await _users.Users.ToListAsync();
+        }
+
+        public async Task DeleteUser(string userId)
+        {
+            _ctx.Users.Remove(await GetUserById(userId));
+            await _ctx.SaveChangesAsync();
+        }
+
+        public async Task GiveUserRole(string userId, string roleName)
+        {
+            await _users.AddToRoleAsync(await GetUserById(userId), roleName);
+            await _ctx.SaveChangesAsync();
+        }
+
+        public async Task RevokeUserRole(string userId, string roleName)
+        {
+            await _users.RemoveFromRoleAsync(await GetUserById(userId), roleName);
+            await _ctx.SaveChangesAsync();
+        }
+
+        public async Task BlockUser(string userId, bool blocked)
+        {
+            (await GetUserById(userId)).IsBlocked = blocked;
+            await _ctx.SaveChangesAsync();
+        }
+
+        public async Task BlockUser(string userId) => await BlockUser(userId, true);
+
+        public async Task UnblockUser(string userId) => await BlockUser(userId, false);
     }
 }

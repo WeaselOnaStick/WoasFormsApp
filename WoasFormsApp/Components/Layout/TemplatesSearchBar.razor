@@ -31,6 +31,6 @@ Color="@Color.Inherit"
             {"search" , searchText },
         };
         var uriWithParams = nav.GetUriWithQueryParameters(baseUri, searchParams);
-        nav.NavigateTo(uriWithParams, forceLoad: true);
+        nav.NavigateTo(uriWithParams, forceLoad: false);
     }
 }

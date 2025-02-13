@@ -7,7 +7,7 @@
 
 <AuthorizeView Roles="Admin">
     <Authorized>
-        <MudButton Href="/AdminPanel" Variant="Variant.Filled" Color="@Color.Error" StartIcon="@Icons.Material.Filled.AdminPanelSettings" Style="p-2">Admin Panel</MudButton>
+        <MudButton Href="/Admin/Dashboard" Variant="Variant.Filled" Color="@Color.Error" StartIcon="@Icons.Material.Filled.AdminPanelSettings" Style="p-2">Admin Panel</MudButton>
     </Authorized>
 </AuthorizeView>
 
@@ -17,12 +17,16 @@
             <MudIcon Icon="@Icons.Material.Filled.Person"/>
             <MudText Align="Align.Center">Logged in as @context.User.Identity?.Name</MudText>
         </MudStack>
-        <MudButton Href="/Account/Logout" Variant="Variant.Filled" StartIcon="@Icons.Material.TwoTone.Logout" Style="p-2">Log Out</MudButton>
+        <form action="Account/Logout" method="post">
+            <button type="submit" style="width: 100%">
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.TwoTone.Logout" Style="p-2; width: 100%" >Log Out</MudButton>
+            </button>
+        </form>
         <MudButton Href="/MyTemplates" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Inventory" Style="p-2">My Templates</MudButton>
     </Authorized>
 
     <NotAuthorized>
-        <MudButton Href="Account/Login" Variant="Variant.Filled" StartIcon="@Icons.Material.TwoTone.Login" Style="p-2">Sign In</MudButton>
+        <MudButton Href="/Account/Login" Variant="Variant.Filled" StartIcon="@Icons.Material.TwoTone.Login" Style="p-2">Sign In</MudButton>
     </NotAuthorized>
 </AuthorizeView>
 
@@ -31,6 +35,6 @@
     public async Task LogOut()
     {
         await SignInManager.SignOutAsync();
-        Nav.NavigateTo("/");
+        Nav.NavigateTo("/", forceLoad: true);
     }
 }

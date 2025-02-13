@@ -10,6 +10,8 @@ using WoasFormsApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddScoped<IThemeCacheService, ThemeCacheService>();
+
 builder.Services.AddMudServices(config =>
 {
     config.SnackbarConfiguration.PositionClass = MudBlazor.Defaults.Classes.Position.BottomStart;
@@ -50,8 +52,6 @@ builder.Services.AddDbContext<WoasFormsDbContext>(options =>
 });
 
 builder.Services.AddScoped<IDatabaseAccessorService, DatabaseAccessorService>();
-
-builder.Services.AddScoped<ThemeService>();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -106,6 +106,8 @@ app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode();
+
+app.MapAdditionalIdentityEndpoints();
 
 using (var scope = app.Services.CreateScope())
 {

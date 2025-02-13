@@ -1,15 +1,28 @@
 ﻿@inject Blazored.LocalStorage.ILocalStorageService storage
+@inject IThemeCacheService ThemeCacheService
 @inject NavigationManager nav
-@rendermode InteractiveServer
+
 
 <MudThemeProvider @bind-IsDarkMode="_isDarkMode" @rendermode="InteractiveServer" />
 
-<MudStack Row="true" Justify="Justify.Center">
-    <MudToggleIconButton hidden="@isButtonHidden" @onclick="OnModeToggleClick" @bind-Toggled="_isDarkMode" ToggledIcon="@Icons.Material.Filled.DarkMode" Icon="@Icons.Material.Outlined.LightMode" />
+
+<MudToggleIconButton hidden="@isButtonHidden" @onclick="OnModeToggleClick" @bind-Toggled="_isDarkMode" ToggledIcon="@Icons.Material.Filled.DarkMode" Icon="@Icons.Material.Outlined.LightMode">Toggle</MudToggleIconButton>
+<MudStack>
+    <div>
+        <MudText Typo="Typo.subtitle1">ServiceInit: @ThemeCacheService.Initialized</MudText>
+        <MudIcon Icon="@(ThemeCacheService.Initialized ? Icons.Material.Filled.Check : Icons.Material.Filled.Close)" />
+    </div>
+    <div>
+        <MudText Typo="Typo.subtitle1">ServiceMode: @ThemeCacheService.CachedMode</MudText>
+
+        <MudIcon Icon="@(ThemeCacheService.Initialized ? Icons.Material.Outlined.DarkMode : Icons.Material.Outlined.LightMode)" />
+    </div>
 </MudStack>
 
+
+
 @code {
-    private bool _isDarkMode { get; set; } = true;
+    private bool _isDarkMode { get; set; }
     private bool _siteBlacklisted;
 
     private bool isButtonHidden { get; set; }
@@ -25,45 +38,33 @@
     protected override async Task OnInitializedAsync()
     {
         BlacklistEnforce();
+        if (_siteBlacklisted) return;
+        if (ThemeCacheService.Initialized)
+        {
+            _isDarkMode = ThemeCacheService.CachedMode;
+            StateHasChanged();
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
         if (_siteBlacklisted) return;
-
-        bool storedMode = await storage.GetItemAsync<bool>("DarkMode");
-        if (storedMode == null) 
+        if (!ThemeCacheService.Initialized)
         {
-            await storage.SetItemAsync("DarkMode", _isDarkMode);
-            storedMode = _isDarkMode;
+            await ThemeCacheService.InitializeAsync();
         }
-        _isDarkMode = storedMode;
-        StateHasChanged();
+        if (_isDarkMode != ThemeCacheService.CachedMode)
+        {
+            _isDarkMode = ThemeCacheService.CachedMode;
+            StateHasChanged();
+        }
     }
 
     private async Task OnModeToggleClick(MouseEventArgs e)
     {
-        if (_siteBlacklisted) return;
-        bool storedMode = await storage.GetItemAsync<bool>("DarkMode");
-        if (storedMode == null)
-        {
-            await storage.SetItemAsync("DarkMode", _isDarkMode);
-            storedMode = _isDarkMode;
-        }
-        _isDarkMode = !storedMode;
-        await storage.SetItemAsync("DarkMode", _isDarkMode);
+        _isDarkMode ^= true;
+        await ThemeCacheService.SetCachedValueAsync(_isDarkMode);
         StateHasChanged();
     }
-
-    // protected override async Task OnAfterRenderAsync(bool firstRender)
-    // {
-    //     if (!firstRender) return;
-    //     bool storedMode = await storage.GetItemAsync<bool>("DarkMode");
-    //     if (storedMode == null) await storage.SetItemAsync<bool>("DarkMode", DefaultDarkMode);
-
-    //     _isDarkMode = storedMode;
-    //     StateHasChanged();
-    // }
-
 }

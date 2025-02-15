@@ -10,6 +10,7 @@ Adornment="Adornment.End"
 AdornmentIcon="@Icons.Material.Filled.Search"
 Placeholder="Search for templates"
 OnAdornmentClick="Search"
+OnKeyDown="EnterKey"
 Color="@Color.Inherit"
 />
 
@@ -18,6 +19,10 @@ Color="@Color.Inherit"
 @code {
     string searchText;
     MudTextField<string> searchField;
+
+    public void EnterKey(KeyboardEventArgs args){
+        if (args.Code == "Enter") Search();
+    }
 
     public void Search()
     {
@@ -31,6 +36,8 @@ Color="@Color.Inherit"
             {"search" , searchText },
         };
         var uriWithParams = nav.GetUriWithQueryParameters(baseUri, searchParams);
+        searchText = "";
+        StateHasChanged();
         nav.NavigateTo(uriWithParams, forceLoad: false);
     }
 }

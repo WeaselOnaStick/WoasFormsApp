@@ -1,0 +1,43 @@
+﻿@inject IDatabaseAccessorService dba
+
+<MudPaper Elevation="5">
+    <MudStack Spacing="2">
+        <MudText Class="p-2" Typo="Typo.h4">@Field.Title</MudText>
+        <MudText Class="p-2" Typo="Typo.subtitle2">@Field.Description</MudText>
+
+        @switch (@Field.Type.Name)
+        {
+            case "SingleLine":
+                <MudTextField Class="p-2" T="string" ReadOnly="@ReadOnly" Variant="Variant.Outlined" For="@(() => ResponseModel.Answers[FieldIndex].AnswerSingleLine)"/>
+                break;
+            case "MultiLine":
+                <MudTextField Class="p-2" T="string" ReadOnly="@ReadOnly" Lines="3" Variant="Variant.Outlined" For="@(() => ResponseModel.Answers[FieldIndex].AnswerSingleLine)" />
+                break;
+            case "PositiveInt":
+                <MudNumericField Class="p-2" T="int?" ReadOnly="@ReadOnly" Min="1" Variant="Variant.Outlined" For="@(() => ResponseModel.Answers[FieldIndex].AnswerPositiveInt)" />
+                break;
+            case "CheckBox":
+                <MudCheckBox Class="p-2" T="bool?" ReadOnly="@ReadOnly" For="@(() => ResponseModel.Answers[FieldIndex].AnswerCheckedBox)" />
+                break;
+        }
+
+    </MudStack>
+</MudPaper>
+
+@code {
+
+    [Parameter, EditorRequired]
+    public required Template TemplateModel { get; set; }
+
+    [Parameter, EditorRequired]
+    public required Response ResponseModel { get; set; }
+
+    [Parameter, EditorRequired]
+    public required int FieldIndex { get; set; }
+
+    [Parameter, EditorRequired]
+    public TemplateField Field { get; set; }
+
+    [Parameter]
+    public bool ReadOnly { get; set; } = false;
+}

@@ -2,22 +2,24 @@
 {
     public class Response
     {
-        public int Id{ get; set; }
+        public int Id { get; set; }
 
-        public required Template Template { get; set; }
+        public DateTime CreationDate { get; set; } = DateTime.UnixEpoch;
 
-        public ICollection<ResponseAnswer> Answers {  get; set; }
+        public Template? Template { get; set; }
+
+        public List<ResponseAnswer> Answers {  get; set; } = new List<ResponseAnswer>();
     }
 
     public class ResponseAnswer
     {
-        public int Id{ get; set; }
+        public int Id { get; set; }
 
-        public required TemplateField Field { get; set; }
+        public TemplateField Field { get; set; }
 
-        public string?          AnswerSingleLine    { get; set; }
-        public string?          AnswerMultiLine     { get; set; }
-        public int?             AnswerPositiveInt   { get; set; }
-        public ICollection<int> AnswerCheckedBoxes  { get; set; }
+        public string?  AnswerSingleLine    { get; set; }
+        public string?  AnswerMultiLine     { get; set; }
+        public int?     AnswerPositiveInt   { get; set; }
+        public bool?    AnswerCheckedBox    { get; set; }
     }
 }

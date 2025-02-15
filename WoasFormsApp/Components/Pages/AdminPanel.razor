@@ -1,9 +1,63 @@
-﻿@page "/AdminPanel"
+﻿@page "/Admin/Dashboard"
+@rendermode InteractiveServer
+@inject IDatabaseAccessorService dba
+@inject UserManager<WoasFormsAppUser> userManager
 
-<h3>AdminPanel</h3>
+@attribute [Authorize(Roles = "Admin")]
 
+<PageTitle>Admin Control Panel</PageTitle>
 
+<MudPaper Class="d-flex flex-column pa-4 mx-auto align-center gap-4 justify-center text-center" Style="max-width: fit-content">
+
+    <MudText Typo="Typo.h2" Align="Align.Center">Admin Dashboard</MudText>
+
+    <MudDataGrid T="UserViewModel" Items="@usersViewModels">
+        <Columns>
+            <PropertyColumn Title="Username" Property="x => x.Name" />
+            <PropertyColumn Title="Email" Property="x => x.Email" />
+            <PropertyColumn Title="Owned Templates" Property="x => x.Templates.Count" />
+             <TemplateColumn Title="Roles">
+                 <CellTemplate>
+                     <MudStack Row="true">
+                        @foreach (string roleName in context.Item.Roles)
+                        {
+                            <MudChip T="string" Color="Color.Primary">@roleName</MudChip>
+                        }
+                     </MudStack>
+                 </CellTemplate>
+             </TemplateColumn>
+        </Columns>
+    </MudDataGrid>
+</MudPaper>
 
 @code {
+    //private MudDataGrid<UserViewModel> grid
+    private List<UserViewModel> usersViewModels;
 
+    protected override async Task OnInitializedAsync()
+    {
+        usersViewModels = new List<UserViewModel>();
+        var formUsers = await dba.GetAllUsers();
+        if (formUsers == null || formUsers.Count == 0) return; //Paradox
+        foreach (var formUser in formUsers)
+        {
+            var view = new UserViewModel
+            {
+                Name = formUser.UserName,
+                Email = formUser.Email,
+                Roles = await dba.GetUserRoles(formUser.Id),
+                Templates = new List<Template>() { },
+            };
+            usersViewModels.Add(view);
+        }
+        StateHasChanged();
+    }
+
+    public record UserViewModel 
+    {
+        public string Name;
+        public string Email;
+        public List<string> Roles;
+        public List<Template> Templates;
+    }
 }

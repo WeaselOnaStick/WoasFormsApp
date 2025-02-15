@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WoasFormsApp.Data;
 
@@ -10,9 +11,11 @@ using WoasFormsApp.Data;
 namespace WoasFormsApp.Migrations
 {
     [DbContext(typeof(WoasFormsDbContext))]
-    partial class WoasFormsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250213230141_Req Tweaks")]
+    partial class ReqTweaks
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.1");
@@ -157,7 +160,7 @@ namespace WoasFormsApp.Migrations
 
                     b.HasIndex("TemplateId");
 
-                    b.ToTable("TemplateTemplateTag", (string)null);
+                    b.ToTable("TemplateTemplateTag");
                 });
 
             modelBuilder.Entity("TemplateWoasFormsAppUser", b =>
@@ -172,7 +175,7 @@ namespace WoasFormsApp.Migrations
 
                     b.HasIndex("UsersWhoLikedId");
 
-                    b.ToTable("TemplateWoasFormsAppUser", (string)null);
+                    b.ToTable("TemplateWoasFormsAppUser");
                 });
 
             modelBuilder.Entity("TemplateWoasFormsAppUser1", b =>
@@ -187,7 +190,7 @@ namespace WoasFormsApp.Migrations
 
                     b.HasIndex("Template1Id");
 
-                    b.ToTable("TemplateWoasFormsAppUser1", (string)null);
+                    b.ToTable("TemplateWoasFormsAppUser1");
                 });
 
             modelBuilder.Entity("WoasFormsApp.Data.Response", b =>
@@ -206,7 +209,7 @@ namespace WoasFormsApp.Migrations
 
                     b.HasIndex("TemplateId");
 
-                    b.ToTable("Responses", (string)null);
+                    b.ToTable("Responses");
                 });
 
             modelBuilder.Entity("WoasFormsApp.Data.ResponseAnswer", b =>
@@ -239,7 +242,7 @@ namespace WoasFormsApp.Migrations
 
                     b.HasIndex("ResponseId");
 
-                    b.ToTable("ResponseAnswer", (string)null);
+                    b.ToTable("ResponseAnswer");
                 });
 
             modelBuilder.Entity("WoasFormsApp.Data.Template", b =>
@@ -279,7 +282,7 @@ namespace WoasFormsApp.Migrations
 
                     b.HasIndex("TopicId");
 
-                    b.ToTable("Templates", (string)null);
+                    b.ToTable("Templates");
                 });
 
             modelBuilder.Entity("WoasFormsApp.Data.TemplateComment", b =>
@@ -307,7 +310,7 @@ namespace WoasFormsApp.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TemplateComments", (string)null);
+                    b.ToTable("TemplateComments");
                 });
 
             modelBuilder.Entity("WoasFormsApp.Data.TemplateField", b =>
@@ -344,7 +347,7 @@ namespace WoasFormsApp.Migrations
 
                     b.HasIndex("TypeId");
 
-                    b.ToTable("TemplateFields", (string)null);
+                    b.ToTable("TemplateFields");
                 });
 
             modelBuilder.Entity("WoasFormsApp.Data.TemplateFieldType", b =>
@@ -359,7 +362,7 @@ namespace WoasFormsApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FieldTypes", (string)null);
+                    b.ToTable("FieldTypes");
                 });
 
             modelBuilder.Entity("WoasFormsApp.Data.TemplateTag", b =>
@@ -374,7 +377,7 @@ namespace WoasFormsApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TemplateTags", (string)null);
+                    b.ToTable("TemplateTags");
                 });
 
             modelBuilder.Entity("WoasFormsApp.Data.TemplateTopic", b =>
@@ -389,7 +392,7 @@ namespace WoasFormsApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TemplateTopics", (string)null);
+                    b.ToTable("TemplateTopics");
                 });
 
             modelBuilder.Entity("WoasFormsApp.Data.WoasFormsAppUser", b =>

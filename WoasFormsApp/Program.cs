@@ -112,6 +112,7 @@ app.MapAdditionalIdentityEndpoints();
 using (var scope = app.Services.CreateScope())
 {
     await Seeder.SeedRoles(scope.ServiceProvider);
+    await Seeder.SeedFieldTypes(scope.ServiceProvider);
 }
 
 app.Run();

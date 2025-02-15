@@ -6,18 +6,7 @@
 <MudThemeProvider @bind-IsDarkMode="_isDarkMode" @rendermode="InteractiveServer" />
 
 
-<MudToggleIconButton hidden="@isButtonHidden" @onclick="OnModeToggleClick" @bind-Toggled="_isDarkMode" ToggledIcon="@Icons.Material.Filled.DarkMode" Icon="@Icons.Material.Outlined.LightMode">Toggle</MudToggleIconButton>
-<MudStack>
-    <div>
-        <MudText Typo="Typo.subtitle1">ServiceInit: @ThemeCacheService.Initialized</MudText>
-        <MudIcon Icon="@(ThemeCacheService.Initialized ? Icons.Material.Filled.Check : Icons.Material.Filled.Close)" />
-    </div>
-    <div>
-        <MudText Typo="Typo.subtitle1">ServiceMode: @ThemeCacheService.CachedMode</MudText>
-
-        <MudIcon Icon="@(ThemeCacheService.Initialized ? Icons.Material.Outlined.DarkMode : Icons.Material.Outlined.LightMode)" />
-    </div>
-</MudStack>
+<MudToggleIconButton Style="width: fit-content; align-self: center" hidden="@isButtonHidden" @onclick="OnModeToggleClick" @bind-Toggled="_isDarkMode" ToggledIcon="@Icons.Material.Filled.DarkMode" Icon="@Icons.Material.Outlined.LightMode">Toggle</MudToggleIconButton>
 
 
 

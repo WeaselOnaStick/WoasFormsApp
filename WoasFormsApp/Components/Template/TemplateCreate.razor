@@ -1,0 +1,212 @@
+﻿@page "/Template/Create"
+@rendermode InteractiveServer
+@inject IDatabaseAccessorService dba
+@inject AuthenticationStateProvider asp
+@inject NavigationManager nav
+@inject ISnackbar snack
+
+<PageTitle>Creating a Template</PageTitle>
+
+<MudGrid Justify="Justify.SpaceBetween" Class="pa-4">
+    <MudItem md="8" xs="12">
+        <MudPaper Class="pa-4">
+            <MudForm Model="templateModel">
+                <MudTextField @bind-Value="templateModel.Title" Class="p-2" Typo="Typo.h3" T="string" Variant="Variant.Outlined" Label="Template Title" Required="true" RequiredError="Title is required!" For="@(() => templateModel.Title)" />
+                <MudTextField @bind-Value="templateModel.Description" Class="p-2 mb-4" Typo="Typo.subtitle1" Variant="Variant.Outlined" T="string" Label="Template Description" For="@(() => templateModel.Description)" />
+                <MudStack>
+                    @for (int i = 0; i < templateModel.Fields.Count; i++)
+                    {
+                        int realIndex = i;
+                        TemplateField realField = templateModel.Fields[realIndex];
+                        <TemplateFieldEdit Model="templateModel" FieldIndex="@realIndex" OnDelete="() => RemoveField(realIndex)" />
+                    }
+                </MudStack>
+            </MudForm>
+        </MudPaper>
+    </MudItem>
+
+    <MudItem md="4" xs="12" >
+        <MudPaper Class="pa-4">
+            <MudStack>
+                <!-- AMMO -->
+                <MudButtonGroup Vertical="true" Variant="Variant.Outlined">
+                    @foreach (var item in _fieldTypesCache)
+                    {
+                        <MudButton Disabled="@(_fieldCounts[item.Id].CurAmount >= _fieldCounts[item.Id].MaxAmount)" StartIcon="@Icons.Material.Outlined.AddCircleOutline" OnClick="(e) => AddField(item.Id)">@($"Add {item.Name}")<MudSpacer />@($"({_fieldCounts[item.Id].CurAmount}/{_fieldCounts[item.Id].MaxAmount})")</MudButton>
+                    }
+                </MudButtonGroup>
+
+                <!-- META -->
+                <MudPaper>
+
+                    <!-- META-TOPIC -->
+                    <MudSelect @bind-Value="templateModel.TopicId" T="int" Variant="Variant.Outlined" Label="Topic" Required="true" RequiredError="Topic is required!">
+                        @foreach (var item in _topicsCache)
+                        {
+                            <MudSelectItem Value="item.Id">@item.Title</MudSelectItem>
+                        }
+                    </MudSelect>
+
+                    <!-- META-TAGS -->
+                    <MudAutocomplete 
+                    @bind-Value=_userNewTag @bind-Text=_userNewTag
+                    Label="Add Tag (optional)" 
+                    CoerceValue="true" 
+                    OnKeyDown="@(e => {if (e.Code == "Enter") AddUserTag();})" 
+                    AdornmentIcon="@Icons.Material.Filled.AddCircleOutline" AdornmentColor="Color.Success" OnAdornmentClick=AddUserTag />
+                    <MudChipSet T="string" AllClosable>
+                        @foreach (var tag in userTags)
+                        {
+                            <MudChip T="TemplateTag" Text="@tag" OnClose="(() => userTags.Remove(tag))" />
+                        }
+                    </MudChipSet>
+
+                </MudPaper>
+
+
+
+                <!-- PRIVACY -->
+                <MudPaper Elevation="4">
+                    <MudCheckBox T="bool" Label="Public" @bind-Value="templateModel.Public"/>
+                    @if (!templateModel.Public)
+                    {
+                        <MudAutocomplete
+                        @bind-Value="_autoFoundAllowedUser"
+                        SearchFunc="@SearchUser"
+                        Label="Search for a user to whitelist" ShowProgressIndicator="true" Class="p-1" Variant="Variant.Filled"
+                        AdornmentIcon="@Icons.Material.Filled.AddCircleOutline" OnAdornmentClick="() => AddAutoFoundUser()"
+                        OnKeyDown="@(e => {if (e.Code == "Enter") AddAutoFoundUser();})"/>
+                        <MudDataGrid Items="@templateModel.AllowedUsers" Groupable="false" Dense="true">
+                            <Columns>
+                                <PropertyColumn Property="u => u.UserName"/>
+                                <TemplateColumn>
+                                    <CellTemplate>
+                                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="() => {templateModel.AllowedUsers.Remove(context.Item); StateHasChanged(); }" />
+                                    </CellTemplate>
+                                </TemplateColumn>
+                            </Columns>
+                        </MudDataGrid>
+                    }
+                </MudPaper>
+
+                <!-- CREATE -->
+                <MudButton OnClick="CreateTemplate" Variant="Variant.Filled" Color="Color.Primary" Class="my-4">Create Template!</MudButton>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private List<TemplateFieldType> _fieldTypesCache;
+    private List<TemplateTopic> _topicsCache;
+    private List<string> _tagsCache;
+
+    private class FieldCounts
+    {
+        public int MaxAmount;
+        public int CurAmount;
+    }
+    private Dictionary<int, FieldCounts> _fieldCounts = new();
+
+    private List<WoasFormsAppUser> _usersCache;
+    private WoasFormsAppUser _autoFoundAllowedUser;
+
+    private string _userNewTag = "";
+    private HashSet<string> userTags = new HashSet<string>();
+
+    private async Task InitTagsCache() => _tagsCache ??= (await dba.GetTags()).Select(t => t.Title).ToList();
+
+
+    private async Task<List<string>> SearchTag(string searchText, CancellationToken cancellationToken)
+    {
+        await InitTagsCache();
+        var res = _tagsCache;
+        if (string.IsNullOrEmpty(searchText)) return res;
+        return res.Where(t => t.Contains(searchText, StringComparison.InvariantCultureIgnoreCase)).ToList();
+    }
+
+    private void AddUserTag()
+    {
+        if (string.IsNullOrEmpty(_userNewTag)) return;
+        userTags.Add(_userNewTag);
+        _userNewTag = "";
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _topicsCache = await dba.GetTopics();
+        _fieldTypesCache = await dba.GetTemplateFieldTypes();
+        foreach (var item in _fieldTypesCache)
+        {
+            _fieldCounts[item.Id] = new FieldCounts
+                {
+                    MaxAmount = 4,
+                    CurAmount = 0,
+                };
+        }
+    }
+
+    Template templateModel = new Template { Fields = new List<TemplateField>() };
+
+    public async Task AddField(int typeId)
+    {
+        if (!_fieldCounts.ContainsKey(typeId) || _fieldCounts[typeId].CurAmount >= _fieldCounts[typeId].MaxAmount) return;
+
+        templateModel.Fields.Add(
+            new TemplateField{
+                Hidden = false,
+                Type = (await dba.GetTemplateFieldTypes()).First(tf => tf.Id == typeId),
+                Template = templateModel,
+            }
+        );
+
+        _fieldCounts[typeId].CurAmount++;
+        StateHasChanged();
+    }
+
+    public void RemoveField(int Pos)
+    {
+        _fieldCounts[templateModel.Fields[Pos].Type.Id].CurAmount--;
+        templateModel.Fields.RemoveAt(Pos);
+        StateHasChanged();
+    }
+
+    async Task CreateTemplate()
+    {
+        for (int i = 0; i < templateModel.Fields.Count; i++) 
+            templateModel.Fields[i].Position = i;
+
+        List<TemplateTag> tagsCache = await dba.GetTags();
+        foreach (string userTag in userTags)
+        {
+            TemplateTag newTag = tagsCache.FirstOrDefault(t => t.Title == userTag, new TemplateTag { Title = userTag });
+            templateModel.Tags.Append(newTag);
+        }
+        var newTemplate = await dba.CreateTemplate(templateModel);
+
+        if (newTemplate == null)
+            snack.Add("There was an error creating the template", Severity.Error);
+        else
+        {
+            snack.Add($"Template \"{newTemplate.Title}\" created successfully!", Severity.Success);
+            nav.NavigateTo("/");
+        }
+    }
+
+    async Task CacheUsers() => _usersCache ??= await dba.GetAllUsers();
+
+    async Task<IEnumerable<WoasFormsAppUser>> SearchUser(string searchText, CancellationToken cancellationToken)
+    {
+        await CacheUsers();
+        if (string.IsNullOrWhiteSpace(searchText)) return _usersCache;
+        return _usersCache.Where(u => u.UserName.Contains(searchText, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    void AddAutoFoundUser()
+    {
+        templateModel.AllowedUsers.Add(_autoFoundAllowedUser);
+        _autoFoundAllowedUser = null;
+        StateHasChanged();
+    }
+}

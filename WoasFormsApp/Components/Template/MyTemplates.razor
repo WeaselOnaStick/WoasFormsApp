@@ -1,0 +1,10 @@
+﻿@page "/MyTemplates"
+@rendermode InteractiveServer
+
+
+<AuthorizeView>
+    <Authorized>
+        <MudText Align="Align.Center" Typo="Typo.h2">My Templates</MudText>
+        <TemplatesGallery Mode="TemplatesGallery.GalleryMode.BySpecificUser" TargetUsername="@context.User.Identity.Name" />
+    </Authorized>
+</AuthorizeView>

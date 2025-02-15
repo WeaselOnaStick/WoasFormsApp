@@ -75,6 +75,7 @@
                 Email = Input.Email,
                 IsBlocked = false,
                 RegisteredAt = DateTime.UtcNow,
+                OwnedTemplates = new List<Template>(),
             };
         var res = await userManager.CreateAsync(newUser, Input.Password);
         if (res.Succeeded)

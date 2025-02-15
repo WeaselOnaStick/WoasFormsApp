@@ -26,7 +26,7 @@
     <MudDrawer id="nav-drawer" Elevation="2" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Class="pa-4" data-enhance-nav="true">
         <MudStack>
             <MudButton Href="/" StartIcon="@Icons.Material.Filled.Home" Variant="Variant.Filled">Browse Templates</MudButton>
-            <AccountDrawerButtons @rendermode="InteractiveServer" />
+            <DrawerButtons @rendermode="InteractiveServer" />
             <ThemeToggleButton @rendermode="InteractiveServer" />
         </MudStack>
     </MudDrawer>

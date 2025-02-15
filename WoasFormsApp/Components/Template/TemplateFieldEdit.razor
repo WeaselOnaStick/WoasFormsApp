@@ -1,0 +1,52 @@
+﻿@inject IDatabaseAccessorService dba
+
+<MudPaper Elevation="5">
+    <MudStack Spacing="2">
+        <MudStack Row="true">
+            <MudText Class="p-4 mx-2" Typo="Typo.h6">@Field.Type.Name</MudText>
+            <MudCheckBox T="bool" Class="p-4 mx-2" Label="Analytics" @bind-Value="Field.ShowInAnalytics"/>
+            <MudSpacer />
+            <MudButton Class="pa-2 ma-4 align-self-end" Style="max-width:fit-content" OnClick="OnDelete" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Close" Color="Color.Error">Delete Field</MudButton>
+        </MudStack>
+
+        <MudTextField @bind-Value="Field.Title" Variant="Variant.Filled" Class="p-2" Typo="Typo.h4" T="string" Label="Field Title" Required="true" RequiredError="Title is required!" For="@(() => Model.Fields[FieldIndex].Title)" />
+        <MudTextField @bind-Value="Field.Description" Variant="Variant.Filled" Class="p-2" Typo="Typo.subtitle2" T="string" Label="Field Description" For="@(() => Model.Fields[FieldIndex].Description)" />
+
+
+        @switch (@Field.Type.Name)
+        {
+            case "SingleLine":
+                <MudTextField Class="p-2" T="string" Disabled="true" Variant="Variant.Filled" Label="@FieldLabelText" />
+                break;
+            case "MultiLine":
+                <MudTextField Class="p-2" T="string" Lines="3" Disabled="true" Variant="Variant.Filled" Label="@FieldLabelText" />
+                break;
+            case "PositiveInt":
+                <MudNumericField Class="p-2" T="int" Min="1" Disabled="true" Variant="Variant.Filled" Label="@FieldLabelText" />
+                break;
+            case "CheckBox":
+                <MudCheckBox Class="p-2" T="bool" Disabled="true" Variant="Variant.Filled" Label="@FieldLabelText" />
+                break;
+        }
+    </MudStack>
+</MudPaper>
+
+@code{
+    private static string FieldLabelText = "This field is to be filled by the respondent";
+
+    [Parameter]
+    public Template Model { get; set; }
+
+    [Parameter, EditorRequired]
+    public int FieldIndex { get; set; }
+
+    private TemplateField Field { get; set; }
+
+    [Parameter]
+    public EventCallback OnDelete { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Field = Model.Fields[FieldIndex];
+    }
+}

@@ -11,6 +11,7 @@ namespace WoasFormsApp.Data
         public DbSet<TemplateTopic> TemplateTopics { get; set; }
 
         public DbSet<TemplateField> TemplateFields { get; set; }
+        public DbSet<TemplateFieldType> FieldTypes { get; set; }
 
         public DbSet<Response> Responses { get; set; }
         

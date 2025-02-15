@@ -12,10 +12,10 @@
         <MudText Typo="Typo.h5">Be the first one to create!</MudText>
         <AuthorizeView>
             <Authorized>
-                <MudButton Href="/Template/Create" Variant="Variant.Filled">Create Template</MudButton>
+                <MudButton Href="/Template/Create" Color="Color.Primary" Variant="Variant.Filled">Create Template</MudButton>
             </Authorized>
             <NotAuthorized>
-                <MudButton Href="/Account/Login" Variant="Variant.Filled" Color="Color.Info">Log in to Create Template</MudButton>
+                <MudButton Href="/Account/Login" Variant="Variant.Filled" Color="Color.Primary">Log in to Create Template</MudButton>
             </NotAuthorized>
         </AuthorizeView>
     </MudPaper>
@@ -48,23 +48,34 @@ else
         {
             @for (int i = 0; i<templates.Count; i++)
             {
-                var template = templates[i];
                 int realIndex = i;
+                var template = templates[realIndex];
 
                 <MudItem>
                     <MudCard Style="max-width:300px">
+                        <MudCardHeader>
+                            <CardHeaderActions>
+                                <MudToggleIconButton Icon="@Icons.Material.Outlined.FavoriteBorder" ToggledIcon="@Icons.Material.Outlined.Favorite" />
+                                <span>@(template.UsersWhoLiked == null ? 0 : template.UsersWhoLiked.Count)</span>
+                                <MudIcon Icon="@Icons.Material.Outlined.ChatBubbleOutline" />
+                                <span>@(template.Comments == null ? 0 : template.Comments.Count)</span>
+                            </CardHeaderActions>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.h6">@(string.IsNullOrWhiteSpace(template.Title) ? "Unnamed Template" : template.Title)</MudText>
+                                <MudText Typo="Typo.body2"><i>@template.Owner.UserName</i></MudText>
+                            </CardHeaderContent>
+                        </MudCardHeader>
                         <MudCardMedia Image="@template.CoverImageUrl" Height="200" Style="width:300px"/>
                         <MudCardContent>
-                            <MudText Typo="Typo.h6">@template.Title</MudText>
-                            <MudText Typo="Typo.body2">Some Douchebag</MudText>
+                            <MudText Typo="Typo.subtitle1">@($"Created at {template.CreatedAt.ToShortDateString()}")</MudText>
                         </MudCardContent>
-                        <MudCardActions style="flex-direction: column; align-items: center">
+                        <MudCardActions>
                             <AuthorizeView Roles="Admin">
                                 <Authorized>
                                     <MudButton Variant="Variant.Filled" Color="Color.Error" Href="@($"/Template/Edit/{templates[realIndex].Id}")">Edit</MudButton>
                                 </Authorized>
                             </AuthorizeView>
-                            <MudButton Variant="Variant.Filled" Color="Color.Info" Href="@($"/Template/Fill/{templates[realIndex].Id}")">Fill out</MudButton>
+                            <MudButton Variant="Variant.Filled" Color="Color.Info" Href="@($"/Template/Fill/{templates[realIndex].Id}")">Open Form</MudButton>
                         </MudCardActions>
                     </MudCard>
                 </MudItem>
@@ -74,15 +85,52 @@ else
 }
 
 @code {
-    int skeletonsCount = 12;
+    public enum GalleryMode{
+        GlobalNewest,
+        GlobalPopular,
+        BySpecificUser,
+        CustomList,
+    }
+
+    [Parameter, EditorRequired]
+    public GalleryMode Mode { get; set; }
+
+    [Parameter]
+    public string? TargetUsername { get; set; }
+
+    [Parameter]
+    public List<Template>? CustomTemplates { get; set; }
+
+    [Parameter]
+    public int skeletonsCount { get; set; } = 12;
 
     List<Template> templates = new();
+
+
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        var foundTemplates = await dba.GetAvailableTemplates();
-        templates = foundTemplates == null ? new List<Template>() : foundTemplates;
-        StateHasChanged();
+        List<Template> prepList = new();
+        switch (Mode)
+        {
+            case GalleryMode.GlobalNewest: 
+                prepList = await dba.GetAvailableTemplates();
+                break;
+            case GalleryMode.GlobalPopular:
+                prepList = await dba.GetAvailableTemplates();
+                prepList.OrderBy(t => t.Responses.Count).ThenBy(t => t.CreatedAt);
+                break;
+            case GalleryMode.BySpecificUser:
+                if (TargetUsername == null) throw new Exception("TargetUsername parameter required");
+                prepList = await dba.GetUsersTemplates(TargetUsername);
+                break;
+            case GalleryMode.CustomList:
+                if (CustomTemplates == null) throw new Exception("CustomTemplates parameter required");
+                prepList = CustomTemplates;
+                break;
+        }
+        prepList ??= new List<Template>();
+        templates = prepList;
     }
 }

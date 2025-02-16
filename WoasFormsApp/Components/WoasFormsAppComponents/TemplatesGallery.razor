@@ -1,9 +1,13 @@
-﻿@using WoasFormsApp.Data
+﻿@using System.Security.Claims
+@using WoasFormsApp.Data
 @using WoasFormsApp.Services
 
 @inject NavigationManager nav
 @inject IDatabaseAccessorService dba
 @attribute [StreamRendering]
+
+@inject UserManager<WoasFormsAppUser> userManager
+@inject AuthenticationStateProvider auth
 
 @if (templates != null && templates.Count == 0) // 0 Templates loaded
 {
@@ -21,7 +25,7 @@
 }
 else
 {
-    <MudText Typo="Typo.h2" Align="Align.Center">@_headerText</MudText>
+    <MudText Typo="Typo.h2" Class="p-4 m-1" Align="Align.Center">@_headerText</MudText>
     <MudGrid Spacing=6 Justify="Justify.Center">
         @if (templates == null) // Loading templates...
         {
@@ -49,33 +53,36 @@ else
             @for (int i = 0; i<templates.Count; i++)
             {
                 int realIndex = i;
-                var template = templates[realIndex];
+                var templateView = templates[realIndex];
+                var template = templateView.template;
 
                 <MudItem>
-                    <MudCard Style="max-width:300px">
+                    <MudCard>
                         <MudCardHeader>
-                            <CardHeaderActions>
-                                <MudToggleIconButton Icon="@Icons.Material.Outlined.FavoriteBorder" ToggledIcon="@Icons.Material.Outlined.Favorite" />
-                                <span>@(template.UsersWhoLiked == null ? 0 : template.UsersWhoLiked.Count)</span>
-                                <MudIcon Icon="@Icons.Material.Outlined.ChatBubbleOutline" />
-                                <span>@(template.Comments == null ? 0 : template.Comments.Count)</span>
+                            <CardHeaderActions> 
+                                <MudChipSet T="int" Class="p-2 m-2">
+                                    <MudChip OnClick="async () => await TemplateLike(templateView)" 
+                                             Variant="@(templateView.liked ? Variant.Filled : Variant.Outlined)"
+                                             Color="@(templateView.liked ? Color.Primary : Color.Surface)"
+                                             Icon="@(templateView.liked ? Icons.Material.Filled.Favorite : Icons.Material.Filled.FavoriteBorder)">@template.UsersWhoLiked.Count</MudChip>
+                                    
+                                    <MudChip Icon="@Icons.Material.Filled.Comment" Color="Color.Surface">@template.Comments.Count</MudChip>
+                                    
+                                    <MudChip Icon="@Icons.Material.Filled.Description" Color="Color.Surface">@template.Responses.Count</MudChip>
+                                </MudChipSet>
                             </CardHeaderActions>
                             <CardHeaderContent>
                                 <MudText Typo="Typo.h6">@(string.IsNullOrWhiteSpace(template.Title) ? "Unnamed Template" : template.Title)</MudText>
                                 <MudText Typo="Typo.body2"><i>@template.Owner.UserName</i></MudText>
                             </CardHeaderContent>
                         </MudCardHeader>
-                        <MudCardMedia Image="@(string.IsNullOrWhiteSpace(template.CoverImageUrl) ? Assets["BlankThumbnail.png"] : template.CoverImageUrl)" Height="200" Style="width:300px" />
+                        <MudCardMedia Style="width: 300px; height: 200px; align-self: center;"
+                            Image="@(string.IsNullOrWhiteSpace(template.CoverImageUrl) ? Assets["BlankThumbnail.png"] : template.CoverImageUrl)" />
                         <MudCardContent>
-                            <MudText Typo="Typo.subtitle1">@($"Created at {template.CreatedAt.ToShortDateString()}")</MudText>
+                            <MudText Typo="Typo.subtitle1">@($"Created at {template.CreatedAt.ToLocalTime().ToShortDateString()}")</MudText>
                         </MudCardContent>
-                        <MudCardActions>
-                            <AuthorizeView Roles="Admin">
-                                <Authorized>
-                                    <MudButton Variant="Variant.Filled" Color="Color.Error" Href="@($"/Template/Edit/{templates[realIndex].Id}")">Edit</MudButton>
-                                </Authorized>
-                            </AuthorizeView>
-                            <MudButton Variant="Variant.Filled" Color="Color.Info" Href="@($"/Template/Fill/{templates[realIndex].Id}")">Open Form</MudButton>
+                        <MudCardActions Class="justify-space-around my-2">
+                            <MudButton Class="rounded-pill" Variant="Variant.Filled" Color="Color.Info" Href="@($"/Template/{template.Id}")">View Template</MudButton>
                         </MudCardActions>
                     </MudCard>
                 </MudItem>
@@ -104,7 +111,10 @@ else
     [Parameter]
     public int skeletonsCount { get; set; } = 12;
 
-    List<Template> templates = new();
+
+    List<TemplateView> templates = new();
+
+    private WoasFormsAppUser curUser;
 
     string _headerText => Mode switch
     {
@@ -115,19 +125,23 @@ else
         _ => "Templates"
     };
 
-
     protected override async Task OnInitializedAsync()
     {
+        var authState = await auth.GetAuthenticationStateAsync();
+        var userId = authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        curUser = await userManager.FindByIdAsync(userId);
+
         await base.OnInitializedAsync();
         List<Template> prepList = new();
         switch (Mode)
         {
             case GalleryMode.GlobalNewest: 
                 prepList = await dba.GetAvailableTemplates();
+                prepList = prepList.OrderByDescending(t => t.CreatedAt).ToList();
                 break;
             case GalleryMode.GlobalPopular:
                 prepList = await dba.GetAvailableTemplates();
-                prepList.OrderBy(t => t.Responses.Count).ThenBy(t => t.CreatedAt);
+                prepList = prepList.OrderBy(t => t.Responses.Count).ThenByDescending(t => t.CreatedAt).ToList();
                 break;
             case GalleryMode.BySpecificUser:
                 if (TargetUsername == null) throw new Exception("TargetUsername parameter required");
@@ -139,6 +153,30 @@ else
                 break;
         }
         prepList ??= new List<Template>();
-        templates = prepList;
+        templates = prepList.Select(
+            t => new TemplateView()
+                {
+                    template = t,
+                    liked = (curUser == null) ? false : t.UsersWhoLiked.Contains(curUser),
+                    likes = t.UsersWhoLiked.Count,
+                    comments = t.Responses.Count,
+                    responses = t.Responses.Count,
+                }
+        ).ToList();
+    }
+
+    public class TemplateView(){
+        public Template template { get; set; }
+        public bool liked { get; set; }
+        public int likes { get; set; }
+        public int comments {get; set;}
+        public int responses { get; set; }
+    }
+
+    private async Task TemplateLike(TemplateView target)
+    {
+        await dba.LikeTemplate(target.template.Id, !target.liked);
+        target.liked = (curUser == null) ? false : target.template.UsersWhoLiked.Contains(curUser);
+        StateHasChanged();
     }
 }

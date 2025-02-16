@@ -1,4 +1,5 @@
 ﻿@page "/Template/Create"
+@using MudBlazor.Utilities
 @rendermode InteractiveServer
 @inject IDatabaseAccessorService dba
 @inject AuthenticationStateProvider asp
@@ -7,26 +8,42 @@
 
 <PageTitle>Creating a Template</PageTitle>
 
-<MudGrid Justify="Justify.SpaceBetween" Class="pa-4">
+<MudGrid Justify="Justify.SpaceAround" Class="pa-4">
     <MudItem md="8" xs="12">
-        <MudPaper Class="pa-4">
+        <MudPaper Class="pa-2">
             <MudForm Model="templateModel">
+                
                 <MudTextField @bind-Value="templateModel.Title" Class="p-2" Typo="Typo.h3" T="string" Variant="Variant.Outlined" Label="Template Title" Required="true" RequiredError="Title is required!" For="@(() => templateModel.Title)" />
-                <MudTextField @bind-Value="templateModel.Description" Class="p-2 mb-4" Typo="Typo.subtitle1" Variant="Variant.Outlined" T="string" Label="Template Description" For="@(() => templateModel.Description)" />
-                <MudStack>
-                    @for (int i = 0; i < templateModel.Fields.Count; i++)
-                    {
-                        int realIndex = i;
-                        TemplateField realField = templateModel.Fields[realIndex];
-                        <TemplateFieldEdit Model="templateModel" FieldIndex="@realIndex" OnDelete="() => RemoveField(realIndex)" />
-                    }
-                </MudStack>
+
+                <MudPaper Elevation="3" Class="m-2 p-2">
+                    <MudTabs Rounded="true">
+                        <MudTabPanel Text="Edit Description">
+                            <MudTextField @bind-Value="templateModel.Description" Class="p-2 mb-4" Typo="Typo.subtitle1" Variant="Variant.Outlined" T="string" Label="Template Description" For="@(() => templateModel.Description)" />
+                        </MudTabPanel>
+                        <MudTabPanel Text="Preview Markdown">
+                            <MudMarkdown Value="@templateModel.Description"/>
+                        </MudTabPanel>
+                    </MudTabs>
+                </MudPaper>
+
+                <MudDropContainer 
+                @bind-Items="templateModel.Fields" 
+                T="TemplateField"
+                ItemDropped="@DropHandle"
+                ItemsSelector="@((_,_) => true)">
+                    <ChildContent>
+                        <MudDropZone T="TemplateField" AllowReorder="true" Identifier="Editor" Class="mud-black" />
+                    </ChildContent>
+                    <ItemRenderer>
+                        <TemplateFieldEdit Model="templateModel" Field="context" OnDelete="() => RemoveField(context.Position)"/>
+                    </ItemRenderer>
+                </MudDropContainer>
             </MudForm>
         </MudPaper>
     </MudItem>
 
-    <MudItem md="4" xs="12" >
-        <MudPaper Class="pa-4">
+    <MudItem md="4" xs="12">
+        <MudPaper Class="pa-4" Style="position: sticky; top: 5rem;">
             <MudStack>
                 <!-- AMMO -->
                 <MudButtonGroup Vertical="true" Variant="Variant.Outlined">
@@ -97,6 +114,8 @@
 </MudGrid>
 
 @code {
+    Template templateModel = new Template { Fields = new List<TemplateField>() };
+
     private List<TemplateFieldType> _fieldTypesCache;
     private List<TemplateTopic> _topicsCache;
     private List<string> _tagsCache;
@@ -115,7 +134,6 @@
     private HashSet<string> userTags = new HashSet<string>();
 
     private async Task InitTagsCache() => _tagsCache ??= (await dba.GetTags()).Select(t => t.Title).ToList();
-
 
     private async Task<List<string>> SearchTag(string searchText, CancellationToken cancellationToken)
     {
@@ -147,7 +165,6 @@
         }
     }
 
-    Template templateModel = new Template { Fields = new List<TemplateField>() };
 
     public async Task AddField(int typeId)
     {
@@ -167,16 +184,21 @@
 
     public void RemoveField(int Pos)
     {
-        _fieldCounts[templateModel.Fields[Pos].Type.Id].CurAmount--;
-        templateModel.Fields.RemoveAt(Pos);
+        var targetField = templateModel.Fields.First(f => f.Position == Pos);
+        _fieldCounts[targetField.Type.Id].CurAmount--;
+        templateModel.Fields.Remove(targetField);
+        StateHasChanged();
+    }
+
+    private void DropHandle(MudItemDropInfo<TemplateField> droppedField)
+    {
+        templateModel.Fields.UpdateOrder(droppedField, f => f.Position);
         StateHasChanged();
     }
 
     async Task CreateTemplate()
     {
-        for (int i = 0; i < templateModel.Fields.Count; i++) 
-            templateModel.Fields[i].Position = i;
-
+        templateModel.Fields.OrderBy(f => f.Position);
         List<TemplateTag> tagsCache = await dba.GetTags();
         foreach (string userTag in userTags)
         {

@@ -1,4 +1,5 @@
 using Blazored.LocalStorage;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,8 @@ using WoasFormsApp.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IThemeCacheService, ThemeCacheService>();
+
+builder.Services.AddFluentValidationAutoValidation();
 
 builder.Services.AddMudServices(config =>
 {

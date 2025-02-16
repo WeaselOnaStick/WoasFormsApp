@@ -61,8 +61,14 @@ namespace WoasFormsApp.Services
         public async Task<List<TemplateFieldType>> GetTemplateFieldTypes() =>
             await _ctx.FieldTypes.ToListAsync();
 
+        public bool ValidateTemplate(Template template)
+        {
+            if (string.IsNullOrWhiteSpace(template.Title)) return false;
+            if (template.Fields == null || template.Fields.Count == 0) return false;
+            return true;
+        }
 
-        public async Task<Template> CreateTemplate(Template template)
+        public async Task<Template?> CreateTemplate(Template template)
         {
             template.Owner ??= await GetCurrentUser();
 
@@ -75,6 +81,8 @@ namespace WoasFormsApp.Services
             template.Tags = syncedTagList;
 
             template.CreatedAt = DateTime.UtcNow;
+
+            if (!ValidateTemplate(template)) return null;
 
             var freshTemplate = await _ctx.Templates.AddAsync(template);
             await _ctx.SaveChangesAsync();
@@ -124,8 +132,9 @@ namespace WoasFormsApp.Services
             return res;
         }
 
-        public async Task<Template> UpdateTemplate(int templateId, Template newTemplate)
+        public async Task<Template?> UpdateTemplate(Template newTemplate, int? templateId = null)
         {
+            if (templateId == null) templateId = newTemplate.Id;
             // Complex function, comparing new fields to old+hidden, recycling data
             throw new NotImplementedException();
         }

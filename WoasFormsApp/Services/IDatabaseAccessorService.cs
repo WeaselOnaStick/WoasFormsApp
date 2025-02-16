@@ -8,11 +8,11 @@ namespace WoasFormsApp.Services
         Task<List<TemplateTag>> GetTags();
         Task<List<TemplateFieldType>> GetTemplateFieldTypes();
 
-        Task<Template> CreateTemplate(Template template);
+        Task<Template?> CreateTemplate(Template template);
         Task<Template?> GetTemplate(int templateId);
         Task<List<Template>> GetAvailableTemplates();
         Task<List<Template>> GetUsersTemplates(string userName);
-        Task<Template> UpdateTemplate(int templateId, Template newTemplate);
+        Task<Template?> UpdateTemplate(Template newTemplate, int? templateId = null);
         Task DeleteTemplate(int templateId);
         Task LikeTemplate(int templateId);
         Task UnLikeTemplate(int templateId);

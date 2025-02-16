@@ -1,5 +1,7 @@
 ﻿@page "/Template/Create"
+@using FluentValidation
 @using MudBlazor.Utilities
+
 @rendermode InteractiveServer
 @inject IDatabaseAccessorService dba
 @inject AuthenticationStateProvider asp
@@ -11,28 +13,39 @@
 <MudGrid Justify="Justify.SpaceAround" Class="pa-4">
     <MudItem md="8" xs="12">
         <MudPaper Class="pa-2">
-            <MudForm Model="templateModel">
-                
-                <MudTextField @bind-Value="templateModel.Title" Class="p-2" Typo="Typo.h3" T="string" Variant="Variant.Outlined" Label="Template Title" Required="true" RequiredError="Title is required!" For="@(() => templateModel.Title)" />
+            <MudForm Model="templateModel" @ref=form Validation="@(validator.ValidateValue)" @bind-Errors=formErrors>
 
-                <MudPaper Elevation="3" Class="m-2 p-2">
+                <MudTextField @bind-Value="templateModel.Title" 
+                Class="p-2" Typo="Typo.h3" Variant="Variant.Outlined" 
+                Label="Template Title"
+                For="@(() => templateModel.Title)"/>
+
+                <MudPaper Elevation="3" Class="m-2 p-2 mb-6">
                     <MudTabs Rounded="true">
                         <MudTabPanel Text="Edit Description">
-                            <MudTextField @bind-Value="templateModel.Description" Class="p-2 mb-4" Typo="Typo.subtitle1" Variant="Variant.Outlined" T="string" Label="Template Description" For="@(() => templateModel.Description)" />
+                            <MudTextField @bind-Value="templateModel.Description"
+                            For="@(() => templateModel.Description)"
+                            Lines="6" AutoGrow="true" MaxLines="24" 
+                            Class="p-2 mb-4" Typo="Typo.subtitle1" Variant="Variant.Outlined" 
+                            Label="Template Description"/>
                         </MudTabPanel>
                         <MudTabPanel Text="Preview Markdown">
-                            <MudMarkdown Value="@templateModel.Description"/>
+                            <MudPaper Class="p-2 mb-4" Elevation="0">
+                                <MudMarkdown Value="@templateModel.Description"/>
+                            </MudPaper>
                         </MudTabPanel>
                     </MudTabs>
                 </MudPaper>
 
                 <MudDropContainer 
-                @bind-Items="templateModel.Fields" 
+                Items="templateModel.Fields"
                 T="TemplateField"
                 ItemDropped="@DropHandle"
                 ItemsSelector="@((_,_) => true)">
                     <ChildContent>
-                        <MudDropZone T="TemplateField" AllowReorder="true" Identifier="Editor" Class="mud-black" />
+                        <MudDropZone T="TemplateField" AllowReorder="true" Identifier="Editor" Class="mud-black">
+                            <MudText Typo="Typo.h5" Align="Align.Center">Template Fields</MudText>
+                        </MudDropZone>
                     </ChildContent>
                     <ItemRenderer>
                         <TemplateFieldEdit Model="templateModel" Field="context" OnDelete="() => RemoveField(context.Position)"/>
@@ -44,46 +57,53 @@
 
     <MudItem md="4" xs="12">
         <MudPaper Class="pa-4" Style="position: sticky; top: 5rem;">
-            <MudStack>
+
+            <!-- META-TOPIC -->
+            <MudSelect @bind-Value="templateModel.TopicId" T="int" Variant="Variant.Outlined" Label="Topic" Required="true" RequiredError="Topic is required!">
+                @foreach (var item in _topicsCache)
+                {
+                    <MudSelectItem Value="item.Id">@item.Title</MudSelectItem>
+                }
+            </MudSelect>
+
+            <!-- META-TAGS -->
+            <MudAutocomplete 
+            @bind-Value=_userNewTag @bind-Text=_userNewTag
+            Label="Add Tag (optional)" Class="p-2 m-2"
+            CoerceValue="true" 
+            OnKeyDown="@(e => {if (e.Code == "Enter") AddUserTag();})" 
+            AdornmentIcon="@Icons.Material.Filled.AddCircleOutline" AdornmentColor="Color.Success" OnAdornmentClick=AddUserTag />
+            <MudChipSet T="string" AllClosable>
+                @foreach (var tag in userTags)
+                {
+                    <MudChip T="TemplateTag" Text="@tag" OnClose="(() => userTags.Remove(tag))" />
+                }
+            </MudChipSet>
+
+            <MudFileUpload T="IBrowserFile" />
+
+            <MudExpansionPanels>
                 <!-- AMMO -->
-                <MudButtonGroup Vertical="true" Variant="Variant.Outlined">
-                    @foreach (var item in _fieldTypesCache)
-                    {
-                        <MudButton Disabled="@(_fieldCounts[item.Id].CurAmount >= _fieldCounts[item.Id].MaxAmount)" StartIcon="@Icons.Material.Outlined.AddCircleOutline" OnClick="(e) => AddField(item.Id)">@($"Add {item.Name}")<MudSpacer />@($"({_fieldCounts[item.Id].CurAmount}/{_fieldCounts[item.Id].MaxAmount})")</MudButton>
-                    }
-                </MudButtonGroup>
-
-                <!-- META -->
-                <MudPaper>
-
-                    <!-- META-TOPIC -->
-                    <MudSelect @bind-Value="templateModel.TopicId" T="int" Variant="Variant.Outlined" Label="Topic" Required="true" RequiredError="Topic is required!">
-                        @foreach (var item in _topicsCache)
+                <MudExpansionPanel Text="Fields">
+                    <MudButtonGroup Vertical="true" Variant="Variant.Outlined" Style="display: flex;">
+                        @foreach (var item in _fieldTypesCache)
                         {
-                            <MudSelectItem Value="item.Id">@item.Title</MudSelectItem>
+                            <MudButton 
+                            Disabled="@(_fieldCounts[item.Id].CurAmount >= _fieldCounts[item.Id].MaxAmount)" 
+                            StartIcon="@Icons.Material.Outlined.AddCircleOutline"
+                            OnClick="(e) => AddField(item.Id)">
+                                @($"Add {item.Name}")
+
+                                <MudSpacer />
+
+                                @($"({_fieldCounts[item.Id].CurAmount}/{_fieldCounts[item.Id].MaxAmount})")
+                            </MudButton>
                         }
-                    </MudSelect>
-
-                    <!-- META-TAGS -->
-                    <MudAutocomplete 
-                    @bind-Value=_userNewTag @bind-Text=_userNewTag
-                    Label="Add Tag (optional)" 
-                    CoerceValue="true" 
-                    OnKeyDown="@(e => {if (e.Code == "Enter") AddUserTag();})" 
-                    AdornmentIcon="@Icons.Material.Filled.AddCircleOutline" AdornmentColor="Color.Success" OnAdornmentClick=AddUserTag />
-                    <MudChipSet T="string" AllClosable>
-                        @foreach (var tag in userTags)
-                        {
-                            <MudChip T="TemplateTag" Text="@tag" OnClose="(() => userTags.Remove(tag))" />
-                        }
-                    </MudChipSet>
-
-                </MudPaper>
-
-
+                    </MudButtonGroup>
+                </MudExpansionPanel>
 
                 <!-- PRIVACY -->
-                <MudPaper Elevation="4">
+                <MudExpansionPanel Text="Privacy">
                     <MudCheckBox T="bool" Label="Public" @bind-Value="templateModel.Public"/>
                     @if (!templateModel.Public)
                     {
@@ -91,7 +111,7 @@
                         @bind-Value="_autoFoundAllowedUser"
                         SearchFunc="@SearchUser"
                         Label="Search for a user to whitelist" ShowProgressIndicator="true" Class="p-1" Variant="Variant.Filled"
-                        AdornmentIcon="@Icons.Material.Filled.AddCircleOutline" OnAdornmentClick="() => AddAutoFoundUser()"
+                        AdornmentColor="Color.Success" AdornmentIcon="@Icons.Material.Filled.AddCircleOutline" OnAdornmentClick="() => AddAutoFoundUser()"
                         OnKeyDown="@(e => {if (e.Code == "Enter") AddAutoFoundUser();})"/>
                         <MudDataGrid Items="@templateModel.AllowedUsers" Groupable="false" Dense="true">
                             <Columns>
@@ -104,17 +124,31 @@
                             </Columns>
                         </MudDataGrid>
                     }
-                </MudPaper>
+                </MudExpansionPanel>
 
                 <!-- CREATE -->
-                <MudButton OnClick="CreateTemplate" Variant="Variant.Filled" Color="Color.Primary" Class="my-4">Create Template!</MudButton>
-            </MudStack>
+                <MudToolBar>
+                    <MudSpacer />
+                    <MudButton OnClick="CreateTemplate" Variant="Variant.Filled" Color="Color.Primary" Class="my-4 justify-center">Create Template!</MudButton>
+                    <MudSpacer />
+                </MudToolBar>
+                <MudStack>
+                    @foreach (var err in formErrors)
+                    {
+                        <MudText Typo="Typo.body2" Color="Color.Error" Align="Align.Center">@err</MudText>
+                    }
+                </MudStack>
+            </MudExpansionPanels>
         </MudPaper>
     </MudItem>
 </MudGrid>
 
 @code {
     Template templateModel = new Template { Fields = new List<TemplateField>() };
+    MudForm form;
+    public string[] formErrors { get; set; } = new string[0];
+
+    public static int MaxQuestionPerType = 4;
 
     private List<TemplateFieldType> _fieldTypesCache;
     private List<TemplateTopic> _topicsCache;
@@ -127,7 +161,7 @@
     }
     private Dictionary<int, FieldCounts> _fieldCounts = new();
 
-    private List<WoasFormsAppUser> _usersCache;
+    private HashSet<WoasFormsAppUser> _usersCache;
     private WoasFormsAppUser _autoFoundAllowedUser;
 
     private string _userNewTag = "";
@@ -159,7 +193,7 @@
         {
             _fieldCounts[item.Id] = new FieldCounts
                 {
-                    MaxAmount = 4,
+                    MaxAmount = MaxQuestionPerType,
                     CurAmount = 0,
                 };
         }
@@ -173,7 +207,7 @@
         templateModel.Fields.Add(
             new TemplateField{
                 Hidden = false,
-                Type = (await dba.GetTemplateFieldTypes()).First(tf => tf.Id == typeId),
+                Type = _fieldTypesCache.First(tfc => tfc.Id == typeId),
                 Template = templateModel,
             }
         );
@@ -196,27 +230,69 @@
         StateHasChanged();
     }
 
+    public TemplateCreationValidator validator = new TemplateCreationValidator();
+
+    public class TemplateCreationValidator : AbstractValidator<Template>
+    {
+        public TemplateCreationValidator(){
+            RuleFor(t => t.Title).NotEmpty().WithMessage("Title is required!");
+            RuleFor(t => t.Fields).NotEmpty().WithMessage("Add at least 1 template field")
+            .Must(
+                t => t.Count == 0 || t.GroupBy(f => f.Type.Id)
+                .Select(g => new { g.Key, Count = g.Count() })
+                .Max(g => g.Count) <= MaxQuestionPerType)
+                .WithMessage($"You can't have more than {MaxQuestionPerType} field per type")
+            .ForEach((rule) =>
+            {
+                rule.NotEmpty().WithMessage($"Field titles can't be empty");
+            });
+
+            
+            RuleFor(t => t.TopicId).NotNull().WithMessage("Topic can't be empty");
+            
+
+        }
+
+        public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>
+        {
+            var result = await ValidateAsync(ValidationContext<Template>.CreateWithOptions((Template)model, x => x.IncludeProperties(propertyName)));
+            if (result.IsValid)
+                return Array.Empty<string>();
+            return result.Errors.Select(e => e.ErrorMessage);
+        };
+    }
+
     async Task CreateTemplate()
     {
-        templateModel.Fields.OrderBy(f => f.Position);
-        List<TemplateTag> tagsCache = await dba.GetTags();
-        foreach (string userTag in userTags)
+        // await form.Validate();
+        // if (!form.IsValid)
+        // {
+        //     snack.Add("Form invalid", MudBlazor.Severity.Error);
+        //     return;
+        // }
+
+        var wholeCheck = validator.Validate(templateModel);
+        if (!wholeCheck.IsValid)
         {
-            TemplateTag newTag = tagsCache.FirstOrDefault(t => t.Title == userTag, new TemplateTag { Title = userTag });
-            templateModel.Tags.Append(newTag);
+            formErrors = wholeCheck.Errors.Select(e => e.ErrorMessage).ToArray();
+            snack.Add("Form invalid", MudBlazor.Severity.Error);
+            return;
         }
+
+
+        templateModel.Fields.OrderBy(f => f.Position);
         var newTemplate = await dba.CreateTemplate(templateModel);
 
         if (newTemplate == null)
-            snack.Add("There was an error creating the template", Severity.Error);
+            snack.Add("There was an error creating the template", MudBlazor.Severity.Error);
         else
         {
-            snack.Add($"Template \"{newTemplate.Title}\" created successfully!", Severity.Success);
+            snack.Add($"Template \"{newTemplate.Title}\" created successfully!", MudBlazor.Severity.Success);
             nav.NavigateTo("/");
         }
     }
 
-    async Task CacheUsers() => _usersCache ??= await dba.GetAllUsers();
+    async Task CacheUsers() => _usersCache ??= new HashSet<WoasFormsAppUser>(await dba.GetAllUsers());
 
     async Task<IEnumerable<WoasFormsAppUser>> SearchUser(string searchText, CancellationToken cancellationToken)
     {
@@ -227,6 +303,7 @@
 
     void AddAutoFoundUser()
     {
+        if (_autoFoundAllowedUser == null || string.IsNullOrEmpty(_autoFoundAllowedUser.UserName)) return;
         templateModel.AllowedUsers.Add(_autoFoundAllowedUser);
         _autoFoundAllowedUser = null;
         StateHasChanged();

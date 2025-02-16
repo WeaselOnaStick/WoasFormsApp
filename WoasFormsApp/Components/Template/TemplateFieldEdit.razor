@@ -3,8 +3,16 @@
 <MudPaper Class="p-2 m-1" Elevation="5">
     <MudStack Spacing="1">
 
-        <MudTextField @bind-Value="Field.Title" Variant="Variant.Filled" Class="p-2" Typo="Typo.h4" T="string" Label="Field Title" Required="true" RequiredError="Title is required!" For="@(() => Field.Title)" />
-        <MudTextField @bind-Value="Field.Description" Variant="Variant.Filled" Class="p-2" Typo="Typo.subtitle2" T="string" Label="Field Description" For="@(() => Field.Description)" />
+        <MudTextField @bind-Value="Field.Title" 
+                    Variant="Variant.Filled" Class="p-2" Typo="Typo.h4" 
+                    Label="Field Title" 
+                    Required="true" RequiredError="Title is required!" 
+                    For="@(() => Field.Title)" />
+
+        <MudTextField @bind-Value="Field.Description" 
+                      Variant="Variant.Filled" Class="p-2" Typo="Typo.subtitle2" 
+                      Label="Field Description" 
+                      For="@(() => Field.Description)" />
 
 
         @switch (@Field.Type.Name)

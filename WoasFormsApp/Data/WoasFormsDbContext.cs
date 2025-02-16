@@ -34,10 +34,5 @@ namespace WoasFormsApp.Data
 
             base.OnModelCreating(builder);
         }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            //optionsBuilder.LogTo(Console.WriteLine);
-        }
     }
 }

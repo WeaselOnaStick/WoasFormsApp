@@ -14,22 +14,22 @@ namespace WoasFormsApp.Data
         public string Title { get; set; } = "";
         public string? Description { get; set; } = "";
 
-        public string? CoverImageUrl { get; set; } = "https://placehold.co/300x200";
+        public string? CoverImageUrl { get; set; } = "";
 
         public int TopicId { get; set; } = 0;
         public TemplateTopic Topic { get; set; }
 
-        public ICollection<TemplateTag> Tags {  get; set; } = new List<TemplateTag>();
+        public ICollection<TemplateTag> Tags {  get; set; } = new HashSet<TemplateTag>();
 
-        public ICollection<WoasFormsAppUser> UsersWhoLiked { get; set; } = new List<WoasFormsAppUser>();
+        public ICollection<WoasFormsAppUser> UsersWhoLiked { get; set; } = new HashSet<WoasFormsAppUser>();
 
-        public ICollection<TemplateComment> Comments { get; set; } = new List<TemplateComment>();
+        public ICollection<TemplateComment> Comments { get; set; } = new HashSet<TemplateComment>();
 
         // if NOT Public refer to trusted list
         public bool Public { get; set; } = true;
-        public ICollection<WoasFormsAppUser> AllowedUsers { get; set; } = new List<WoasFormsAppUser>();
+        public ICollection<WoasFormsAppUser> AllowedUsers { get; set; } = new HashSet<WoasFormsAppUser>();
 
-        public ICollection<Response> Responses { get; set; } = new List<Response>();
+        public ICollection<Response> Responses { get; set; } = new HashSet<Response>();
 
         public required List<TemplateField> Fields { get; set; } = new List<TemplateField>();
     }

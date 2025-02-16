@@ -65,7 +65,7 @@ else
                                 <MudText Typo="Typo.body2"><i>@template.Owner.UserName</i></MudText>
                             </CardHeaderContent>
                         </MudCardHeader>
-                        <MudCardMedia Image="@template.CoverImageUrl" Height="200" Style="width:300px"/>
+                        <MudCardMedia Image="@(string.IsNullOrWhiteSpace(template.CoverImageUrl) ? Assets["BlankThumbnail.png"] : template.CoverImageUrl)" Height="200" Style="width:300px" />
                         <MudCardContent>
                             <MudText Typo="Typo.subtitle1">@($"Created at {template.CreatedAt.ToShortDateString()}")</MudText>
                         </MudCardContent>

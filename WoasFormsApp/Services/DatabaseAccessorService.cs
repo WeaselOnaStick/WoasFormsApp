@@ -92,7 +92,16 @@ namespace WoasFormsApp.Services
 
         public async Task<Template?> GetTemplate(int templateId)
         {
-            var res = await _ctx.Templates.FirstAsync(t => t.Id == templateId);
+            var res = await _ctx.Templates
+                .Include(t => t.Owner)
+                .Include(t => t.Responses)
+                .Include(t => t.Fields)
+                .Include(t => t.Tags)
+                .Include(t => t.Responses)
+                .Include(t => t.UsersWhoLiked)
+                .Include(t => t.Comments)
+                .Include(t => t.AllowedUsers)
+                .FirstAsync(t => t.Id == templateId);
             if (res == null) return null;
             if (res.Owner == null && !await CurrentUserHasAdmin()) return null;
             return await CurrentUserHasPowerOverTarget(res.Owner) ? res : null;
@@ -153,13 +162,13 @@ namespace WoasFormsApp.Services
             //template.Owner = null;
         }
 
-        private async Task TemplateSetLike(int templateId, bool liked)
+        public async Task LikeTemplate(int templateId, bool liked)
         {
             var appUser = await GetCurrentUser();
             if (appUser == null) return;
             var template = await GetTemplateById(templateId);
             if (template == null) return;
-            var curUserAllowedToInteract = template.Public || (!template.Public && template.AllowedUsers.Contains(appUser));
+            var curUserAllowedToInteract = template.Public || await CurrentUserHasAdmin() || (!template.Public && template.AllowedUsers.Contains(appUser));
             if (!curUserAllowedToInteract) return;
 
             if (liked)
@@ -170,15 +179,6 @@ namespace WoasFormsApp.Services
             await _ctx.SaveChangesAsync();
         }
 
-        public async Task LikeTemplate(int templateId)
-        {
-            await TemplateSetLike(templateId, true);
-        }
-
-        public async Task UnLikeTemplate(int templateId)
-        {
-            await TemplateSetLike(templateId, false);
-        }
 
         public async Task CommentOnTemplate(int templateId, string commentText)
         {

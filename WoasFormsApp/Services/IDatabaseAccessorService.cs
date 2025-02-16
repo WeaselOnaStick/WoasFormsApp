@@ -14,8 +14,7 @@ namespace WoasFormsApp.Services
         Task<List<Template>> GetUsersTemplates(string userName);
         Task<Template?> UpdateTemplate(Template newTemplate, int? templateId = null);
         Task DeleteTemplate(int templateId);
-        Task LikeTemplate(int templateId);
-        Task UnLikeTemplate(int templateId);
+        Task LikeTemplate(int templateId, bool like);
         Task CommentOnTemplate(int templateId, string commentText);
 
         Task<List<WoasFormsAppUser>> GetAllUsers();

@@ -1,4 +1,5 @@
 ﻿@page "/Admin/Dashboard"
+@using Bogus
 @rendermode InteractiveServer
 @inject IDatabaseAccessorService dba
 @inject UserManager<WoasFormsAppUser> userManager
@@ -11,53 +12,43 @@
 
     <MudText Typo="Typo.h2" Align="Align.Center">Admin Dashboard</MudText>
 
-    <MudDataGrid T="UserViewModel" Items="@usersViewModels">
+    <MudDataGrid T="UserRoleModel" Items="_users">
         <Columns>
-            <PropertyColumn Title="Username" Property="x => x.Name" />
-            <PropertyColumn Title="Email" Property="x => x.Email" />
-            <PropertyColumn Title="Owned Templates" Property="x => x.Templates.Count" />
-             <TemplateColumn Title="Roles">
-                 <CellTemplate>
-                     <MudStack Row="true">
-                        @foreach (string roleName in context.Item.Roles)
+            <PropertyColumn Title="Username" Property="x => x.user.UserName" />
+            <PropertyColumn Title="Email" Property="x => x.user.Email" />
+            <PropertyColumn Title="Owned Templates" Property="x => x.user.OwnedTemplates.Count" />
+            <TemplateColumn Title="Roles">
+                <CellTemplate>
+                    <MudChipSet>
+                        @foreach (var item in context.Item.roles)
                         {
-                            <MudChip T="string" Color="Color.Primary">@roleName</MudChip>
+                            <MudChip Color="Color.Error">item</MudChip>
                         }
-                     </MudStack>
-                 </CellTemplate>
-             </TemplateColumn>
+                    </MudChipSet>
+                </CellTemplate>
+            </TemplateColumn>
         </Columns>
     </MudDataGrid>
 </MudPaper>
 
 @code {
     //private MudDataGrid<UserViewModel> grid
-    private List<UserViewModel> usersViewModels;
+    private List<UserRoleModel> _users;
 
     protected override async Task OnInitializedAsync()
     {
-        usersViewModels = new List<UserViewModel>();
         var formUsers = await dba.GetAllUsers();
-        if (formUsers == null || formUsers.Count == 0) return; //Paradox
-        foreach (var formUser in formUsers)
+        if (formUsers?.Any() != true) return; //Paradox
+        _users = formUsers.Select(u => new UserRoleModel
         {
-            var view = new UserViewModel
-            {
-                Name = formUser.UserName,
-                Email = formUser.Email,
-                Roles = await dba.GetUserRoles(formUser.Id),
-                Templates = new List<Template>() { },
-            };
-            usersViewModels.Add(view);
-        }
-        StateHasChanged();
+            user = u,
+            roles = userManager.GetRolesAsync(u).Result.ToList(),
+        }).ToList();
     }
 
-    public record UserViewModel 
+    public class UserRoleModel
     {
-        public string Name;
-        public string Email;
-        public List<string> Roles;
-        public List<Template> Templates;
+        public WoasFormsAppUser user { get; set; }
+        public List<string> roles { get; set; }
     }
 }

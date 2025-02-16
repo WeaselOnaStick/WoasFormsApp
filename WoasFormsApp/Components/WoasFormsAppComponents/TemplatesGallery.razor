@@ -9,7 +9,6 @@
 {
     <MudPaper Class="d-flex flex-column pa-4 mx-auto align-center gap-4 justify-center text-center" Style="max-width: fit-content" Elevation="2">
         <MudText Typo="Typo.h4">No templates yet...</MudText>
-        <MudText Typo="Typo.h5">Be the first one to create!</MudText>
         <AuthorizeView>
             <Authorized>
                 <MudButton Href="/Template/Create" Color="Color.Primary" Variant="Variant.Filled">Create Template</MudButton>
@@ -22,6 +21,7 @@
 }
 else
 {
+    <MudText Typo="Typo.h2" Align="Align.Center">@_headerText</MudText>
     <MudGrid Spacing=6 Justify="Justify.Center">
         @if (templates == null) // Loading templates...
         {
@@ -106,6 +106,14 @@ else
 
     List<Template> templates = new();
 
+    string _headerText => Mode switch
+    {
+        GalleryMode.GlobalNewest => "Newest Templates",
+        GalleryMode.GlobalPopular => "Popular Templates",
+        GalleryMode.BySpecificUser => $"Templates by {TargetUsername}",
+        GalleryMode.CustomList => "Custom Templates",
+        _ => "Templates"
+    };
 
 
     protected override async Task OnInitializedAsync()

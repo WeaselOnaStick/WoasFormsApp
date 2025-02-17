@@ -52,14 +52,14 @@ namespace WoasFormsApp.Services
         private async Task<Template> GetTemplateById(int templateId) => await _ctx.Templates.FindAsync(templateId);
 
 
-        public async Task<List<TemplateTopic>> GetTopics() =>
-            await _ctx.TemplateTopics.ToListAsync();
+        public async Task<HashSet<TemplateTopic>> GetTopics() =>
+            await _ctx.TemplateTopics.ToHashSetAsync();
 
-        public async Task<List<TemplateTag>> GetTags() =>
-            await _ctx.TemplateTags.ToListAsync();
+        public async Task<HashSet<TemplateTag>> GetTags() =>
+            await _ctx.TemplateTags.ToHashSetAsync();
 
-        public async Task<List<TemplateFieldType>> GetTemplateFieldTypes() =>
-            await _ctx.FieldTypes.ToListAsync();
+        public async Task<HashSet<TemplateFieldType>> GetTemplateFieldTypes() =>
+            await _ctx.FieldTypes.ToHashSetAsync();
 
         public bool ValidateTemplate(Template template)
         {
@@ -72,12 +72,25 @@ namespace WoasFormsApp.Services
         {
             template.Owner ??= await GetCurrentUser();
 
-            List<TemplateTag> syncedTagList = new List<TemplateTag>();
+            // replacing submitted tags with existing ones if found, creating new if not found
+            HashSet<TemplateTag> syncedTagList = new HashSet<TemplateTag>();
+            HashSet<TemplateTag> newTags = new HashSet<TemplateTag>();
             foreach (var tagName in template.Tags.Select(t=>t.Title))
             {
-                var foundTag = await _ctx.TemplateTags.FirstAsync(t => t.Title == tagName);
-                syncedTagList.Add(foundTag ?? new TemplateTag() { Title = tagName });
+                TemplateTag? foundTag = await _ctx.TemplateTags.FirstOrDefaultAsync(t => t.Title == tagName);
+                if (foundTag != null)
+                    syncedTagList.Add(foundTag);
+                else
+                    newTags.Add(new TemplateTag { Title = tagName });
             }
+
+            if (newTags.Any())
+            {
+                await _ctx.TemplateTags.AddRangeAsync(newTags);
+                await _ctx.SaveChangesAsync();
+                syncedTagList.UnionWith(newTags);
+            }
+
             template.Tags = syncedTagList;
 
             template.CreatedAt = DateTime.UtcNow;
@@ -85,7 +98,14 @@ namespace WoasFormsApp.Services
             if (!ValidateTemplate(template)) return null;
 
             var freshTemplate = await _ctx.Templates.AddAsync(template);
-            await _ctx.SaveChangesAsync();
+            try
+            {
+                await _ctx.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
 
             return freshTemplate.Entity;
         }
@@ -96,6 +116,7 @@ namespace WoasFormsApp.Services
                 .Include(t => t.Owner)
                 .Include(t => t.Responses)
                 .Include(t => t.Fields)
+                .Include(t => t.Topic)
                 .Include(t => t.Tags)
                 .Include(t => t.Responses)
                 .Include(t => t.UsersWhoLiked)

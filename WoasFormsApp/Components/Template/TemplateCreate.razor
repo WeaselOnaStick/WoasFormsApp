@@ -70,13 +70,13 @@
             <MudAutocomplete 
             @bind-Value=_userNewTag @bind-Text=_userNewTag
             Label="Add Tag (optional)" Class="p-2 m-2"
-            CoerceValue="true" 
+            CoerceValue="true" SearchFunc="SearchTag" T="string"
             OnKeyDown="@(e => {if (e.Code == "Enter") AddUserTag();})" 
             AdornmentIcon="@Icons.Material.Filled.AddCircleOutline" AdornmentColor="Color.Success" OnAdornmentClick=AddUserTag />
-            <MudChipSet T="string" AllClosable>
-                @foreach (var tag in userTags)
+            <MudChipSet T="TemplateTag" AllClosable>
+                @foreach (var tag in templateModel.Tags)
                 {
-                    <MudChip T="TemplateTag" Text="@tag" OnClose="(() => userTags.Remove(tag))" />
+                    <MudChip T="TemplateTag" Text="@tag.Title" OnClose="(() => templateModel.Tags.Remove(tag))" />
                 }
             </MudChipSet>
 
@@ -150,9 +150,9 @@
 
     public static int MaxQuestionPerType = 4;
 
-    private List<TemplateFieldType> _fieldTypesCache;
-    private List<TemplateTopic> _topicsCache;
-    private List<string> _tagsCache;
+    private HashSet<TemplateFieldType> _fieldTypesCache;
+    private HashSet<TemplateTopic> _topicsCache;
+    private HashSet<TemplateTag> _tagsCache;
 
     private class FieldCounts
     {
@@ -165,22 +165,22 @@
     private WoasFormsAppUser _autoFoundAllowedUser;
 
     private string _userNewTag = "";
-    private HashSet<string> userTags = new HashSet<string>();
 
-    private async Task InitTagsCache() => _tagsCache ??= (await dba.GetTags()).Select(t => t.Title).ToList();
+    private async Task InitTagsCache() => _tagsCache ??= (await dba.GetTags()).ToHashSet();
 
-    private async Task<List<string>> SearchTag(string searchText, CancellationToken cancellationToken)
+    private async Task<IEnumerable<string>> SearchTag(string searchText, CancellationToken cancellationToken)
     {
         await InitTagsCache();
-        var res = _tagsCache;
-        if (string.IsNullOrEmpty(searchText)) return res;
-        return res.Where(t => t.Contains(searchText, StringComparison.InvariantCultureIgnoreCase)).ToList();
+        var res = _tagsCache.ExceptBy(templateModel.Tags.Select(t => t.Title), t => t.Title, StringComparer.InvariantCultureIgnoreCase);
+        if (string.IsNullOrEmpty(searchText)) return res.Select(t => t.Title);
+        return res.Where(t => t.Title.Contains(searchText, StringComparison.InvariantCultureIgnoreCase)).Select(t => t.Title);
     }
 
     private void AddUserTag()
     {
         if (string.IsNullOrEmpty(_userNewTag)) return;
-        userTags.Add(_userNewTag);
+        if (templateModel.Tags.Select(t => t.Title).Contains(_userNewTag)) return;
+        templateModel.Tags.Add(new TemplateTag { Title = _userNewTag });
         _userNewTag = "";
         StateHasChanged();
     }
@@ -237,16 +237,18 @@
     {
         public TemplateCreationValidator(){
             RuleFor(t => t.Title).NotEmpty().WithMessage("Title is required!");
-            RuleFor(t => t.Fields).NotEmpty().WithMessage("Add at least 1 template field")
-            .Must(
+            RuleFor(t => t.Fields).NotEmpty().WithMessage("Add at least 1 template field!");
+
+            RuleFor(t => t.Fields).Must(
                 t => t.Count == 0 || t.GroupBy(f => f.Type.Id)
                 .Select(g => new { g.Key, Count = g.Count() })
                 .Max(g => g.Count) <= MaxQuestionPerType)
-                .WithMessage($"You can't have more than {MaxQuestionPerType} field per type")
-            .ForEach((rule) =>
-            {
-                rule.NotEmpty().WithMessage($"Field titles can't be empty");
-            });
+                .WithMessage($"You can't have more than {MaxQuestionPerType} field per type!");
+            
+            RuleForEach(t => t.Fields).ChildRules(f =>
+                {
+                    f.RuleFor(f => f.Title).NotEmpty().WithMessage((f, t) => $"Field #{f.Position} is missing a title!");
+                });
 
             
             RuleFor(t => t.TopicId).NotNull().WithMessage("Topic can't be empty");
@@ -265,13 +267,6 @@
 
     async Task CreateTemplate()
     {
-        // await form.Validate();
-        // if (!form.IsValid)
-        // {
-        //     snack.Add("Form invalid", MudBlazor.Severity.Error);
-        //     return;
-        // }
-
         var wholeCheck = validator.Validate(templateModel);
         if (!wholeCheck.IsValid)
         {
@@ -298,6 +293,7 @@
     async Task<IEnumerable<WoasFormsAppUser>> SearchUser(string searchText, CancellationToken cancellationToken)
     {
         await CacheUsers();
+        var res = _usersCache.ExceptBy(templateModel.AllowedUsers.Select(au => au.UserName), u => u.UserName, StringComparer.InvariantCultureIgnoreCase);
         if (string.IsNullOrWhiteSpace(searchText)) return _usersCache;
         return _usersCache.Where(u => u.UserName.Contains(searchText, StringComparison.InvariantCultureIgnoreCase));
     }

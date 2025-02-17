@@ -60,11 +60,11 @@ else
                     <MudCard>
                         <MudCardHeader>
                             <CardHeaderActions> 
-                                <MudChipSet T="int" Class="p-2 m-2">
+                                <MudChipSet T="int" Class="p-2">
                                     <MudChip OnClick="async () => await TemplateLike(templateView)" 
-                                             Variant="@(templateView.liked ? Variant.Filled : Variant.Outlined)"
+                                             Variant="@(templateView.liked ? Variant.Filled : Variant.Text)"
                                              Color="@(templateView.liked ? Color.Primary : Color.Surface)"
-                                             Icon="@(templateView.liked ? Icons.Material.Filled.Favorite : Icons.Material.Filled.FavoriteBorder)">@template.UsersWhoLiked.Count</MudChip>
+                                             Icon="@(templateView.liked ? Icons.Material.Filled.Favorite : Icons.Material.Outlined.FavoriteBorder)">@template.UsersWhoLiked.Count</MudChip>
                                     
                                     <MudChip Icon="@Icons.Material.Filled.Comment" Color="Color.Surface">@template.Comments.Count</MudChip>
                                     

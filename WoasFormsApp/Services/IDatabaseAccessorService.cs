@@ -4,9 +4,9 @@ namespace WoasFormsApp.Services
 {
     public interface IDatabaseAccessorService
     {
-        Task<List<TemplateTopic>> GetTopics();
-        Task<List<TemplateTag>> GetTags();
-        Task<List<TemplateFieldType>> GetTemplateFieldTypes();
+        Task<HashSet<TemplateTopic>> GetTopics();
+        Task<HashSet<TemplateTag>> GetTags();
+        Task<HashSet<TemplateFieldType>> GetTemplateFieldTypes();
 
         Task<Template?> CreateTemplate(Template template);
         Task<Template?> GetTemplate(int templateId);

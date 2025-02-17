@@ -121,6 +121,7 @@ namespace WoasFormsApp.Services
                 .Include(t => t.AllowedUsers)
                 .FirstAsync(t => t.Id == templateId);
             if (res == null) return null;
+            res.Fields.Sort((a,b) => a.Position.CompareTo(b.Position));
             if (await CurrentUserHasAdmin()) return res;
             if (res.Owner == null && await CurrentUserHasAdmin()) return res;
             if (res.Owner == null) return null;
@@ -262,5 +263,22 @@ namespace WoasFormsApp.Services
             return res;
         }
 
+        public async Task<Response?> CreateResponse(Response response)
+        {
+            var curUser = await GetCurrentUser();
+            response.Respondent = curUser;
+            response.CreationDate = DateTime.UtcNow;
+            // Response validation? Nothing to validate for now
+            var freshResponse = await _ctx.Responses.AddAsync(response);
+            try
+            {
+                await _ctx.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            return freshResponse.Entity;
+        }
     }
 }

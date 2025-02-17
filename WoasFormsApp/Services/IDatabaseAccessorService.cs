@@ -13,6 +13,7 @@ namespace WoasFormsApp.Services
         Task<List<Template>> GetAvailableTemplates();
         Task<List<Template>> GetUsersTemplates(string userName);
         Task<Template?> UpdateTemplate(Template newTemplate, int? templateId = null);
+        Task<Response?> CreateResponse(Response response);
         Task DeleteTemplate(int templateId);
         Task LikeTemplate(int templateId, bool like);
         Task CommentOnTemplate(int templateId, string commentText);

@@ -4,6 +4,8 @@
     {
         public int Id { get; set; }
 
+        public WoasFormsAppUser? Respondent { get; set; }
+
         public DateTime CreationDate { get; set; } = DateTime.UnixEpoch;
 
         public Template? Template { get; set; }

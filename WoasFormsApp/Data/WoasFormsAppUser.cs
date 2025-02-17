@@ -8,6 +8,8 @@ namespace WoasFormsApp.Data
         public DateTime? RegisteredAt { get; set; }
         public bool IsBlocked { get; set; } = false;
 
+        public ICollection<Response> Responses { get; set; }
+
         public ICollection<Template> OwnedTemplates { get; set; }
     }
 }

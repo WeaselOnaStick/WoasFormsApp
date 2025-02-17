@@ -43,7 +43,11 @@ else
             {
                 <MudImage Src="@_template.CoverImageUrl" />
             }
-            <MudMarkdown Value="@(string.IsNullOrWhiteSpace(_template.Description) ? "__(No Description Provided)__" : _template.Description)"></MudMarkdown>
+            <div class="p-4">
+                <MudPaper Class="p-4 m-6 mud-background-gray">
+                    <MudMarkdown Value="@(string.IsNullOrWhiteSpace(_template.Description) ? "__(No Description Provided)__" : _template.Description)"></MudMarkdown>
+                </MudPaper>
+            </div>
 
             <MudToolBar>
                 

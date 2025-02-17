@@ -20,8 +20,7 @@ namespace WoasFormsApp.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<WoasFormsAppUser>().HasMany(u => u.OwnedTemplates).WithOne(t => t.Owner);
-
-            
+            builder.Entity<WoasFormsAppUser>().HasMany(u => u.Responses).WithOne(r => r.Respondent);
 
             builder.Entity<Template>().HasMany(t => t.Tags).WithMany();
             builder.Entity<Template>().HasMany(t => t.UsersWhoLiked).WithMany();

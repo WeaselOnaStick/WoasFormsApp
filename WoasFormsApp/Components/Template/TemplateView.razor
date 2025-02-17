@@ -3,6 +3,26 @@
 @inject IDatabaseAccessorService dba
 @inject NavigationManager nav
 
+
+@if (_template == null) {
+
+<PageTitle>Template Missing</PageTitle>
+
+<MudGrid Justify="Justify.Center" Class="p-12 pt-15">
+    <MudItem xs="10">
+        <MudPaper Class="mb-50">
+            <MudStack AlignItems="AlignItems.Center">
+                <MudText Align="Align.Center" Typo="Typo.h3" Class="pt-4">Template not found <br /> or you don't have permission</MudText>
+                    <MudLink Typo="Typo.subtitle1" Href="/" Class="pb-8">Click here to return to home page</MudLink>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+}
+else
+{
+
 <PageTitle>Template "@_template.Title"</PageTitle>
 
 <MudGrid Justify="Justify.Center" Class="pt-12">
@@ -25,10 +45,10 @@
                         }
 
                     </MudGrid>
-                    
+
                 </MudItem>
             </MudGrid>
-            <MudText Class="p-1" Typo="Typo.body1" Style="font-style: italic;">Created by @(_template.Owner.UserName ?? "(Orphan Template)") on @(_template.CreatedAt.ToLocalTime().ToLongTimeString())</MudText>
+                <MudText Class="p-1" Typo="Typo.body1" Style="font-style: italic;">Created by @(_template.Owner.UserName ?? "(Orphan Template)") on @(_template.CreatedAt.ToLocalTime().ToLongDateString()) @(_template.CreatedAt.ToLocalTime().ToShortTimeString()) </MudText>
             @if (!string.IsNullOrWhiteSpace(_template.CoverImageUrl))
             {
                 <MudImage Src="@_template.CoverImageUrl" />
@@ -45,6 +65,9 @@
         </MudPaper>
     </MudItem>
 </MudGrid>
+}
+
+
 @code {
     [Parameter]
     public int TemplateId { get; set; }
@@ -54,7 +77,6 @@
     protected override async Task OnInitializedAsync()
     {
         _template = await dba.GetTemplate(TemplateId);
-        if (_template == null) nav.NavigateTo("/404");
-
+        
     }
 }

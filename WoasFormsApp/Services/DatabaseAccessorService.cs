@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using WoasFormsApp.Data;
 
@@ -131,10 +132,10 @@ namespace WoasFormsApp.Services
             return null;
         }
 
-        public async Task<List<Template>> GetAvailableTemplates()
+        public async Task<ICollection<Template>> GetAvailableTemplates()
         {
-            var templateIds = await _ctx.Templates.Select(t => t.Id).ToListAsync();
-            var res = new List<Template>();
+            var templateIds = await _ctx.Templates.Select(t => t.Id).ToHashSetAsync();
+            var res = new HashSet<Template>();
             foreach (var id in templateIds)
             {
                 var foundTemplate = await GetTemplate(id);
@@ -144,7 +145,7 @@ namespace WoasFormsApp.Services
             return res;
         }
 
-        public async Task<List<Template>> GetUsersTemplates(string userName)
+        public async Task<ICollection<Template>> GetTemplatesByOwner(string userName)
         {
             var curUser = await GetCurrentUser();
             var targetUser = await GetUserByName(userName);
@@ -263,6 +264,52 @@ namespace WoasFormsApp.Services
             return res;
         }
 
+        public async Task<ICollection<Response>> GetResponsesByTemplate(int templateId)
+        {
+            var responsesIds = await _ctx.Responses.Where(r => r.Template.Id == templateId).Select(r => r.Id).ToHashSetAsync();
+            if (responsesIds == null) return new HashSet<Response>();
+            var res = new HashSet<Response>();
+            foreach (var rid in responsesIds)
+            {
+                var foundResponse = await GetResponse(rid);
+                if (foundResponse != null) res.Add(foundResponse);
+            }
+            return res;
+        }
+
+        public async Task<ICollection<Response>> GetResponsesByRespondent(string userId)
+        {
+            var responsesIds = await _ctx.Responses.Where(r => r.Respondent.Id == userId).Select(r => r.Id).ToHashSetAsync();
+            if (responsesIds == null) return new HashSet<Response>();
+            var res = new HashSet<Response>();
+            foreach (var rid in responsesIds)
+            {
+                var foundResponse = await GetResponse(rid);
+                if (foundResponse != null) res.Add(foundResponse);
+            }
+            return res;
+        }
+
+        public async Task<Response?> GetResponse(int responseId)
+        {
+            var res = await _ctx.Responses
+                 .Include(r => r.Respondent)
+                 .Include(r => r.Template)
+                    .ThenInclude(t => t.Owner)
+                 .Include(r => r.Template)
+                 .Include(r => r.Answers)
+                    .ThenInclude(a => a.Field)
+                        .ThenInclude(f => f.Type)
+                 .FirstAsync(r => r.Id == responseId);
+            if (res == null) return null;
+            res.Answers.Sort((a, b) => a.Field.Position.CompareTo(b.Field.Position));
+            if (await CurrentUserHasAdmin()) return res;
+            if (res.Respondent == null && await CurrentUserHasAdmin()) return res;
+            if (res.Respondent == null) return null;
+            if (res.Respondent == await GetCurrentUser() || res.Template.AllowedUsers.Contains(await GetCurrentUser())) return res;
+            return null;
+        }
+
         public async Task<Response?> CreateResponse(Response response)
         {
             var curUser = await GetCurrentUser();
@@ -280,5 +327,6 @@ namespace WoasFormsApp.Services
             }
             return freshResponse.Entity;
         }
+
     }
 }

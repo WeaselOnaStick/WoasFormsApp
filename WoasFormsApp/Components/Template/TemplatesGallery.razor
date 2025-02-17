@@ -136,16 +136,16 @@ else
         switch (Mode)
         {
             case GalleryMode.GlobalNewest: 
-                prepList = await dba.GetAvailableTemplates();
+                prepList = new List<Template>(await dba.GetAvailableTemplates());
                 prepList = prepList.OrderByDescending(t => t.CreatedAt).ToList();
                 break;
             case GalleryMode.GlobalPopular:
-                prepList = await dba.GetAvailableTemplates();
+                prepList = new List<Template>(await dba.GetAvailableTemplates());
                 prepList = prepList.OrderBy(t => t.Responses.Count).ThenByDescending(t => t.CreatedAt).ToList();
                 break;
             case GalleryMode.BySpecificUser:
                 if (TargetUsername == null) throw new Exception("TargetUsername parameter required");
-                prepList = await dba.GetUsersTemplates(TargetUsername);
+                prepList = new List<Template>(await dba.GetTemplatesByOwner(TargetUsername));
                 break;
             case GalleryMode.CustomList:
                 if (CustomTemplates == null) throw new Exception("CustomTemplates parameter required");

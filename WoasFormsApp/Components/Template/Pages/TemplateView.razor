@@ -1,0 +1,43 @@
+﻿@page "/Template/{TemplateId:int}"
+@rendermode InteractiveServer
+@inject IDatabaseAccessorService dba
+@inject NavigationManager nav
+
+
+@if (_template == null) 
+{
+    <TemplateInaccessible />
+}
+else
+{
+    <PageTitle>Template "@_template.Title"</PageTitle>
+
+    <MudGrid Justify="Justify.Center" Class="pt-12">
+        <MudItem xs="10">
+            <MudPaper Class="p-4">
+                <TemplateMetaInfo Template="@_template" />
+
+                <MudToolBar>
+                
+                </MudToolBar>
+
+                <TemplateCommentsSection />
+
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+}
+
+
+@code {
+    [Parameter]
+    public int TemplateId { get; set; }
+
+    private Template _template { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _template = await dba.GetTemplate(TemplateId);
+        
+    }
+}

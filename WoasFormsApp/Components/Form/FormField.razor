@@ -1,0 +1,61 @@
+﻿@inject IDatabaseAccessorService dba
+
+<MudPaper Elevation="5" Class="p-4 m-2">
+    <MudStack Spacing="2">
+        <MudText Class="p-1" Typo="Typo.h4">@Answer.Field.Title</MudText>
+        @if(!string.IsNullOrWhiteSpace(Answer.Field.Description))
+        {
+            <MudText Class="p-1" Typo="Typo.body1">@Answer.Field.Description</MudText>
+        }
+
+        @switch (Answer.Field.Type.Name)
+        {
+            case "SingleLine":
+                <MudTextField Class="p-2" @bind-Value=Answer.AnswerSingleLine ReadOnly="@ReadOnly" Disabled="@ReadOnly" Variant="Variant.Outlined" For="@(() => Answer.AnswerSingleLine)"/>
+                break;
+            case "MultiLine":
+                <MudTextField Class="p-2" @bind-Value=Answer.AnswerMultiLine ReadOnly="@ReadOnly" Disabled="@ReadOnly" Lines="3" AutoGrow="true" Variant="Variant.Outlined" For="@(() => Answer.AnswerSingleLine)" />
+                break;
+            case "PositiveInt":
+                <MudNumericField Class="p-2" @bind-Value=Answer.AnswerPositiveInt ReadOnly="@ReadOnly" Disabled="@ReadOnly" Min="1" Variant="Variant.Outlined" For="@(() => Answer.AnswerPositiveInt)" />
+                break;
+            case "CheckBox":
+                <MudCheckBox TriState="false" Class="p-2" @bind-Value=Answer.AnswerCheckedBox ReadOnly="@ReadOnly" Disabled="@ReadOnly" For="@(() => Answer.AnswerCheckedBox)" />
+                break;
+            default:
+                <MudText Typo="Typo.body1" Color="Color.Error" Class="p-2">Field type not supported</MudText>
+                break;
+        }
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public ResponseAnswer Answer { get; set; }
+
+    [Parameter]
+    public bool ReadOnly { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Answer == null) throw new Exception("Answer Navigation Missing");
+        if (Answer.Field == null) throw new Exception("Field Missing");
+        if (!ReadOnly)
+            switch (Answer.Field.Type.Name)
+            {
+                case "SingleLine":
+                    Answer.AnswerSingleLine ??= "";
+                    break;
+                case "MultiLine":
+                    Answer.AnswerMultiLine ??= "";
+                    break;
+                case "PositiveInt":
+                    Answer.AnswerPositiveInt ??= 1;
+                    break;
+                case "CheckBox":
+                    Answer.AnswerCheckedBox ??= false;
+                    break;
+            
+        }
+    }
+}

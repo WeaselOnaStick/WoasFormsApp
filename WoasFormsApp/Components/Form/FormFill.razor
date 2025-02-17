@@ -5,7 +5,7 @@
 @inject NavigationManager nav
 
 @if (_template == null){
-    <TemplateUnaccessible />
+    <WoasFormsApp.Components.Template.TemplateInaccessible />
 }
 else
 {
@@ -22,10 +22,10 @@ else
 
                     </div>
 
-                    @foreach (var field in _template.Fields)
-                    {
-                        <TemplateFieldFill Field="field" ResponseModel="_response" ReadOnly="false" />
-                    }
+                    @foreach (var answer in _response.Answers)
+                        {
+                            <FormField Answer="answer" ReadOnly="false"/>
+                        }
                     <div class="mt-6 px-4 m-4 align-self-center">
                         <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="SubmitForm" Class="rounded-5 flex-shrink">
                             <MudText Typo="Typo.h6"> Submit Form </MudText>
@@ -70,7 +70,7 @@ else
         else
         {
             snack.Add("Form submitted successfully", Severity.Success);
-            nav.NavigateTo($"/Template/{_template.Id}");
+            nav.NavigateTo($"/Form/{res.Id}");
         }
     }
 }

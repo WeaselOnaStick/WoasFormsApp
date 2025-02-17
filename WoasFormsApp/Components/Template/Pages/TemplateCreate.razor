@@ -284,7 +284,7 @@
         else
         {
             snack.Add($"Template \"{newTemplate.Title}\" created successfully!", MudBlazor.Severity.Success);
-            nav.NavigateTo("/");
+            nav.NavigateTo($"/Template/{newTemplate.Id}");
         }
     }
 

@@ -28,9 +28,12 @@ else
 <MudGrid Justify="Justify.Center" Class="pt-12">
     <MudItem xs="10">
         <MudPaper Class="p-4">
-            <MudGrid Justify="Justify.SpaceBetween">
+            <MudGrid Justify="Justify.SpaceEvenly">
                 <MudItem md="8" xs="12">
-                    <MudText Class="pb-2" Typo="Typo.h3">@_template.Title</MudText>
+                    <MudText style="white-space: nowrap; max-width: fit-content; display: inline; vertical-align: middle;" Class="pb-2 pr-4" Typo="Typo.h3">@_template.Title</MudText>
+                    <MudButton StartIcon="@Icons.Material.Filled.Checklist" IconSize="Size.Large" Class="rounded-pill" Color="Color.Info" Variant="Variant.Filled" Href=@($"/Template/Fill/{TemplateId}")>Fill Form</MudButton>
+                        
+                    <MudText Typo="Typo.body1" Style="font-style: italic;">Created by @(_template.Owner.UserName ?? "(Orphan Template)") on @(_template.CreatedAt.ToLocalTime().ToLongDateString()) @(_template.CreatedAt.ToLocalTime().ToShortTimeString()) </MudText>
                 </MudItem>
                 <MudItem md="4" xs="12">
                     <div class="rounded-pill mud-theme-secondary py-2 px-6 mx-4 my-6">
@@ -48,7 +51,6 @@ else
 
                 </MudItem>
             </MudGrid>
-                <MudText Class="p-1" Typo="Typo.body1" Style="font-style: italic;">Created by @(_template.Owner.UserName ?? "(Orphan Template)") on @(_template.CreatedAt.ToLocalTime().ToLongDateString()) @(_template.CreatedAt.ToLocalTime().ToShortTimeString()) </MudText>
             @if (!string.IsNullOrWhiteSpace(_template.CoverImageUrl))
             {
                 <MudImage Src="@_template.CoverImageUrl" />
@@ -56,8 +58,7 @@ else
             <MudMarkdown Value="@(string.IsNullOrWhiteSpace(_template.Description) ? "__(No Description Provided)__" : _template.Description)"></MudMarkdown>
 
             <MudToolBar>
-                <MudButton StartIcon="@Icons.Material.Filled.Checklist" IconSize="Size.Large" Class="rounded-pill" Color="Color.Info" Variant="Variant.Filled" Href=@($"/Template/Fill/{TemplateId}")>Fill Form</MudButton>
-
+                
             </MudToolBar>
 
             <TemplateCommentsSection />

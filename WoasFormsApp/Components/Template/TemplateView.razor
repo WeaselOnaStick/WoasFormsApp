@@ -53,7 +53,7 @@ else
             {
                 <MudImage Src="@_template.CoverImageUrl" />
             }
-            <MudMarkdown Value="@(_template.Description ?? "")"></MudMarkdown>
+            <MudMarkdown Value="@(string.IsNullOrWhiteSpace(_template.Description) ? "__(No Description Provided)__" : _template.Description)"></MudMarkdown>
 
             <MudToolBar>
                 <MudButton StartIcon="@Icons.Material.Filled.Checklist" IconSize="Size.Large" Class="rounded-pill" Color="Color.Info" Variant="Variant.Filled" Href=@($"/Template/Fill/{TemplateId}")>Fill Form</MudButton>

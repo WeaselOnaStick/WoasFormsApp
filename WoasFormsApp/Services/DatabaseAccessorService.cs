@@ -49,9 +49,6 @@ namespace WoasFormsApp.Services
         private async Task<WoasFormsAppUser> GetUserById(string userId) => await _users.FindByIdAsync(userId);
         private async Task<WoasFormsAppUser> GetUserByName(string userName) => await _users.FindByNameAsync(userName);
 
-        private async Task<Template> GetTemplateById(int templateId) => await _ctx.Templates.FindAsync(templateId);
-
-
         public async Task<HashSet<TemplateTopic>> GetTopics() =>
             await _ctx.TemplateTopics.ToHashSetAsync();
 
@@ -124,29 +121,26 @@ namespace WoasFormsApp.Services
                 .Include(t => t.AllowedUsers)
                 .FirstAsync(t => t.Id == templateId);
             if (res == null) return null;
-            if (res.Owner == null && !await CurrentUserHasAdmin()) return null;
-            return await CurrentUserHasPowerOverTarget(res.Owner) ? res : null;
+            if (await CurrentUserHasAdmin()) return res;
+            if (res.Owner == null && await CurrentUserHasAdmin()) return res;
+            if (res.Owner == null) return null;
+            if (res.Public) return res;
+            if (res.Owner == await GetCurrentUser()) return res;
+            if (res.AllowedUsers.Contains(await GetCurrentUser())) return res;
+            return null;
         }
 
         public async Task<List<Template>> GetAvailableTemplates()
         {
-            IQueryable<Template> res = null;
-            if (await CurrentUserHasAdmin()) 
-                res = _ctx.Templates;
-            else
+            var templateIds = await _ctx.Templates.Select(t => t.Id).ToListAsync();
+            var res = new List<Template>();
+            foreach (var id in templateIds)
             {
-                var curUser = await GetCurrentUser();
-                res = _ctx.Templates.Where(t => t.Public || t.Owner == curUser || t.AllowedUsers.Contains(curUser));
-            }
+                var foundTemplate = await GetTemplate(id);
+                if (foundTemplate != null) res.Add(foundTemplate);
+            }     
             
-            return await res
-                .Include(t => t.Owner)
-                .Include(t => t.UsersWhoLiked)
-                .Include(t => t.Comments)
-                .Include(t => t.AllowedUsers)
-                .Include(t => t.Responses)
-                .Include(t => t.Fields)
-                .ToListAsync();
+            return res;
         }
 
         public async Task<List<Template>> GetUsersTemplates(string userName)
@@ -171,8 +165,7 @@ namespace WoasFormsApp.Services
 
         public async Task DeleteTemplate(int templateId)
         {
-
-            var template = GetTemplateById(templateId);
+            var template = await GetTemplate(templateId);
             if (template == null) return;
             _ctx.Remove(template);
             await _ctx.SaveChangesAsync();
@@ -187,7 +180,7 @@ namespace WoasFormsApp.Services
         {
             var appUser = await GetCurrentUser();
             if (appUser == null) return;
-            var template = await GetTemplateById(templateId);
+            var template = await GetTemplate(templateId);
             if (template == null) return;
             var curUserAllowedToInteract = template.Public || await CurrentUserHasAdmin() || (!template.Public && template.AllowedUsers.Contains(appUser));
             if (!curUserAllowedToInteract) return;
@@ -206,7 +199,7 @@ namespace WoasFormsApp.Services
             if (string.IsNullOrWhiteSpace(commentText)) return;
             var appUser = await GetCurrentUser();
             if (appUser == null) return;
-            var template = await GetTemplateById(templateId);
+            var template = await GetTemplate(templateId);
             if (template == null) return;
             var curUserAllowedToInteract = template.Public || (!template.Public && template.AllowedUsers.Contains(appUser));
             if (!curUserAllowedToInteract) return;

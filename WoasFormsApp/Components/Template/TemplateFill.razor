@@ -1,11 +1,63 @@
 ﻿@page "/Template/Fill/{FormId:int}"
 @rendermode InteractiveServer
+@inject IDatabaseAccessorService dba
+@inject ISnackbar snack
 
-<h3>Form ID @FormId</h3>
+@if (_template == null){
+    <TemplateUnaccessible />
+}
+else
+{
+    <MudForm Model="_response" @ref=form>
+        <MudGrid Justify="Justify.Center" Class="p-4 m-2">
+            <MudItem md="10" xs="12">
+                <MudPaper Class="m-2 d-flex flex-column">
+                    <MudText style="white-space: nowrap; max-width: fit-content" Class="p-4" Typo="Typo.h3">@_template.Title</MudText>
+                    <MudText Class="p-4" Typo="Typo.body1" style="font-style: italic;">Created by @(_template.Owner.UserName ?? "(Orphan Template)") on @(_template.CreatedAt.ToLocalTime().ToLongDateString()) @(_template.CreatedAt.ToLocalTime().ToShortTimeString()) </MudText>
+                    <MudPaper Class="p-4 mud-background-gray">
+                        <MudMarkdown Value="@(string.IsNullOrWhiteSpace(_template.Description) ? "__(No Description Provided)__" : _template.Description)"></MudMarkdown>
+                    </MudPaper>
 
-TBD
+                    @foreach (var field in _template.Fields)
+                    {
+                        <TemplateFieldFill Field="field" ResponseModel="_response" ReadOnly="false" />
+                    }
+                    <div class="mt-6 px-4 m-4 align-self-center">
+                        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="SubmitForm" Class="rounded-5 flex-shrink">
+                            <MudText Typo="Typo.h6"> Submit Form </MudText>
+                        </MudButton>
+                    </div>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    </MudForm>
+
+}
 
 @code {
+    MudForm form { get; set; }
+
     [Parameter]
     public int FormId { get; set; }
+
+    private Template? _template { get; set; }
+
+    private Response _response { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _template = await dba.GetTemplate(FormId);
+        if (_template == null) return;
+        List<ResponseAnswer> _answers = _template.Fields.Select(f => new ResponseAnswer { Field = f }).ToList();
+        _response = new Response()
+            {
+                Template = _template,
+                Answers = _answers,
+            };
+    }
+
+    private async Task SubmitForm()
+    {
+        snack.Add("Not yet implemented", Severity.Warning);
+    }
 }

@@ -17,9 +17,9 @@
 
         public TemplateField Field { get; set; }
 
-        public string?  AnswerSingleLine    { get; set; }
-        public string?  AnswerMultiLine     { get; set; }
-        public int?     AnswerPositiveInt   { get; set; }
-        public bool?    AnswerCheckedBox    { get; set; }
+        public string? AnswerSingleLine { get; set; }
+        public string? AnswerMultiLine { get; set; }
+        public int? AnswerPositiveInt { get; set; } 
+        public bool? AnswerCheckedBox { get; set; }
     }
 }

@@ -1,43 +1,64 @@
 ﻿@inject IDatabaseAccessorService dba
 
-<MudPaper Elevation="5">
+<MudPaper Elevation="5" Class="p-4 m-2">
     <MudStack Spacing="2">
-        <MudText Class="p-2" Typo="Typo.h4">@Field.Title</MudText>
-        <MudText Class="p-2" Typo="Typo.subtitle2">@Field.Description</MudText>
+        <MudText Class="p-1" Typo="Typo.h4">@Field.Title</MudText>
+        <MudText Class="p-1" Typo="Typo.body1">@Field.Description</MudText>
 
         @switch (@Field.Type.Name)
         {
             case "SingleLine":
-                <MudTextField Class="p-2" T="string" ReadOnly="@ReadOnly" Variant="Variant.Outlined" For="@(() => ResponseModel.Answers[FieldIndex].AnswerSingleLine)"/>
+                <MudTextField Class="p-2" @bind-Value=_answer.AnswerSingleLine ReadOnly="@ReadOnly" Variant="Variant.Outlined" For="@(() => _answer.AnswerSingleLine)"/>
                 break;
             case "MultiLine":
-                <MudTextField Class="p-2" T="string" ReadOnly="@ReadOnly" Lines="3" Variant="Variant.Outlined" For="@(() => ResponseModel.Answers[FieldIndex].AnswerSingleLine)" />
+                <MudTextField Class="p-2" @bind-Value=_answer.AnswerMultiLine ReadOnly="@ReadOnly" Lines="3" AutoGrow="true" Variant="Variant.Outlined" For="@(() => _answer.AnswerSingleLine)" />
                 break;
             case "PositiveInt":
-                <MudNumericField Class="p-2" T="int?" ReadOnly="@ReadOnly" Min="1" Variant="Variant.Outlined" For="@(() => ResponseModel.Answers[FieldIndex].AnswerPositiveInt)" />
+                <MudNumericField Class="p-2" @bind-Value=_answer.AnswerPositiveInt ReadOnly="@ReadOnly" Min="1" Variant="Variant.Outlined" For="@(() => _answer.AnswerPositiveInt)" />
                 break;
             case "CheckBox":
-                <MudCheckBox Class="p-2" T="bool?" ReadOnly="@ReadOnly" For="@(() => ResponseModel.Answers[FieldIndex].AnswerCheckedBox)" />
+                <MudCheckBox TriState="false" Class="p-2" @bind-Value=_answer.AnswerCheckedBox ReadOnly="@ReadOnly" For="@(() => _answer.AnswerCheckedBox)" />
+                break;
+            default:
+                <MudText Typo="Typo.body1" Color="Color.Error" Class="p-2">Field type not supported</MudText>
                 break;
         }
-
     </MudStack>
 </MudPaper>
 
 @code {
-
     [Parameter, EditorRequired]
-    public required Template TemplateModel { get; set; }
-
-    [Parameter, EditorRequired]
-    public required Response ResponseModel { get; set; }
-
-    [Parameter, EditorRequired]
-    public required int FieldIndex { get; set; }
+    public Response ResponseModel { get; set; }
 
     [Parameter, EditorRequired]
     public TemplateField Field { get; set; }
 
+    private ResponseAnswer? _answer { get; set; }
+
     [Parameter]
     public bool ReadOnly { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (ResponseModel == null) throw new Exception("ResponseModel required");
+        if (Field == null) throw new Exception("Field required");
+
+        _answer = ResponseModel.Answers.FirstOrDefault(a => a.Field == Field);
+        if (_answer == null) throw new Exception("Field/Answer mismatch");
+        switch (Field.Type.Name)
+        {
+            case "SingleLine":
+                _answer.AnswerSingleLine = "";
+                break;
+            case "MultiLine":
+                _answer.AnswerMultiLine = "";
+                break;
+            case "PositiveInt":
+                _answer.AnswerPositiveInt = 1;
+                break;
+            case "CheckBox":
+                _answer.AnswerCheckedBox = false;
+                break;
+        }
+    }
 }

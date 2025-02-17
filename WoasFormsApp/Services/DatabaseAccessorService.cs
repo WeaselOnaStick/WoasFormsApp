@@ -112,7 +112,7 @@ namespace WoasFormsApp.Services
             var res = await _ctx.Templates
                 .Include(t => t.Owner)
                 .Include(t => t.Responses)
-                .Include(t => t.Fields)
+                .Include(t => t.Fields).ThenInclude(f => f.Type)
                 .Include(t => t.Topic)
                 .Include(t => t.Tags)
                 .Include(t => t.Responses)

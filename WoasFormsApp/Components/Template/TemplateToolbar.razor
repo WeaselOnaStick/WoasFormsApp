@@ -53,11 +53,11 @@
         };
         var dialog = await DialogService.ShowAsync<WarningDialog>(null, options);
         var res = await dialog.Result;
-        if (res == DialogResult.Ok(true))
+        if (!res.Canceled)
         {
             await dba.DeleteTemplate(Item.Id);
             snack.Add("Template Deleted", Severity.Success);
-            nav.NavigateTo("/MyTemplates", true);
+            nav.Refresh(true);
         }
     }
 }

@@ -14,50 +14,30 @@ namespace WoasFormsApp.Services
         WoasFormsDbContext _ctx;
         AuthenticationStateProvider _asp;
         UserManager<WoasFormsAppUser> _users;
-        SignInManager<WoasFormsAppUser> _sign;
 
         public DatabaseAccessorService(
             WoasFormsDbContext context, 
             AuthenticationStateProvider authenticationStateProvider,
-            UserManager<WoasFormsAppUser> userManager,
-            SignInManager<WoasFormsAppUser> signInManager)
+            UserManager<WoasFormsAppUser> userManager)
         {
             _ctx = context;
             _asp = authenticationStateProvider;
             _users = userManager;
-            _sign = signInManager;
         }
-
-        private WoasFormsAppUser? _curUserCache = null;
-        private bool _curUserIsCached = false;
-
-        private bool _curUserHasAdminCache;
-        private bool _curUserHasAdminIsCached = false;
 
         public async Task<WoasFormsAppUser?> GetCurrentUser()
         {
-            if (!_curUserIsCached) 
-            { 
-                var user = (await _asp.GetAuthenticationStateAsync()).User;
-                string userName = user.Identity.Name;
-                if (userName == null) return null;
-                var resUser = await _users.FindByNameAsync(userName);
-                _curUserCache = resUser;
-                _curUserIsCached = true;
-            }
-            return _curUserCache;
+            var user = (await _asp.GetAuthenticationStateAsync()).User;
+            string userName = user.Identity.Name;
+            if (userName == null) return null;
+            return await _users.FindByNameAsync(userName);
         }
 
         private async Task<bool> CurrentUserHasAdmin()
         {
-            if (!_curUserHasAdminIsCached)
-            {
-                var user = await GetCurrentUser();
-                if (user == null) return false;
-                _curUserHasAdminCache = await _users.IsInRoleAsync(user, "Admin");
-                _curUserHasAdminIsCached = true;
-            }
-            return _curUserHasAdminCache;
+            var user = await GetCurrentUser();
+            if (user == null) return false;
+            return await _users.IsInRoleAsync(user, "Admin");
         }
 
         private async Task<bool> CurrentUserHasPowerOverTarget(WoasFormsAppUser targetUser) 
@@ -266,41 +246,39 @@ namespace WoasFormsApp.Services
                 .ToListAsync();
         }
 
-        public async Task UserDelete(string targetUserId)
+        public async Task DeleteUser(string targetUserId)
         {
             if (!await CurrentUserHasPowerOverTarget(targetUserId)) return;
-            var targetUser = await GetUserById(targetUserId);
-            if (await GetCurrentUser() == targetUser) await _sign.SignOutAsync();
             _ctx.Users.Remove(await GetUserById(targetUserId));
             await _ctx.SaveChangesAsync();
         }
 
-        public async Task UserGiveRole(string userId, string roleName)
+        public async Task GiveUserRole(string userId, string roleName)
         {
             if (!await CurrentUserHasAdmin()) return;
             await _users.AddToRoleAsync(await GetUserById(userId), roleName);
             await _ctx.SaveChangesAsync();
         }
 
-        public async Task UserRevokeRole(string userId, string roleName)
+        public async Task RevokeUserRole(string userId, string roleName)
         {
             if (!await CurrentUserHasAdmin()) return;
             await _users.RemoveFromRoleAsync(await GetUserById(userId), roleName);
             await _ctx.SaveChangesAsync();
         }
 
-        public async Task UserSetBlocked(string userId, bool blocked)
+        public async Task BlockUser(string userId, bool blocked)
         {
             if (!await CurrentUserHasAdmin()) return;
             (await GetUserById(userId)).IsBlocked = blocked;
             await _ctx.SaveChangesAsync();
         }
 
-        public async Task UserBlock(string userId) => await UserSetBlocked(userId, true);
+        public async Task BlockUser(string userId) => await BlockUser(userId, true);
 
-        public async Task UserUnblock(string userId) => await UserSetBlocked(userId, false);
+        public async Task UnblockUser(string userId) => await BlockUser(userId, false);
 
-        public async Task<List<string>> UserGetRoles(string userId)
+        public async Task<List<string>> GetUserRoles(string userId)
         {
             List<string> res = new List<string>();
             if (!await CurrentUserHasAdmin()) return res;

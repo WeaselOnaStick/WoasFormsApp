@@ -3,9 +3,11 @@
 
 @attribute [Authorize]
 
-<AuthorizeView>
-    <Authorized>
-        WILL BE REPLACED LATER
-        <TemplatesGallery Mode="TemplatesGallery.GalleryMode.BySpecificUser" TargetUsername="@context.User.Identity.Name" />
-    </Authorized>
-</AuthorizeView>
+<PaperCenter Title="My Templates">
+    <AuthorizeView>
+        <Authorized>
+            WILL BE REPLACED LATER
+            <TemplatesGallery Mode="TemplatesGallery.GalleryMode.BySpecificUser" TargetUsername="@context.User.Identity.Name" />
+        </Authorized>
+    </AuthorizeView>
+</PaperCenter>

@@ -10,22 +10,11 @@
 }
 else
 {
-    <PageTitle>Template "@_template.Title"</PageTitle>
+    <PaperCenter Title="@($"Template {_template.Title}")">
+        <TemplateMetaInfo Template="@_template" />
 
-    <MudGrid Justify="Justify.Center" Class="pt-12">
-        <MudItem xs="10">
-            <MudPaper Class="p-4">
-                <TemplateMetaInfo Template="@_template" />
-
-                <MudToolBar>
-                
-                </MudToolBar>
-
-                <TemplateCommentsSection />
-
-            </MudPaper>
-        </MudItem>
-    </MudGrid>
+        <TemplateCommentsSection />
+    </PaperCenter>
 }
 
 

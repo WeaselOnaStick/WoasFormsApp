@@ -1,0 +1,20 @@
+﻿@if (Title != null)
+{
+    <PageTitle>@Title - WoasForms</PageTitle>
+}
+
+<MudGrid Justify="Justify.Center" Class="pt-12">
+    <MudItem xs="10">
+        <MudPaper Class="p-4">
+            @ChildContent
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code{
+    [Parameter, EditorRequired]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+}

@@ -8,6 +8,7 @@ namespace WoasFormsApp.Services
         Task<HashSet<TemplateTag>> GetTags();
         Task<HashSet<TemplateFieldType>> GetTemplateFieldTypes();
 
+        Task<bool> GetCurrentUserOwnsTemplate(int templateId);
         Task<Template?> GetTemplate(int templateId);
         Task<IEnumerable<Template>> GetAvailableTemplates();
         Task<IEnumerable<Template>> GetTemplatesByOwner(string userName);
@@ -18,6 +19,7 @@ namespace WoasFormsApp.Services
         Task LikeTemplate(int templateId, bool like);
         Task CommentOnTemplate(int templateId, string commentText);
 
+        Task<bool> GetCurrentUserOwnsResponse(int responseId);
         Task<Response?> CreateResponse(Response response);
         Task<Response?> GetResponse(int responseId);
         Task<IEnumerable<Response>> GetResponsesByTemplate(int templateId);
@@ -25,7 +27,7 @@ namespace WoasFormsApp.Services
         Task<IEnumerable<Response>> GetResponsesByCurrentUser();
 
         Task<List<WoasFormsAppUser>> GetAllUsers();
-        Task<WoasFormsAppUser> GetCurrentUser();
+        Task<WoasFormsAppUser?> GetCurrentUser();
         Task DeleteUser(string userId);
         Task GiveUserRole(string userId, string roleName);
         Task RevokeUserRole(string userId, string roleName);

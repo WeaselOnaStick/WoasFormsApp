@@ -1,0 +1,71 @@
+﻿@page "/Template/{TemplateId:int}/Analytics"
+@rendermode InteractiveServer
+
+@attribute [Authorize]
+
+@inject IDatabaseAccessorService dba
+
+@if (_template == null){
+    <TemplateInaccessible />
+}
+else{
+    <PaperCenter Title=@($"Analytics for Template {TemplateTitleOrUnnamed(_template)}")>
+        <TemplateToolbar Item="_template"  ShowAnalyticsButton="false"/>
+        <MudText Align="Align.Center" Typo="Typo.h5">@($"Analytics for Template {TemplateTitleOrUnnamed(_template)}")</MudText>
+        <MudDataGrid T="Response" Items=_responses>
+            <Columns>
+                <PropertyColumn Property="r => r.Respondent.UserName" Title="Respondent" />
+                <PropertyColumn Property="r => r.CreationDate" Title="Date" /> 
+
+                @foreach (var field in _template.Fields.Where(f => f.ShowInAnalytics)) 
+                { 
+                    switch (field.Type.Name) 
+                    { 
+                        case "SingleLine": 
+                            <PropertyColumn Property="r => GetAnswer(r,field).AnswerSingleLine" Title="@field.Title" /> 
+                            break; 
+                        case "MultiLine": 
+                            <PropertyColumn Property="r => GetAnswer(r,field).AnswerMultiLine" Title="@field.Title" /> 
+                            break; 
+                        case "PositiveInt": 
+                            <PropertyColumn Property="r => GetAnswer(r,field).AnswerPositiveInt" Title="@field.Title" /> 
+                            break; 
+                        case "CheckBox": 
+                            <PropertyColumn Property="r => GetAnswer(r,field).AnswerCheckedBox" Title="@field.Title" /> 
+                            break; 
+                    } 
+                } 
+            </Columns>
+        </MudDataGrid>
+        @if(fieldsHidden > 0)
+        { 
+            <MudText Typo="Typo.body2" Style="font-style: italic">Numder of fields omitted: @fieldsHidden</MudText>
+        }
+    </PaperCenter>
+}
+
+@code
+{
+    [Parameter]
+    public int TemplateId { get; set; }
+
+    private Template? _template;
+    private List<Response> _responses;
+
+    private int fieldsHidden = 0;
+
+    override protected async Task OnInitializedAsync()
+    {
+        _template = await dba.GetTemplate(TemplateId);
+        if (_template == null) return;
+        _template.Fields.Sort((a, b) => a.Position.CompareTo(b.Position));
+        _responses = new List<Response>(await dba.GetResponsesByTemplate(_template.Id));
+
+        fieldsHidden = _template.Fields.Count(f => !f.ShowInAnalytics);
+    }
+
+    private ResponseAnswer GetAnswer(Response response, TemplateField field)
+    {
+        return response.Answers.First(a => a.Field == field);
+    }
+}

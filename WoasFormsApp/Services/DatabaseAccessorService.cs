@@ -25,7 +25,7 @@ namespace WoasFormsApp.Services
             _users = userManager;
         }
 
-        public async Task<WoasFormsAppUser> GetCurrentUser()
+        public async Task<WoasFormsAppUser?> GetCurrentUser()
         {
             var user = (await _asp.GetAuthenticationStateAsync()).User;
             string userName = user.Identity.Name;
@@ -137,6 +137,13 @@ namespace WoasFormsApp.Services
             if (curUserHasAdmin) return true;
             var curUser = await GetCurrentUser();
             return template.Owner == curUser;
+        }
+
+        public async Task<bool> GetCurrentUserOwnsTemplate(int templateId)
+        {
+            if (await CurrentUserHasAdmin()) return true;
+            var curUser = await GetCurrentUser();
+            return curUser == (await GetTemplate(templateId))?.Owner;
         }
 
         public async Task<Template?> GetTemplate(int templateId)
@@ -300,6 +307,13 @@ namespace WoasFormsApp.Services
             return query.Where(r => r.Respondent == curUser);
         }
 
+        public async Task<bool> GetCurrentUserOwnsResponse(int responseId)
+        {
+            if (await CurrentUserHasAdmin()) return true;
+            var curUser = await GetCurrentUser();
+            return curUser == (await GetResponse(responseId))?.Respondent;
+        }
+
         public async Task<IEnumerable<Response>> GetResponsesByTemplate(int templateId)
         {
             var res = _ctx.Responses.Where(r => r.Template.Id == templateId);
@@ -358,6 +372,7 @@ namespace WoasFormsApp.Services
             }
             return freshResponse.Entity;
         }
+
 
     }
 }

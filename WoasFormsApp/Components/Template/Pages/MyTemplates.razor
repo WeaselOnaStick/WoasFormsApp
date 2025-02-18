@@ -1,13 +1,33 @@
 ﻿@page "/MyTemplates"
 @rendermode InteractiveServer
 
+@inject IDatabaseAccessorService dba
+
 @attribute [Authorize]
 
 <PaperCenter Title="My Templates">
-    <AuthorizeView>
-        <Authorized>
-            WILL BE REPLACED LATER
-            <TemplatesGallery Mode="TemplatesGallery.GalleryMode.BySpecificUser" TargetUsername="@context.User.Identity.Name" />
-        </Authorized>
-    </AuthorizeView>
+    <MudDataGrid T="Template" Items="_templates" Dense="true">
+        <Columns>
+            <HierarchyColumn />
+            <PropertyColumn Property="t => TemplateTitleOrUnnamed(t, default)" StickyLeft="true" Title="Template"/>
+            <PropertyColumn Property="t => t.CreatedAt" Title="Created" />
+            <PropertyColumn Property="t => t.UsersWhoLiked.Count" Title="Likes" />
+            <PropertyColumn Property="t => t.Comments.Count" Title="Comments" />
+            <PropertyColumn Property="t => t.Responses.Count" Title="Responses" />
+        </Columns>
+        <ChildRowContent>
+            <TemplateToolbar Item="context.Item" />
+        </ChildRowContent>
+    </MudDataGrid>
 </PaperCenter>
+
+@code{
+    private IEnumerable<Template> _templates;
+
+    //private Expression<Func<Template, string>> GetTemplateTitleOrUnnamed
+
+    protected override async Task OnInitializedAsync()
+    {
+        _templates = await dba.GetTemplatesByCurrentUser();
+    }
+}

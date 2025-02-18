@@ -11,7 +11,8 @@
 else
 {
     <PaperCenter Title="@($"Template {_template.Title}")">
-        <TemplateMetaInfo Template="@_template" />
+        <TemplateToolbar Item="_template" ShowViewButton="false" />
+        <TemplateMetaInfo Item="_template" />
 
         <TemplateCommentsSection />
     </PaperCenter>

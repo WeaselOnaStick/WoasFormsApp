@@ -1,6 +1,9 @@
 ﻿@page "/Form/{FormId:int}"
+@rendermode InteractiveServer
 @using WoasFormsApp.Components.Template
 @inject IDatabaseAccessorService dba
+
+@attribute [Authorize]
 
 @if (_response == null || _template == null)
 {
@@ -9,7 +12,7 @@
 else
 {
     <PaperCenter Title=@($"Form for Template {_template.Title}")>
-        <TemplateMetaInfo Template="@_template" />
+        <TemplateMetaInfo Item="@_template" />
 
         <MudText Typo="Typo.body2" Style="font-style: italic;">
             Form filled by @(_response.Respondent.UserName ?? "(Orphan Form)") 

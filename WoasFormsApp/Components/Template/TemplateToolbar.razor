@@ -1,0 +1,63 @@
+﻿@inject IDialogService DialogService
+@inject IDatabaseAccessorService dba
+@inject NavigationManager nav
+@inject ISnackbar snack
+
+@if(Enabled)
+{
+    <MudButtonGroup Variant="Variant.Outlined" OverrideStyles="false" Class="justify-center">
+        @if (ShowViewButton)
+        {
+            <MudButton Class="p-2" Href=@($"/Template/{Item.Id}") StartIcon="@Icons.Material.Filled.Description" Variant="Variant.Outlined" Color="Color.Info">Template Page</MudButton>
+        }
+        @if(ShowEditButton)
+        {
+            <MudButton Class="p-2" Href=@($"/Template/{Item.Id}/Edit") StartIcon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Secondary">Edit</MudButton>
+        }
+        @if(ShowAnalyticsButton)
+        {
+            <MudButton Class="p-2" Href=@($"/Template/{Item.Id}/Analytics") StartIcon="@Icons.Material.Filled.Analytics" Variant="Variant.Outlined" Color="Color.Tertiary">Analytics</MudButton>
+        }
+        <MudButton Class="p-2" OnClick="DeleteTemplate" StartIcon="@Icons.Material.Filled.DeleteForever" Variant="Variant.Outlined" Color="Color.Error">Delete Template</MudButton>
+
+    </MudButtonGroup>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public required Template Item { get; set; }
+
+    [Parameter]
+    public bool ShowViewButton { get; set; } = true;
+
+    [Parameter]
+    public bool ShowEditButton { get; set; } = true;
+
+    [Parameter]
+    public bool ShowAnalyticsButton { get; set; } = true;
+
+    private bool Enabled = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Enabled = await dba.GetCurrentUserOwnsTemplate(Item.Id);
+    }
+
+    private async Task DeleteTemplate()
+    {
+        var options = new DialogParameters<WarningDialog>
+        {
+            {x => x.DialogTitle, "Confirm Delete" },
+            {x => x.DialogText, $"Are you sure you want to delete template ?"},
+            {x => x.DialogIcon, Icons.Material.Filled.DeleteForever }
+        };
+        var dialog = await DialogService.ShowAsync<WarningDialog>(null, options);
+        var res = await dialog.Result;
+        if (res == DialogResult.Ok(true))
+        {
+            await dba.DeleteTemplate(Item.Id);
+            snack.Add("Template Deleted", Severity.Success);
+            nav.NavigateTo("/MyTemplates", true);
+        }
+    }
+}

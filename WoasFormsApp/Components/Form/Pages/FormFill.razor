@@ -1,8 +1,10 @@
-﻿@page "/Template/Fill/{FormId:int}"
+﻿@page "/Template/{TemplateId:int}/Fill"
 @rendermode InteractiveServer
 @inject IDatabaseAccessorService dba
 @inject ISnackbar snack
 @inject NavigationManager nav
+
+@attribute [Authorize]
 
 @if (_template == null){
     <WoasFormsApp.Components.Template.TemplateInaccessible />
@@ -38,7 +40,7 @@ else
     MudForm form { get; set; }
 
     [Parameter]
-    public int FormId { get; set; }
+    public int TemplateId { get; set; }
 
     private Template? _template { get; set; }
 
@@ -46,7 +48,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        _template = await dba.GetTemplate(FormId);
+        _template = await dba.GetTemplate(TemplateId);
         if (_template == null) return;
         List<ResponseAnswer> _answers = _template.Fields.Select(f => new ResponseAnswer { Field = f }).ToList();
         _response = new Response()

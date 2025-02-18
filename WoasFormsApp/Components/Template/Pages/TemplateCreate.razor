@@ -2,6 +2,8 @@
 @using FluentValidation
 @using MudBlazor.Utilities
 
+@attribute [Authorize]
+
 @rendermode InteractiveServer
 @inject IDatabaseAccessorService dba
 @inject AuthenticationStateProvider asp

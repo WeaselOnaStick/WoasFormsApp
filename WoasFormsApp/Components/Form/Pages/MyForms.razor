@@ -1,5 +1,8 @@
 ﻿@page "/MyForms/"
+@rendermode InteractiveServer
 @inject IDatabaseAccessorService dba
+
+@attribute [Authorize]
 
 <PaperCenter Title="My Forms">
     @if (_responses == null || !_responses.Any()){

@@ -72,8 +72,8 @@ else
                                 </MudChipSet>
                             </CardHeaderActions>
                             <CardHeaderContent>
-                                <MudText Typo="Typo.h6">@(string.IsNullOrWhiteSpace(template.Title) ? "Unnamed Template" : template.Title)</MudText>
-                                <MudText Typo="Typo.body2"><i>@template.Owner.UserName</i></MudText>
+                                <MudText Typo="Typo.h6">@TemplateTitleOrUnnamed(template)</MudText>
+                                <MudText Typo="Typo.body2" style="font-style: italic;">@template.Owner?.UserName</MudText>
                             </CardHeaderContent>
                         </MudCardHeader>
                         <MudCardMedia Style="width: 300px; height: 200px; align-self: center;"

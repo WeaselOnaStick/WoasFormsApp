@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Claims;
 using WoasFormsApp.Data;
@@ -39,12 +40,11 @@ namespace WoasFormsApp.Services
             return await _users.IsInRoleAsync(user, "Admin");
         }
 
-        private async Task<bool> CurrentUserHasPowerOverTarget(string userId) 
-            => await CurrentUserHasPowerOverTarget(await GetUserById(userId));
-        
-
         private async Task<bool> CurrentUserHasPowerOverTarget(WoasFormsAppUser targetUser) 
             => (await CurrentUserHasAdmin()) || (await GetCurrentUser() == targetUser);
+
+        private async Task<bool> CurrentUserHasPowerOverTarget(string userId) 
+            => await CurrentUserHasPowerOverTarget(await GetUserById(userId));
         
 
         private async Task<WoasFormsAppUser> GetUserById(string userId) => await _users.FindByIdAsync(userId);
@@ -108,9 +108,9 @@ namespace WoasFormsApp.Services
             return freshTemplate.Entity;
         }
 
-        public async Task<Template?> GetTemplate(int templateId)
+        private static IQueryable<Template> GetTemplateDetails(IQueryable<Template> query)
         {
-            var res = await _ctx.Templates
+            return query
                 .Include(t => t.Owner)
                 .Include(t => t.Responses)
                 .Include(t => t.Fields).ThenInclude(f => f.Type)
@@ -119,63 +119,78 @@ namespace WoasFormsApp.Services
                 .Include(t => t.Responses)
                 .Include(t => t.UsersWhoLiked)
                 .Include(t => t.Comments)
-                .Include(t => t.AllowedUsers)
-                .FirstAsync(t => t.Id == templateId);
-            if (res == null) return null;
-            res.Fields.Sort((a,b) => a.Position.CompareTo(b.Position));
-            if (await CurrentUserHasAdmin()) return res;
-            if (res.Owner == null && await CurrentUserHasAdmin()) return res;
-            if (res.Owner == null) return null;
-            if (res.Public) return res;
-            if (res.Owner == await GetCurrentUser()) return res;
-            if (res.AllowedUsers.Contains(await GetCurrentUser())) return res;
-            return null;
+                .Include(t => t.AllowedUsers);
         }
 
-        public async Task<ICollection<Template>> GetAvailableTemplates()
+        private async Task<IQueryable<Template>> TemplateAuthVisibility(IQueryable<Template> query)
         {
-            var templateIds = await _ctx.Templates.Select(t => t.Id).ToHashSetAsync();
-            var res = new HashSet<Template>();
-            foreach (var id in templateIds)
-            {
-                var foundTemplate = await GetTemplate(id);
-                if (foundTemplate != null) res.Add(foundTemplate);
-            }     
-            
+            var curUserHasAdmin = await CurrentUserHasAdmin();
+            if (curUserHasAdmin) return query;
+
+            var curUser = await GetCurrentUser();
+            return query.Where(t => t.Public || t.Owner == curUser || t.AllowedUsers.Contains(curUser));
+        }
+
+        private async Task<bool> TemplateAuthManage(Template template)
+        {
+            var curUserHasAdmin = await CurrentUserHasAdmin();
+            if (curUserHasAdmin) return true;
+            var curUser = await GetCurrentUser();
+            return template.Owner == curUser;
+        }
+
+        public async Task<Template?> GetTemplate(int templateId)
+        {
+            var res = _ctx.Templates.Where(t => t.Id == templateId);
+            res = await TemplateAuthVisibility(res);
+            res = GetTemplateDetails(res);
+            return await res.FirstOrDefaultAsync();
+        }
+
+        public async Task<IEnumerable<Template>> GetAvailableTemplates()
+        {
+            var res = _ctx.Templates.AsQueryable();
+            res = await TemplateAuthVisibility(res);
+            res = GetTemplateDetails(res);
             return res;
         }
 
-        public async Task<ICollection<Template>> GetTemplatesByOwner(string userName)
+        public async Task<IEnumerable<Template>> GetTemplatesByOwner(string userName)
+        {
+            var res = _ctx.Templates.Where(t => t.Owner.UserName == userName);
+            res = await TemplateAuthVisibility(res);
+            res = GetTemplateDetails(res);
+            return res;
+        }
+
+        public async Task<IEnumerable<Template>> GetTemplatesByCurrentUser()
         {
             var curUser = await GetCurrentUser();
-            var targetUser = await GetUserByName(userName);
-            bool curUserHasFullAccess = (await CurrentUserHasAdmin()) || (curUser == targetUser);
-
-            if (targetUser.OwnedTemplates == null) return new List<Template>();
-            var res = targetUser.OwnedTemplates.ToList();
-            if (!curUserHasFullAccess)
-                res = res.Where(t => t.Public || t.AllowedUsers.Contains(curUser)).ToList();
+            var res = _ctx.Templates.Where(t => t.Owner == curUser);
+            //res = await TemplateAuthVisibility(res);
+            res = GetTemplateDetails(res);
             return res;
         }
 
         public async Task<Template?> UpdateTemplate(Template newTemplate, int? templateId = null)
         {
-            if (templateId == null) templateId = newTemplate.Id;
+            var realTemplateId = templateId ?? newTemplate.Id;
+            Template? template = await GetTemplate(realTemplateId);
+            if (template == null) return null;
+            if (!await TemplateAuthManage(template)) return null;
             // Complex function, comparing new fields to old+hidden, recycling data
             throw new NotImplementedException();
         }
 
         public async Task DeleteTemplate(int templateId)
         {
-            var template = await GetTemplate(templateId);
+            Template? template = await GetTemplate(templateId);
             if (template == null) return;
-            _ctx.Remove(template);
+            if (!await TemplateAuthManage(template)) return;
+            _ctx.Templates.Remove(template);
             await _ctx.SaveChangesAsync();
-            
-            //Soft delete. Enabling would require migration (currently owner can't be null)
-            //var owner = template.Owner;
-            //if (owner == null) return;
-            //template.Owner = null;
+
+            // Soft delete not stated in requirements
         }
 
         public async Task LikeTemplate(int templateId, bool liked)
@@ -264,50 +279,66 @@ namespace WoasFormsApp.Services
             return res;
         }
 
-        public async Task<ICollection<Response>> GetResponsesByTemplate(int templateId)
+        private static IQueryable<Response> GetResponseDetails(IQueryable<Response> query)
         {
-            var responsesIds = await _ctx.Responses.Where(r => r.Template.Id == templateId).Select(r => r.Id).ToHashSetAsync();
-            if (responsesIds == null) return new HashSet<Response>();
-            var res = new HashSet<Response>();
-            foreach (var rid in responsesIds)
-            {
-                var foundResponse = await GetResponse(rid);
-                if (foundResponse != null) res.Add(foundResponse);
-            }
-            return res;
-        }
-
-        public async Task<ICollection<Response>> GetResponsesByRespondent(string userId)
-        {
-            var responsesIds = await _ctx.Responses.Where(r => r.Respondent.Id == userId).Select(r => r.Id).ToHashSetAsync();
-            if (responsesIds == null) return new HashSet<Response>();
-            var res = new HashSet<Response>();
-            foreach (var rid in responsesIds)
-            {
-                var foundResponse = await GetResponse(rid);
-                if (foundResponse != null) res.Add(foundResponse);
-            }
-            return res;
-        }
-
-        public async Task<Response?> GetResponse(int responseId)
-        {
-            var res = await _ctx.Responses
+            return query
                  .Include(r => r.Respondent)
                  .Include(r => r.Template)
                     .ThenInclude(t => t.Owner)
                  .Include(r => r.Template)
                  .Include(r => r.Answers)
                     .ThenInclude(a => a.Field)
-                        .ThenInclude(f => f.Type)
-                 .FirstAsync(r => r.Id == responseId);
-            if (res == null) return null;
-            res.Answers.Sort((a, b) => a.Field.Position.CompareTo(b.Field.Position));
-            if (await CurrentUserHasAdmin()) return res;
-            if (res.Respondent == null && await CurrentUserHasAdmin()) return res;
-            if (res.Respondent == null) return null;
-            if (res.Respondent == await GetCurrentUser() || res.Template.AllowedUsers.Contains(await GetCurrentUser())) return res;
-            return null;
+                        .ThenInclude(f => f.Type);
+        }
+
+        private async Task<IQueryable<Response>> ResponseAuthVisibility(IQueryable<Response> query)
+        {
+            var curUserHasAdmin = await CurrentUserHasAdmin();
+            if (curUserHasAdmin) return query;
+
+            var curUser = await GetCurrentUser();
+            return query.Where(r => r.Respondent == curUser);
+        }
+
+        public async Task<IEnumerable<Response>> GetResponsesByTemplate(int templateId)
+        {
+            var res = _ctx.Responses.Where(r => r.Template.Id == templateId);
+            res = await ResponseAuthVisibility(res);
+            res = GetResponseDetails(res);
+            return res;
+        }
+
+        public async Task<IEnumerable<Response>> GetResponsesByRespondent(string userId)
+        {
+            var res = _ctx.Responses.Where(r => r.Respondent.Id == userId);
+            res = await ResponseAuthVisibility(res);
+            res = GetResponseDetails(res);
+            return res;
+        }
+
+        public async Task<IEnumerable<Response>> GetResponsesByCurrentUser()
+        {
+            var curUser = await GetCurrentUser();
+            var res = _ctx.Responses.Where(r => r.Respondent.Id == curUser.Id);
+            //res = await ResponseAuthVisibility(res);
+            res = GetResponseDetails(res);
+            return res;
+        }
+
+        public async Task<Response?> GetResponse(int responseId)
+        {
+            var res = _ctx.Responses.Where(r => r.Id == responseId);
+            res = await ResponseAuthVisibility(res);
+            res = GetResponseDetails(res);
+            return await res.FirstAsync();
+        }
+
+        public async Task<IEnumerable<Response>> GetAllResponses()
+        {
+            var res = _ctx.Responses.AsQueryable();
+            res = await ResponseAuthVisibility(res);
+            res = GetResponseDetails(res);
+            return res;
         }
 
         public async Task<Response?> CreateResponse(Response response)

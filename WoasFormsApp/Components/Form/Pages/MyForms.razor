@@ -1,0 +1,39 @@
+﻿@page "/MyForms/"
+@inject IDatabaseAccessorService dba
+
+<PaperCenter Title="My Forms">
+    @if (_responses == null || !_responses.Any()){
+        <MudText>
+            You have not filled any forms yet.
+        </MudText>
+        <MudLink Href="/">
+            Browse Templates
+        </MudLink>
+    }
+    else
+    {
+        <MudDataGrid T="Response" Items="_responses" Elevation="2">
+            <Columns>
+                <PropertyColumn Property="@(r => (r.Template == null || r.Template.Owner == null) ? "No Owner (Orphan Template)" : r.Template.Owner.UserName)" Title="Template Author"/>
+                <PropertyColumn Property="@(r => (r.Template == null || string.IsNullOrWhiteSpace(r.Template.Title)) ? "Unnamed Template" : r.Template.Title )" Title="Template Title" />
+                <PropertyColumn Property="r => r.CreationDate" Title="Filled On" />
+                <TemplateColumn>
+                    <CellTemplate>
+                        <MudButton Href="@($"/Form/{context.Item.Id}")" StartIcon="@Icons.Material.Filled.Visibility" Variant="Variant.Outlined" Color="Color.Info">
+                            View Form
+                        </MudButton>
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+        </MudDataGrid>
+    }
+</PaperCenter>
+
+@code{
+    private IEnumerable<Response> _responses;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _responses = await dba.GetResponsesByCurrentUser();
+    }
+}

@@ -1,4 +1,5 @@
 ﻿@page "/Template/{TemplateId:int}/Analytics"
+@using System.Linq.Expressions
 @rendermode InteractiveServer
 
 @attribute [Authorize]
@@ -8,46 +9,158 @@
 @if (_template == null){
     <TemplateInaccessible />
 }
-else{
+else if (!_responses.Any())
+{
+    <TemplateNotEnoughResponses />
+}
+else
+{
     <PaperCenter Title=@($"Analytics for Template {TemplateTitleOrUnnamed(_template)}")>
-        <TemplateToolbar Item="_template"  ShowAnalyticsButton="false"/>
-        <MudText Align="Align.Center" Typo="Typo.h5">@($"Analytics for Template {TemplateTitleOrUnnamed(_template)}")</MudText>
-        <MudDataGrid T="Response" Items=_responses>
-            <Columns>
-                <PropertyColumn Property="r => r.Respondent.UserName" Title="Respondent" />
-                <PropertyColumn Property="r => r.CreationDate" Title="Date" /> 
+    <TemplateToolbar Item="_template"  ShowAnalyticsButton="false"/>
+    <MudText Align="Align.Center" Typo="Typo.h5">@($"Analytics for Template {TemplateTitleOrUnnamed(_template)}")</MudText>
+    <MudDataGrid T="Response" Items=_responses Breakpoint="Breakpoint.None" Striped="true">
+        <Columns>
+            <PropertyColumn Property="r => r.Respondent.UserName" Title="Respondent" />
+            <PropertyColumn Property="r => r.CreationDate" Title="Date" /> 
 
-                @foreach (var field in _template.Fields.Where(f => f.ShowInAnalytics)) 
+            @foreach (var field in _template.Fields.Where(f => f.ShowInAnalytics)) 
+            {
+
+                switch (field.Type.Name) 
                 { 
-                    switch (field.Type.Name) 
-                    { 
-                        case "SingleLine": 
-                            <PropertyColumn Property="r => GetAnswer(r,field).AnswerSingleLine" Title="@field.Title" /> 
+                    case "SingleLine":
+                        {
+                            Func<Response,string?> GetAnswerCase = r => GetAnswer(r, field).AnswerSingleLine;
+                            <PropertyColumn Property="r => GetAnswerCase(r)" Title="@field.Title" AggregateDefinition="@(new AggregateDefinition<Response>())">
+                                <AggregateTemplate>
+                                    <MudSimpleTable Dense="true" Hover="true">
+                                        <tbody style="white-space: break-spaces;">
+                                            <tr>
+                                                <td>Count</td>
+                                                <td>@context.Select(r => GetAnswerCase(r)).Count()</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Count Unique</td>
+                                                <td>@context.Select(r => GetAnswerCase(r)).ToHashSet().Count()</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Top @(TopN) Popular</td>
+                                                <td>@string.Join(", ", context.Select(r => GetAnswerCase(r)).GroupBy(x => x).OrderByDescending(x => x.Count()).Take(TopN).Select(g => g.Key))</td>
+                                            </tr>
+                                        </tbody>
+                                    </MudSimpleTable>
+                                </AggregateTemplate>
+                            </PropertyColumn>
+                            break;
+                        }
+                    case "MultiLine":
+                        {
+                            Func<Response, string> GetAnswerCase = r => GetAnswer(r, field).AnswerMultiLine;
+                            <PropertyColumn Property="r => GetAnswer(r,field).AnswerMultiLine" Title="@field.Title" AggregateDefinition="@(new AggregateDefinition<Response>())">
+                                <AggregateTemplate>
+                                    <MudSimpleTable Dense="true" Hover="true">
+                                        <tbody style="white-space: break-spaces;">
+                                            <tr>
+                                                <td>Count</td>
+                                                <td>@context.Select(r => GetAnswerCase(r)).Count()</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Count Unique</td>
+                                                <td>@context.Select(r => GetAnswerCase(r)).ToHashSet().Count()</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Top @(TopN) Popular</td>
+                                                <td>@string.Join("\n", context.Select(r => GetAnswerCase(r)).GroupBy(x => x).OrderByDescending(x => x.Count()).Take(TopN).Select(g => $"{g.Key} (x{g.Count()})"))</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Top @(TopN) Longest</td>
+                                                <td>@string.Join("\n", context.Select(r => GetAnswerCase(r)).OrderByDescending(x => x.Length).Take(TopN).Select(x => $"{x} (x{x.Length})"))</td>
+                                            </tr>
+                                        </tbody>
+                                    </MudSimpleTable>
+                                </AggregateTemplate>
+                            </PropertyColumn>
                             break; 
-                        case "MultiLine": 
-                            <PropertyColumn Property="r => GetAnswer(r,field).AnswerMultiLine" Title="@field.Title" /> 
+                        }
+                    case "PositiveInt": 
+                        {
+                            Func<Response, int?> GetAnswerCase = r => GetAnswer(r, field).AnswerPositiveInt;
+                            <PropertyColumn Property="r => GetAnswerCase(r)" Title="@field.Title" AggregateDefinition="@(new AggregateDefinition<Response>())">
+                                <AggregateTemplate>
+                                    <MudSimpleTable Dense="true" Hover="true">
+                                        <tbody style="white-space: break-spaces;">
+                                            <tr>
+                                                <td>Count</td>
+                                                <td>@context.Select(r => GetAnswerCase(r)).Count()</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Count Unique</td>
+                                                <td>@context.Select(r => GetAnswerCase(r)).ToHashSet().Count()</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Top @(TopN) Popular</td>
+                                                <td>@string.Join(", ", context.Select(r => GetAnswerCase(r)).GroupBy(x => x).OrderByDescending(x => x.Count()).Take(TopN).Select(g => $"{g.Key} (x{g.Count()})"))</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Average</td>
+                                                <td>@context.Select(r => GetAnswerCase(r)).Average()</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Min</td>
+                                                <td>@context.Select(r => GetAnswerCase(r)).Min()</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Max</td>
+                                                <td>@context.Select(r => GetAnswerCase(r)).Max()</td>
+                                            </tr>
+                                        </tbody>
+                                    </MudSimpleTable>
+                                </AggregateTemplate>
+                            </PropertyColumn>
                             break; 
-                        case "PositiveInt": 
-                            <PropertyColumn Property="r => GetAnswer(r,field).AnswerPositiveInt" Title="@field.Title" /> 
+                        }
+                    case "CheckBox": 
+                        {
+                            Func<Response, bool?> GetAnswerCase = r => GetAnswer(r, field).AnswerCheckedBox;
+                            <PropertyColumn Property="r => GetAnswerCase(r)" Title="@field.Title" AggregateDefinition="@(new AggregateDefinition<Response>())">
+                                <AggregateTemplate>
+                                    @{
+                                        var dataDict = context.Select(r => GetAnswerCase(r)).Where(x => x is not null).GroupBy(x => x).ToDictionary(g => (bool)g.Key ? "Y" : "N", g=>Convert.ToDouble(g.Count()));
+                                        <MudGrid Justify="Justify.Center">
+                                            <MudItem>
+                                                <MudChart ChartType="ChartType.Pie" Width="100px" Height="100px" InputData=@(dataDict.Values.ToArray()) InputLabels=@(dataDict.Keys.ToArray())/>
+                                                <MudSimpleTable Dense="true" Hover="true">
+                                                    <tbody style="white-space: break-spaces;">
+                                                        <tr>
+                                                            <td>Count</td>
+                                                            <td>@context.Select(r => GetAnswerCase(r)).Count()</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </MudSimpleTable>
+                                            </MudItem>
+                                        </MudGrid>
+                                    }
+                                </AggregateTemplate>
+                            </PropertyColumn>
                             break; 
-                        case "CheckBox": 
-                            <PropertyColumn Property="r => GetAnswer(r,field).AnswerCheckedBox" Title="@field.Title" /> 
-                            break; 
-                    } 
+                        }
                 } 
-            </Columns>
-        </MudDataGrid>
-        @if(fieldsHidden > 0)
-        { 
-            <MudText Typo="Typo.body2" Style="font-style: italic">Numder of fields omitted: @fieldsHidden</MudText>
-        }
-    </PaperCenter>
+            } 
+        </Columns>
+    </MudDataGrid>
+    @if(fieldsHidden > 0)
+    { 
+        <MudText Typo="Typo.body2" Style="font-style: italic">Numder of fields omitted: @fieldsHidden</MudText>
+    }
+</PaperCenter>
 }
 
 @code
 {
     [Parameter]
     public int TemplateId { get; set; }
+
+    private int TopN = 3;
 
     private Template? _template;
     private List<Response> _responses;
@@ -58,14 +171,18 @@ else{
     {
         _template = await dba.GetTemplate(TemplateId);
         if (_template == null) return;
+        if (!await dba.GetCurrentUserOwnsTemplate(_template.Id)) 
+        {
+            _template = null;
+            return;
+        }
         _template.Fields.Sort((a, b) => a.Position.CompareTo(b.Position));
         _responses = new List<Response>(await dba.GetResponsesByTemplate(_template.Id));
 
         fieldsHidden = _template.Fields.Count(f => !f.ShowInAnalytics);
     }
 
-    private ResponseAnswer GetAnswer(Response response, TemplateField field)
-    {
-        return response.Answers.First(a => a.Field == field);
-    }
+    private ResponseAnswer GetAnswer(Response response, TemplateField field) 
+        => response.Answers.First(a => a.Field == field);
+    
 }

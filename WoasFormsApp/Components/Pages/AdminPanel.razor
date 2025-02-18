@@ -3,6 +3,10 @@
 @rendermode InteractiveServer
 @inject IDatabaseAccessorService dba
 @inject UserManager<WoasFormsAppUser> userManager
+@inject IDialogService DialogService
+@inject NavigationManager nav
+@inject ISnackbar snack
+
 
 @attribute [Authorize(Roles = "Admin")]
 
@@ -12,8 +16,16 @@
 
     <MudText Typo="Typo.h2" Align="Align.Center">Admin Dashboard</MudText>
 
+    <MudButtonGroup Variant="Variant.Filled">
+        <MudButton StartIcon="@Icons.Material.Filled.AddModerator">Give Admin</MudButton>
+        <MudButton StartIcon="@Icons.Material.Filled.RemoveModerator">Remove Admin</MudButton>
+        <MudButton StartIcon="@Icons.Material.Filled.PersonOff">Delete Users</MudButton>
+        <MudButton StartIcon="@Icons.Material.Filled.LockPerson">Block Users</MudButton>
+        <MudButton StartIcon="@Icons.Material.Filled.LockOpen">Unblock users</MudButton>
+    </MudButtonGroup>
     <MudDataGrid T="UserRoleModel" Items="_users">
         <Columns>
+            <SelectColumn />
             <PropertyColumn Title="Username" Property="x => x.user.UserName" />
             <PropertyColumn Title="Email" Property="x => x.user.Email" />
             <PropertyColumn Title="Owned Templates" Property="x => x.user.OwnedTemplates.Count" />
@@ -22,7 +34,7 @@
                     <MudChipSet>
                         @foreach (var item in context.Item.roles)
                         {
-                            <MudChip Color="Color.Error">item</MudChip>
+                            <MudChip Color="Color.Error">@item</MudChip>
                         }
                     </MudChipSet>
                 </CellTemplate>
@@ -48,7 +60,7 @@
 
     public class UserRoleModel
     {
-        public WoasFormsAppUser user { get; set; }
-        public List<string> roles { get; set; }
+        public WoasFormsAppUser? user { get; set; }
+        required public List<string> roles { get; set; }
     }
 }

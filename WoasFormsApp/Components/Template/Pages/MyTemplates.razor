@@ -6,7 +6,7 @@
 @attribute [Authorize]
 
 <PaperCenter Title="My Templates">
-    <MudDataGrid T="Template" Items="_templates" Dense="true">
+    <MudDataGrid T="Template" Items="_templates" Dense="true" Striped="true">
         <Columns>
             <HierarchyColumn />
             <PropertyColumn Property="t => TemplateTitleOrUnnamed(t, default)" StickyLeft="true" Title="Template"/>
@@ -23,9 +23,6 @@
 
 @code{
     private IEnumerable<Template> _templates;
-
-    //private Expression<Func<Template, string>> GetTemplateTitleOrUnnamed
-
     protected override async Task OnInitializedAsync()
     {
         _templates = await dba.GetTemplatesByCurrentUser();

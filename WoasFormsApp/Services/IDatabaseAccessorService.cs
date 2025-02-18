@@ -28,11 +28,11 @@ namespace WoasFormsApp.Services
 
         Task<List<WoasFormsAppUser>> GetAllUsers();
         Task<WoasFormsAppUser?> GetCurrentUser();
-        Task DeleteUser(string userId);
-        Task GiveUserRole(string userId, string roleName);
-        Task RevokeUserRole(string userId, string roleName);
-        Task BlockUser(string userId);
-        Task UnblockUser(string userId);
-        Task<List<string>> GetUserRoles(string userId);
+        Task UserDelete(string userId);
+        Task UserGiveRole(string userId, string roleName);
+        Task UserRevokeRole(string userId, string roleName);
+        Task UserBlock(string userId);
+        Task UserUnblock(string userId);
+        Task<List<string>> UserGetRoles(string userId);
     }
 }

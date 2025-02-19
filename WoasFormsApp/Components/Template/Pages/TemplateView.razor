@@ -13,6 +13,8 @@ else
     <PaperCenter Title="@($"Template {_template.Title}")">
         <TemplateToolbar Item="_template" ShowViewButton="false" />
         <TemplateMetaInfo Item="_template" />
+        <MudText Typo="Typo.body2">Form includes following questions:</MudText>
+        <TemplateQuestionsPreview Item="_template" />
 
         <TemplateCommentsSection Item="_template" />
     </PaperCenter>

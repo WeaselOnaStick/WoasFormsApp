@@ -1,0 +1,11 @@
+<MudDataGrid Dense="true" Class="mud-background-dark p-2 m-2" Items="Item.Fields" SortMode="SortMode.None">
+    <Columns>
+        <PropertyColumn Title="Question" Property="x => x.Title" />
+        <PropertyColumn Title="Description" Property="x => x.Description" />
+    </Columns>
+</MudDataGrid>
+
+@code{
+    [Parameter, EditorRequired]
+    public Template Item { get; set; }
+}

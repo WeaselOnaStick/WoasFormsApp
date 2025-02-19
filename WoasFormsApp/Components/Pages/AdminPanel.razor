@@ -16,22 +16,24 @@
 
     <MudText Typo="Typo.h2" Align="Align.Center">Admin Dashboard</MudText>
 
-    <MudButtonGroup Variant="Variant.Filled">
-        <MudButton StartIcon="@Icons.Material.Filled.AddModerator">Give Admin</MudButton>
-        <MudButton StartIcon="@Icons.Material.Filled.RemoveModerator">Remove Admin</MudButton>
-        <MudButton StartIcon="@Icons.Material.Filled.PersonOff">Delete Users</MudButton>
-        <MudButton StartIcon="@Icons.Material.Filled.LockPerson">Block Users</MudButton>
-        <MudButton StartIcon="@Icons.Material.Filled.LockOpen">Unblock users</MudButton>
+    <MudButtonGroup Variant="Variant.Filled" Color="Color.Error">
+        <MudButton OnClick="GiveAdmins"     StartIcon="@Icons.Material.Filled.AddModerator">Give Admin</MudButton>
+        <MudButton OnClick="RevokeAdmins"   StartIcon="@Icons.Material.Filled.RemoveModerator">Remove Admin</MudButton>
+        <MudButton OnClick="DeleteUsers"    StartIcon="@Icons.Material.Filled.PersonOff">Delete Users</MudButton>
+        <MudButton OnClick="BlockUsers"     StartIcon="@Icons.Material.Filled.LockPerson">Block Users</MudButton>
+        <MudButton OnClick="UnblockUsers"   StartIcon="@Icons.Material.Filled.LockOpen">Unblock users</MudButton>
     </MudButtonGroup>
-    <MudDataGrid T="UserRoleModel" Items="_users">
+    <MudDataGrid T="UserRoleModel" Items="_users" @bind-SelectedItems=_selected MultiSelection="true">
         <Columns>
             <SelectColumn />
             <PropertyColumn Title="Username" Property="x => x.user.UserName" />
             <PropertyColumn Title="Email" Property="x => x.user.Email" />
             <PropertyColumn Title="Owned Templates" Property="x => x.user.OwnedTemplates.Count" />
+            <PropertyColumn Title="Blocked" Property="x => x.user.IsBlocked" />
+            <PropertyColumn Title="Account Created" Property="x => x.user.RegisteredAt" />
             <TemplateColumn Title="Roles">
                 <CellTemplate>
-                    <MudChipSet>
+                    <MudChipSet ReadOnly="true" AllClosable="false">
                         @foreach (var item in context.Item.roles)
                         {
                             <MudChip Color="Color.Error">@item</MudChip>
@@ -44,7 +46,8 @@
 </MudPaper>
 
 @code {
-    //private MudDataGrid<UserViewModel> grid
+    private HashSet<UserRoleModel> _selected;
+
     private List<UserRoleModel> _users;
 
     protected override async Task OnInitializedAsync()
@@ -60,7 +63,63 @@
 
     public class UserRoleModel
     {
-        public WoasFormsAppUser? user { get; set; }
+        public WoasFormsAppUser user { get; set; }
         required public List<string> roles { get; set; }
     }
+
+    private async Task AdminAction(string DialogTitleText, string DialogContentTextFormatted, string? DialogIcon, string SuccessTextFormatted, Func<WoasFormsAppUser, Task> action)
+    {
+        DialogContentTextFormatted = string.Format(DialogContentTextFormatted, _selected.Count);
+        SuccessTextFormatted = string.Format(SuccessTextFormatted, _selected.Count);
+        var options = new DialogParameters<WarningDialog>
+        {
+            {x => x.DialogTitle, DialogTitleText },
+            {x => x.DialogText, DialogContentTextFormatted},
+            {x => x.DialogIcon, DialogIcon}
+        };
+        var dialog = await DialogService.ShowAsync<WarningDialog>(DialogTitleText, options);
+        var res = await dialog.Result;
+        if (!res.Canceled)
+        {
+            foreach (var user in _selected.Select(x=>x.user))
+                await action(user);
+            snack.Add(SuccessTextFormatted, Severity.Success);
+            StateHasChanged();
+        }
+    }
+
+    private async Task GiveAdmins() => await AdminAction(
+        $"Confirm Giving Roles",
+        "Are you sure you want to give admin to {0} users?",
+        Icons.Material.Filled.AddModerator,
+        "Successfully gave admin to {0} users",
+        async x => await dba.GiveUserRole(x.Id, "admin"));
+
+    private async Task RevokeAdmins() => await AdminAction(
+        $"Confirm Revoking Roles",
+        "Are you sure you want to revoke admin from {0} users?",
+        Icons.Material.Filled.RemoveModerator,
+        "Successfully removed admin from {0} users",
+        async x => await dba.RevokeUserRole(x.Id, "admin"));
+
+    private async Task BlockUsers() => await AdminAction(
+        $"Confirm Block",
+        "Are you sure you want to block {0} users? Blocked users can't log in unless they're admins",
+        Icons.Material.Filled.LockPerson,
+        "Successfully blocked {0} users",
+        async x => await dba.BlockUser(x.Id));
+
+    private async Task UnblockUsers() => await AdminAction(
+        $"Confirm Unblock",
+        "Are you sure you want to unblock {0} users?",
+        Icons.Material.Filled.LockOpen,
+        "Successfully unblocked {0} users",
+        async x => await dba.UnblockUser(x.Id));
+
+    private async Task DeleteUsers() => await AdminAction(
+        $"Confirm Delete",
+        "Are you sure you want to delete {0} users?",
+        Icons.Material.Filled.PersonOff,
+        "Successfully deleted {0} users",
+        async x => await dba.DeleteUser(x.Id));
 }

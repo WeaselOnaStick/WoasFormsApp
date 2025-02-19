@@ -36,18 +36,11 @@ Color="@Color.Inherit"
     public void Search()
     {
         StateHasChanged();
-        if (string.IsNullOrWhiteSpace(searchText)) {
-            searchField.Error = true;
-            StateHasChanged();
-            return;
-        }
         var baseUri = "/SearchTemplate";
         var searchParams = new Dictionary<string, object>{
             {"search" , searchText },
         };
         var uriWithParams = nav.GetUriWithQueryParameters(baseUri, searchParams);
-        searchText = "";
-        StateHasChanged();
-        nav.NavigateTo(uriWithParams, forceLoad: false);
+        nav.NavigateTo(uriWithParams, forceLoad: true);
     }
 }

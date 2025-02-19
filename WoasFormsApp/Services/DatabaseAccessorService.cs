@@ -160,44 +160,44 @@ namespace WoasFormsApp.Services
             return template.Owner == curUser;
         }
 
-        public record TemplateOrderModeData
-        {
-            required public string DisplayName { get; init; }
-            required public Func<Template, object> Selector { get; init; }
-            required public SortDirection Direction { get; init; }
-        }
 
         public static Dictionary<TemplateOrderMode, TemplateOrderModeData> TemplateOrdersData = new Dictionary<TemplateOrderMode, TemplateOrderModeData>
         {
-            {TemplateOrderMode.Oldest,              new TemplateOrderModeData{ DisplayName="Oldest",            Direction = SortDirection.Descending,   Selector = x => x.CreatedAt } },
-            {TemplateOrderMode.Newest,              new TemplateOrderModeData{ DisplayName="Newest",            Direction = SortDirection.Ascending,    Selector = x => x.CreatedAt } },
-            {TemplateOrderMode.MostLiked,           new TemplateOrderModeData{ DisplayName="Most Likes",        Direction = SortDirection.Descending,   Selector = x => x.UsersWhoLiked.Count } },
-            {TemplateOrderMode.LeastLiked,          new TemplateOrderModeData{ DisplayName="Least Likes",       Direction = SortDirection.Ascending,    Selector = x => x.UsersWhoLiked.Count } },
-            {TemplateOrderMode.MostCommented,       new TemplateOrderModeData{ DisplayName="Most Comments",     Direction = SortDirection.Descending,   Selector = x => x.Comments.Count } },
-            {TemplateOrderMode.LeastCommented,      new TemplateOrderModeData{ DisplayName="Least Comments",    Direction = SortDirection.Ascending,    Selector = x => x.Comments.Count } },
-            {TemplateOrderMode.MostResponded,       new TemplateOrderModeData{ DisplayName="Most Forms",        Direction = SortDirection.Descending,   Selector = x => x.Responses.Count } },
-            {TemplateOrderMode.LeastResponded,      new TemplateOrderModeData{ DisplayName="Least Forms",       Direction = SortDirection.Ascending,    Selector = x => x.Responses.Count } },
+            {TemplateOrderMode.Oldest,              new TemplateOrderModeData{ DisplayName="Oldest",            Direction = SortDirection.Descending,   Selector = x => x.CreatedAt,            Icon = Icons.Material.Filled.History } },
+            {TemplateOrderMode.Newest,              new TemplateOrderModeData{ DisplayName="Newest",            Direction = SortDirection.Ascending,    Selector = x => x.CreatedAt,            Icon = Icons.Material.Filled.History } },
+            {TemplateOrderMode.MostLiked,           new TemplateOrderModeData{ DisplayName="Most Likes",        Direction = SortDirection.Descending,   Selector = x => x.UsersWhoLiked.Count,  Icon = Icons.Material.Filled.Favorite } },
+            {TemplateOrderMode.LeastLiked,          new TemplateOrderModeData{ DisplayName="Least Likes",       Direction = SortDirection.Ascending,    Selector = x => x.UsersWhoLiked.Count,  Icon = Icons.Material.Filled.HeartBroken } },
+            {TemplateOrderMode.MostCommented,       new TemplateOrderModeData{ DisplayName="Most Comments",     Direction = SortDirection.Descending,   Selector = x => x.Comments.Count,       Icon = Icons.Material.Filled.Comment } },
+            {TemplateOrderMode.LeastCommented,      new TemplateOrderModeData{ DisplayName="Least Comments",    Direction = SortDirection.Ascending,    Selector = x => x.Comments.Count,       Icon = Icons.Material.Filled.Comment } },
+            {TemplateOrderMode.MostResponded,       new TemplateOrderModeData{ DisplayName="Most Forms",        Direction = SortDirection.Descending,   Selector = x => x.Responses.Count,      Icon = Icons.Material.Filled.Description } },
+            {TemplateOrderMode.LeastResponded,      new TemplateOrderModeData{ DisplayName="Least Forms",       Direction = SortDirection.Ascending,    Selector = x => x.Responses.Count,      Icon = Icons.Material.Filled.Description } },
 
         };
 
+        public Dictionary<TemplateOrderMode, TemplateOrderModeData> GetTemplateOrdersData() => TemplateOrdersData;
+
         public async Task<IList<Template>> SearchTemplates(TemplateOrderMode order = TemplateOrderMode.Newest, string? query = default, string? username = default, string? tag = default)
         {
-            var res = _ctx.Templates.Where(t =>
-                t.Title.Contains(query) ||
-                t.Description.Contains(query) ||
-                t.Fields.Select(f => f.Title).Contains(query) ||
-                t.Fields.Select(f => f.Description).Contains(query));
+            var res = await GetAvailableTemplates();
+
+            if (!string.IsNullOrWhiteSpace(query))
+                res = _ctx.Templates.Where(t =>
+                    (!string.IsNullOrWhiteSpace(t.Title) && (t.Title.Contains(query) || query.Contains(t.Title))) ||
+                    (!string.IsNullOrWhiteSpace(t.Description) && (t.Description.Contains(query) || query.Contains(t.Description))) ||
+                    t.Fields.Any(f => (!string.IsNullOrWhiteSpace(f.Title) &&  (f.Title.Contains(query) || query.Contains(f.Title)))) ||
+                    t.Fields.Any(f => (!string.IsNullOrWhiteSpace(f.Description) && (f.Description.Contains(query) || query.Contains(f.Description))))
+                    );
             
-            if (username != null)
-                res = res.Where(t => t.Owner.UserName == username);
+            if (!string.IsNullOrWhiteSpace(username))
+                res = res.Where(t => (t.Owner != null && t.Owner.UserName != null && t.Owner.UserName.Contains(username)));
 
-            if (tag != null)
-                res = res.Where(t => t.Tags.Select(t => t.Title).Contains(tag));
+            if (!string.IsNullOrWhiteSpace(tag))
+                res = res.Where(template => (template.Tags.Any(t => 
+                t.Title.Contains(tag) || tag.Contains(t.Title)
+                )));
 
-            res = await TemplateAuthVisibility(res);
-            var resList = await res.ToListAsync();
             var curOrderModeData = TemplateOrdersData[order];
-            return resList.OrderByDirection(curOrderModeData.Direction, curOrderModeData.Selector).ToList();
+            return res.OrderByDirection(curOrderModeData.Direction, curOrderModeData.Selector).ToList();
         }
 
         public async Task<bool> GetCurrentUserOwnsTemplate(int templateId)

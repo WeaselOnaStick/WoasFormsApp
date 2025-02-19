@@ -25,7 +25,10 @@
 }
 else
 {
-    <MudText Typo="Typo.h2" Class="p-4 m-1" Align="Align.Center">@_headerText</MudText>
+    @if(!string.IsNullOrWhiteSpace(_headerText))
+    {
+        <MudText Typo="Typo.h2" Class="p-4 m-1" Align="Align.Center">@_headerText</MudText>
+    }
     <MudGrid Spacing=6 Justify="Justify.Center">
         @if (templates == null) // Loading templates...
         {
@@ -62,12 +65,12 @@ else
                             <CardHeaderActions> 
                                 <MudChipSet T="int" Class="p-2">
                                     <MudChip OnClick="async () => await TemplateLike(templateView)" 
-                                             Variant="@(templateView.liked ? Variant.Filled : Variant.Text)"
-                                             Color="@(templateView.liked ? Color.Primary : Color.Surface)"
-                                             Icon="@(templateView.liked ? Icons.Material.Filled.Favorite : Icons.Material.Outlined.FavoriteBorder)">@template.UsersWhoLiked.Count</MudChip>
-                                    
+                                    Variant="@(templateView.liked ? Variant.Filled : Variant.Text)"
+                                    Color="@(templateView.liked ? Color.Primary : Color.Surface)"
+                                    Icon="@(templateView.liked ? Icons.Material.Filled.Favorite : Icons.Material.Outlined.FavoriteBorder)">@template.UsersWhoLiked.Count</MudChip>
+
                                     <MudChip Icon="@Icons.Material.Filled.Comment" Color="Color.Surface">@template.Comments.Count</MudChip>
-                                    
+
                                     <MudChip Icon="@Icons.Material.Filled.Description" Color="Color.Surface">@template.Responses.Count</MudChip>
                                 </MudChipSet>
                             </CardHeaderActions>
@@ -77,7 +80,7 @@ else
                             </CardHeaderContent>
                         </MudCardHeader>
                         <MudCardMedia Style="width: 300px; height: 200px; align-self: center;"
-                            Image="@(string.IsNullOrWhiteSpace(template.CoverImageUrl) ? Assets["BlankThumbnail.png"] : template.CoverImageUrl)" />
+                        Image="@(string.IsNullOrWhiteSpace(template.CoverImageUrl) ? Assets["BlankThumbnail.png"] : template.CoverImageUrl)" />
                         <MudCardContent>
                             <MudText Typo="Typo.subtitle1">@($"Created at {template.CreatedAt.ToLocalTime().ToShortDateString()}")</MudText>
                         </MudCardContent>
@@ -109,6 +112,9 @@ else
     public List<Template>? CustomTemplates { get; set; }
 
     [Parameter]
+    public string CustomTemplatesHeaderText { get; set; } = "";
+
+    [Parameter]
     public int skeletonsCount { get; set; } = 12;
 
 
@@ -121,17 +127,17 @@ else
         GalleryMode.GlobalNewest => "Newest Templates",
         GalleryMode.GlobalPopular => "Popular Templates",
         GalleryMode.BySpecificUser => $"Templates by {TargetUsername}",
-        GalleryMode.CustomList => "Custom Templates",
+        GalleryMode.CustomList => CustomTemplatesHeaderText,
         _ => "Templates"
     };
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         var authState = await auth.GetAuthenticationStateAsync();
         var userId = authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
         curUser = await userManager.FindByIdAsync(userId);
 
-        await base.OnInitializedAsync();
+        
         List<Template> prepList = new();
         switch (Mode)
         {
@@ -163,6 +169,7 @@ else
                     responses = t.Responses.Count,
                 }
         ).ToList();
+        await base.OnInitializedAsync();
     }
 
     public class TemplateView(){

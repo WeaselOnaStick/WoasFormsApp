@@ -5,20 +5,24 @@
 
 
 <PaperCenter Title="Search">
-    <MudText Align="Align.Center" Typo="Typo.h5">Templates Search</MudText>
-    <MudMenu Label="Search Options" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FilterList">
-        @foreach (var kv in IDatabaseAccessorService.TemplateOrdersData)
-        {
-            <MudMenuItem Label=@kv.Value.DisplayName OnClick="async _ => {_orderMode = kv.Key; await FetchTemplates();}"/>
-        }
-    </MudMenu>
-    <TemplatesGallery Mode="Components.Template.TemplatesGallery.GalleryMode.CustomList" CustomTemplates="_searchResults"/>
+    <div style="display:block">
+        <MudText Align="Align.Center" Class="p-2 m-2" Typo="Typo.h5">Templates Search</MudText>
+        <MudMenu Label=@($"Search Options ({_modesCache[currentMode].DisplayName})") Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FilterList" Class="justify-self-center p-2">
+            @foreach (var kv in _modesCache)
+            {
+                <MudMenuItem Label=@kv.Value.DisplayName OnClick="async () => await FetchTemplates(kv.Key)" ForceLoad="true" Icon="@kv.Value.Icon"/>
+            }
+        </MudMenu>
+        <TemplatesGallery Mode="Components.Template.TemplatesGallery.GalleryMode.CustomList" CustomTemplates="_searchResults"/>
+    </div>
 </PaperCenter>
 
 @code {
+    private Dictionary<TemplateOrderMode, TemplateOrderModeData> _modesCache = new();
     private List<Template>? _searchResults;
+    private TemplateOrderMode defaultMode = TemplateOrderMode.Newest;
 
-    private TemplateOrderMode _orderMode = TemplateOrderMode.Newest;
+    private TemplateOrderMode currentMode = default;
 
     [Parameter]
     [SupplyParameterFromQuery(Name = "search")]
@@ -36,12 +40,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await FetchTemplates();
+        _modesCache = dba.GetTemplateOrdersData();
+        currentMode = defaultMode;
+        await FetchTemplates(defaultMode);
     }
 
-    private async Task FetchTemplates()
+    private async Task FetchTemplates(TemplateOrderMode order)
     {
-        _searchResults = new List<Template>(await dba.SearchTemplates(_orderMode, searchString, searchAuthor, searchTag));
+        currentMode = order;
+        _searchResults = new List<Template>(await dba.SearchTemplates(order, searchString, searchAuthor, searchTag));
         StateHasChanged();
     }
 }

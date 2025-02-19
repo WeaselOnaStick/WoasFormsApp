@@ -1,8 +1,17 @@
-﻿using WoasFormsApp.Data;
+﻿using MudBlazor;
+using WoasFormsApp.Data;
 using static WoasFormsApp.Services.DatabaseAccessorService;
 
 namespace WoasFormsApp.Services
 {
+
+    public record TemplateOrderModeData
+    {
+        required public string DisplayName { get; init; }
+        required public Func<Template, object> Selector { get; init; }
+        required public SortDirection Direction { get; init; }
+        public string? Icon { get; init; }
+    }
 
     public enum TemplateOrderMode
     {
@@ -22,7 +31,7 @@ namespace WoasFormsApp.Services
         Task<HashSet<TemplateTag>> GetTags();
         Task<HashSet<TemplateFieldType>> GetTemplateFieldTypes();
 
-        public static Dictionary<TemplateOrderMode, TemplateOrderModeData> TemplateOrdersData;
+        Dictionary<TemplateOrderMode, TemplateOrderModeData> GetTemplateOrdersData();
         Task<IList<Template>> SearchTemplates(TemplateOrderMode order = TemplateOrderMode.Newest, string? query = default, string? username = default, string? tag = default);
         Task<bool> GetCurrentUserOwnsTemplate(int templateId);
         Task<Template?> GetTemplate(int templateId);

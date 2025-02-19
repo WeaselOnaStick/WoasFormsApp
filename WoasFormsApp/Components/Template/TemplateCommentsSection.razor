@@ -1,5 +1,78 @@
-﻿<h3>TemplateCommentsSection</h3>
+﻿@inject IDatabaseAccessorService dba
+
+<MudPaper Elevation="0" Class="m-4 p-4">
+    <MudGrid Justify="Justify.Center">
+        <AuthorizeView>
+            <Authorized>
+                <MudItem xs="10">
+                    <MudTextField Variant="Variant.Filled" Label="Post a comment..." Lines="2" @bind-Value=_userComment Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AddComment" OnAdornmentClick="AddUsercomment" OnKeyDown="@(e => {if (e.Code=="Enter") AddUsercomment();})" />
+                </MudItem>
+            </Authorized>
+        </AuthorizeView>
+        <MudItem xs="10">
+            <MudPaper Elevation="0">
+                @if(!_comments.Any())
+                {
+                    <MudText Typo="Typo.h6" Align="Align.Center" Class="m-4 p-4">No comments yet...</MudText>
+                }
+                else{
+                    @foreach (var comment in _comments)
+                    {
+                        <MudChat>
+                            <MudChatHeader Name="@comment.Author" Time="@($"{comment.PostedAt.ToLocalTime().ToShortDateString()} {comment.PostedAt.ToLocalTime().ToShortTimeString()}")"/>
+                            <MudChatBubble>@comment.Content</MudChatBubble>
+                        </MudChat>
+                    }
+                }
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
 
 @code {
+    [Parameter, EditorRequired]
+    public Template? Item { get; set; }
 
+    private string _userComment { get; set; } = "";
+
+    private List<CommentView> _comments = new();
+
+    public class CommentView
+    {
+        public string Author { get; set; }
+        public string Content { get; set; }
+        public DateTime PostedAt { get; set; }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await ReloadComments();
+    }
+
+    private async Task ReloadComments()
+    {
+        Item = await dba.GetTemplate(Item.Id);
+        if (Item is null) 
+        {
+            _comments = new List<CommentView>();
+            return;
+        }
+        _comments = Item.Comments.Select(c => new CommentView
+            {
+                Author = c.User.UserName ?? "deleted user",
+                Content = c.Text,
+                PostedAt = c.PostedAt
+            })
+            .OrderBy(x => x.PostedAt)
+            .ToList();
+    }
+
+    private async Task AddUsercomment()
+    {
+        if (string.IsNullOrWhiteSpace(_userComment)) return;
+        await dba.CommentOnTemplate(Item.Id, _userComment);
+        _userComment = "";
+        await ReloadComments();
+        StateHasChanged();
+    }
 }

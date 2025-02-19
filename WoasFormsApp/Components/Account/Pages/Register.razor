@@ -27,22 +27,22 @@
         <EditForm Model="Input" method="post" OnValidSubmit="RegisterUser" FormName="register">
             <MudGrid>
                 <MudItem md="12">
-                    <MudStaticTextField For="@(() => Input.Username)" @bind-Value="Input.Username"
+                    <MudStaticTextField ShrinkLabel="true" For="@(() => Input.Username)" @bind-Value="Input.Username"
                     Label="Username" Variant="Variant.Outlined"
                     UserAttributes="@(new() { { "autocomplete", "username" }, { "aria-required", "true" } } )" />
                 </MudItem>
                 <MudItem md="12">
-                    <MudStaticTextField For="@(() => Input.Email)" @bind-Value="Input.Email"
+                    <MudStaticTextField ShrinkLabel="true" For="@(() => Input.Email)" @bind-Value="Input.Email"
                     Label="Email" Placeholder="name@example.com" Variant="Variant.Outlined"
                     UserAttributes="@(new() { { "autocomplete", "username" }, { "aria-required", "true" } } )" />
                 </MudItem>
                 <MudItem md="12">
-                    <MudStaticTextField For="@(() => Input.Password)" @bind-Value="Input.Password"
+                    <MudStaticTextField ShrinkLabel="true" For="@(() => Input.Password)" @bind-Value="Input.Password"
                     Label="Password" InputType="InputType.Password" Placeholder="password" Variant="Variant.Outlined"
                     UserAttributes="@(new() { { "autocomplete", "new-password" }, { "aria-required", "true" } } )" />
                 </MudItem>
                 <MudItem md="12">
-                    <MudStaticTextField For="@(() => Input.ConfirmPassword)" @bind-Value="Input.ConfirmPassword"
+                    <MudStaticTextField ShrinkLabel="true" For="@(() => Input.ConfirmPassword)" @bind-Value="Input.ConfirmPassword"
                     Label="Confirm Password" InputType="InputType.Password" Placeholder="confirm password" Variant="Variant.Outlined"
                     UserAttributes="@(new() { { "autocomplete", "new-password" }, { "aria-required", "true" } } )" />
                 </MudItem>

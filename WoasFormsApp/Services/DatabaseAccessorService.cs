@@ -163,8 +163,8 @@ namespace WoasFormsApp.Services
 
         public static Dictionary<TemplateOrderMode, TemplateOrderModeData> TemplateOrdersData = new Dictionary<TemplateOrderMode, TemplateOrderModeData>
         {
-            {TemplateOrderMode.Oldest,              new TemplateOrderModeData{ DisplayName="Oldest",            Direction = SortDirection.Descending,   Selector = x => x.CreatedAt,            Icon = Icons.Material.Filled.History } },
-            {TemplateOrderMode.Newest,              new TemplateOrderModeData{ DisplayName="Newest",            Direction = SortDirection.Ascending,    Selector = x => x.CreatedAt,            Icon = Icons.Material.Filled.History } },
+            {TemplateOrderMode.Newest,              new TemplateOrderModeData{ DisplayName="Newest",            Direction = SortDirection.Descending,   Selector = x => x.CreatedAt,            Icon = Icons.Material.Filled.History } },
+            {TemplateOrderMode.Oldest,              new TemplateOrderModeData{ DisplayName="Oldest",            Direction = SortDirection.Ascending,    Selector = x => x.CreatedAt,            Icon = Icons.Material.Filled.History } },
             {TemplateOrderMode.MostLiked,           new TemplateOrderModeData{ DisplayName="Most Likes",        Direction = SortDirection.Descending,   Selector = x => x.UsersWhoLiked.Count,  Icon = Icons.Material.Filled.Favorite } },
             {TemplateOrderMode.LeastLiked,          new TemplateOrderModeData{ DisplayName="Least Likes",       Direction = SortDirection.Ascending,    Selector = x => x.UsersWhoLiked.Count,  Icon = Icons.Material.Filled.HeartBroken } },
             {TemplateOrderMode.MostCommented,       new TemplateOrderModeData{ DisplayName="Most Comments",     Direction = SortDirection.Descending,   Selector = x => x.Comments.Count,       Icon = Icons.Material.Filled.Comment } },
@@ -286,7 +286,7 @@ namespace WoasFormsApp.Services
             if (appUser == null) return;
             var template = await GetTemplate(templateId);
             if (template == null) return;
-            var curUserAllowedToInteract = template.Public || (!template.Public && template.AllowedUsers.Contains(appUser));
+            var curUserAllowedToInteract = await CurrentUserHasAdmin() || template.Public || (!template.Public && template.AllowedUsers.Contains(appUser));
             if (!curUserAllowedToInteract) return;
 
             template.Comments.Add(new TemplateComment

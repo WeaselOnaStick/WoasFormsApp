@@ -165,7 +165,7 @@ else
                     template = t,
                     liked = (curUser == null) ? false : t.UsersWhoLiked.Contains(curUser),
                     likes = t.UsersWhoLiked.Count,
-                    comments = t.Responses.Count,
+                    comments = t.Comments.Count,
                     responses = t.Responses.Count,
                 }
         ).ToList();

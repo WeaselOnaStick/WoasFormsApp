@@ -20,12 +20,22 @@ Color="@Color.Inherit"
     string searchText;
     MudTextField<string> searchField;
 
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "search")]
+    public string searchString { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(searchString)) searchText = searchString;
+    }
+
     public void EnterKey(KeyboardEventArgs args){
         if (args.Code == "Enter") Search();
     }
 
     public void Search()
     {
+        StateHasChanged();
         if (string.IsNullOrWhiteSpace(searchText)) {
             searchField.Error = true;
             StateHasChanged();

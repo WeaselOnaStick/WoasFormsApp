@@ -17,7 +17,7 @@ namespace WoasFormsApp.Services
         SignInManager<WoasFormsAppUser> _sign;
 
         public DatabaseAccessorService(
-            WoasFormsDbContext context, 
+            WoasFormsDbContext context,
             AuthenticationStateProvider authenticationStateProvider,
             UserManager<WoasFormsAppUser> userManager,
             SignInManager<WoasFormsAppUser> signInManager)
@@ -36,8 +36,8 @@ namespace WoasFormsApp.Services
 
         public async Task<WoasFormsAppUser?> GetCurrentUser()
         {
-            if (!_curUserIsCached) 
-            { 
+            if (!_curUserIsCached)
+            {
                 var user = (await _asp.GetAuthenticationStateAsync()).User;
                 string userName = user.Identity.Name;
                 if (userName == null) return null;
@@ -155,8 +155,49 @@ namespace WoasFormsApp.Services
         {
             var curUserHasAdmin = await CurrentUserHasAdmin();
             if (curUserHasAdmin) return true;
+
             var curUser = await GetCurrentUser();
             return template.Owner == curUser;
+        }
+
+        public record TemplateOrderModeData
+        {
+            required public string DisplayName { get; init; }
+            required public Func<Template, object> Selector { get; init; }
+            required public SortDirection Direction { get; init; }
+        }
+
+        public static Dictionary<TemplateOrderMode, TemplateOrderModeData> TemplateOrdersData = new Dictionary<TemplateOrderMode, TemplateOrderModeData>
+        {
+            {TemplateOrderMode.Oldest,              new TemplateOrderModeData{ DisplayName="Oldest",            Direction = SortDirection.Descending,   Selector = x => x.CreatedAt } },
+            {TemplateOrderMode.Newest,              new TemplateOrderModeData{ DisplayName="Newest",            Direction = SortDirection.Ascending,    Selector = x => x.CreatedAt } },
+            {TemplateOrderMode.MostLiked,           new TemplateOrderModeData{ DisplayName="Most Likes",        Direction = SortDirection.Descending,   Selector = x => x.UsersWhoLiked.Count } },
+            {TemplateOrderMode.LeastLiked,          new TemplateOrderModeData{ DisplayName="Least Likes",       Direction = SortDirection.Ascending,    Selector = x => x.UsersWhoLiked.Count } },
+            {TemplateOrderMode.MostCommented,       new TemplateOrderModeData{ DisplayName="Most Comments",     Direction = SortDirection.Descending,   Selector = x => x.Comments.Count } },
+            {TemplateOrderMode.LeastCommented,      new TemplateOrderModeData{ DisplayName="Least Comments",    Direction = SortDirection.Ascending,    Selector = x => x.Comments.Count } },
+            {TemplateOrderMode.MostResponded,       new TemplateOrderModeData{ DisplayName="Most Forms",        Direction = SortDirection.Descending,   Selector = x => x.Responses.Count } },
+            {TemplateOrderMode.LeastResponded,      new TemplateOrderModeData{ DisplayName="Least Forms",       Direction = SortDirection.Ascending,    Selector = x => x.Responses.Count } },
+
+        };
+
+        public async Task<IList<Template>> SearchTemplates(TemplateOrderMode order = TemplateOrderMode.Newest, string? query = default, string? username = default, string? tag = default)
+        {
+            var res = _ctx.Templates.Where(t =>
+                t.Title.Contains(query) ||
+                t.Description.Contains(query) ||
+                t.Fields.Select(f => f.Title).Contains(query) ||
+                t.Fields.Select(f => f.Description).Contains(query));
+            
+            if (username != null)
+                res = res.Where(t => t.Owner.UserName == username);
+
+            if (tag != null)
+                res = res.Where(t => t.Tags.Select(t => t.Title).Contains(tag));
+
+            res = await TemplateAuthVisibility(res);
+            var resList = await res.ToListAsync();
+            var curOrderModeData = TemplateOrdersData[order];
+            return resList.OrderByDirection(curOrderModeData.Direction, curOrderModeData.Selector).ToList();
         }
 
         public async Task<bool> GetCurrentUserOwnsTemplate(int templateId)
@@ -266,41 +307,47 @@ namespace WoasFormsApp.Services
                 .ToListAsync();
         }
 
-        public async Task UserDelete(string targetUserId)
+        public async Task DeleteUser(string targetUserId)
         {
             if (!await CurrentUserHasPowerOverTarget(targetUserId)) return;
             var targetUser = await GetUserById(targetUserId);
+            await _users.UpdateSecurityStampAsync(targetUser);
             if (await GetCurrentUser() == targetUser) await _sign.SignOutAsync();
             _ctx.Users.Remove(await GetUserById(targetUserId));
             await _ctx.SaveChangesAsync();
         }
 
-        public async Task UserGiveRole(string userId, string roleName)
+        public async Task GiveUserRole(string userId, string roleName)
         {
             if (!await CurrentUserHasAdmin()) return;
             await _users.AddToRoleAsync(await GetUserById(userId), roleName);
             await _ctx.SaveChangesAsync();
         }
 
-        public async Task UserRevokeRole(string userId, string roleName)
+        public async Task RevokeUserRole(string userId, string roleName)
         {
             if (!await CurrentUserHasAdmin()) return;
-            await _users.RemoveFromRoleAsync(await GetUserById(userId), roleName);
+            var targetUser = await GetUserById(userId);
+            await _users.RemoveFromRoleAsync(targetUser, roleName);
+            await _users.UpdateSecurityStampAsync(targetUser);
+            if (roleName == "Admin" && await GetCurrentUser() == targetUser) await _sign.SignOutAsync();
             await _ctx.SaveChangesAsync();
         }
 
-        public async Task UserSetBlocked(string userId, bool blocked)
+        public async Task BlockUser(string userId, bool blocked)
         {
             if (!await CurrentUserHasAdmin()) return;
-            (await GetUserById(userId)).IsBlocked = blocked;
+            var targetUser = await GetUserById(userId);
+            targetUser.IsBlocked = blocked;
+            await _users.UpdateSecurityStampAsync(targetUser);
             await _ctx.SaveChangesAsync();
         }
 
-        public async Task UserBlock(string userId) => await UserSetBlocked(userId, true);
+        public async Task BlockUser(string userId) => await BlockUser(userId, true);
 
-        public async Task UserUnblock(string userId) => await UserSetBlocked(userId, false);
+        public async Task UnblockUser(string userId) => await BlockUser(userId, false);
 
-        public async Task<List<string>> UserGetRoles(string userId)
+        public async Task<List<string>> GetUserRoles(string userId)
         {
             List<string> res = new List<string>();
             if (!await CurrentUserHasAdmin()) return res;
@@ -395,6 +442,17 @@ namespace WoasFormsApp.Services
             return freshResponse.Entity;
         }
 
+        public async Task<WoasFormsAppUser?> GetUser(string userId) 
+            => await GetUserById(userId);
+
+        public async IAsyncEnumerable<WoasFormsAppUser> GetUsers(IEnumerable<string> userIds)
+        {
+            foreach (var userId in userIds)
+            {
+                var user = await GetUserById(userId);
+                if (user != null) yield return user;
+            }
+        }
 
     }
 }

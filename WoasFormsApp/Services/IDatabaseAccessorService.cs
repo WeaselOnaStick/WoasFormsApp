@@ -1,13 +1,29 @@
 ﻿using WoasFormsApp.Data;
+using static WoasFormsApp.Services.DatabaseAccessorService;
 
 namespace WoasFormsApp.Services
 {
+
+    public enum TemplateOrderMode
+    {
+        Newest,
+        Oldest,
+        MostLiked,
+        LeastLiked,
+        MostCommented,
+        LeastCommented,
+        MostResponded,
+        LeastResponded,
+    }
+
     public interface IDatabaseAccessorService
     {
         Task<HashSet<TemplateTopic>> GetTopics();
         Task<HashSet<TemplateTag>> GetTags();
         Task<HashSet<TemplateFieldType>> GetTemplateFieldTypes();
 
+        public static Dictionary<TemplateOrderMode, TemplateOrderModeData> TemplateOrdersData;
+        Task<IList<Template>> SearchTemplates(TemplateOrderMode order = TemplateOrderMode.Newest, string? query = default, string? username = default, string? tag = default);
         Task<bool> GetCurrentUserOwnsTemplate(int templateId);
         Task<Template?> GetTemplate(int templateId);
         Task<IEnumerable<Template>> GetAvailableTemplates();
@@ -26,13 +42,14 @@ namespace WoasFormsApp.Services
         Task<IEnumerable<Response>> GetResponsesByRespondent(string userId);
         Task<IEnumerable<Response>> GetResponsesByCurrentUser();
 
+        Task<WoasFormsAppUser?> GetUser(string userId);
         Task<List<WoasFormsAppUser>> GetAllUsers();
         Task<WoasFormsAppUser?> GetCurrentUser();
-        Task UserDelete(string userId);
-        Task UserGiveRole(string userId, string roleName);
-        Task UserRevokeRole(string userId, string roleName);
-        Task UserBlock(string userId);
-        Task UserUnblock(string userId);
-        Task<List<string>> UserGetRoles(string userId);
+        Task DeleteUser(string userId);
+        Task GiveUserRole(string userId, string roleName);
+        Task RevokeUserRole(string userId, string roleName);
+        Task BlockUser(string userId);
+        Task UnblockUser(string userId);
+        Task<List<string>> GetUserRoles(string userId);
     }
 }

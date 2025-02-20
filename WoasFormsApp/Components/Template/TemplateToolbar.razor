@@ -5,22 +5,20 @@
 
 @if(Enabled)
 {
-    <MudButtonGroup Variant="Variant.Outlined" OverrideStyles="false" Class="justify-center">
-        @if (ShowViewButton)
-        {
-            <MudButton Class="p-2" Href=@($"/Template/{Item.Id}") StartIcon="@Icons.Material.Filled.Description" Variant="Variant.Outlined" Color="Color.Info">Template Page</MudButton>
-        }
-        @if(ShowEditButton)
-        {
-            <MudButton Class="p-2" Href=@($"/Template/{Item.Id}/Edit") StartIcon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Secondary">Edit</MudButton>
-        }
-        @if(ShowAnalyticsButton)
-        {
-            <MudButton Class="p-2" Href=@($"/Template/{Item.Id}/Analytics") StartIcon="@Icons.Material.Filled.Analytics" Variant="Variant.Outlined" Color="Color.Tertiary">Analytics</MudButton>
-        }
-        <MudButton Class="p-2" OnClick="DeleteTemplate" StartIcon="@Icons.Material.Filled.DeleteForever" Variant="Variant.Outlined" Color="Color.Error">Delete Template</MudButton>
+    @if (ShowViewButton)
+    {
+        <MudFab Class="p-2 m-1" Href=@($"/Template/{Item.Id}") StartIcon="@Icons.Material.Filled.Description" Variant="Variant.Outlined" Color="Color.Info" Label="Template Page" />
+    }
+    @if(ShowEditButton)
+    {
+        <MudFab Class="p-2 m-1" Href=@($"/Template/{Item.Id}/Edit") StartIcon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Secondary" Label="Edit"/>
+    }
+    @if(ShowAnalyticsButton)
+    {
+        <MudFab Class="p-2 m-1" Href=@($"/Template/{Item.Id}/Analytics") StartIcon="@Icons.Material.Filled.Analytics" Variant="Variant.Outlined" Color="Color.Tertiary" Label="Analytics"/>
+    }
+        <MudFab Class="p-2 m-1" OnClick="DeleteTemplate" StartIcon="@Icons.Material.Filled.DeleteForever" Variant="Variant.Outlined" Color="Color.Error" Label="Delete Template" />
 
-    </MudButtonGroup>
 }
 
 @code {

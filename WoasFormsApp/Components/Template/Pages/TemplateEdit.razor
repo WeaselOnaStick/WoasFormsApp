@@ -1,13 +1,62 @@
-﻿@page "/Template/Edit/{TemplateId:int}"
+﻿@page "/Template/{TemplateId:int}/Edit"
 @rendermode InteractiveServer
+
+@inject IDatabaseAccessorService dba
 
 @attribute [Authorize]
 
-<h3>Template Editor</h3>
+<PageTitle>Template Editor - WoasForms</PageTitle>
 
-Not Yet Implemented
+@if (AccessDenied || template == null)
+{
+    <PaperCenter>
+        <TemplateInaccessible />
+    </PaperCenter>
+}
+else
+{
+    <MudText Typo="Typo.h3" Align="Align.Center">Editing Template <i>@TemplateTitleOrUnnamed(template)</i></MudText>
+    <TemplateEditor editorMode="TemplateEditor.EditorMode.Edit" templateModel="@template" />
+}
+
+
 
 @code {
     [Parameter]
     public int TemplateId { get; set; }
+
+    private bool AccessDenied = true;
+
+    private Template? template;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!await dba.GetCurrentUserOwnsTemplate(TemplateId))
+        {
+            AccessDenied = true;
+            StateHasChanged();
+            return;
+        }
+        AccessDenied = false;
+
+        var foundTemplate = (await dba.GetTemplate(TemplateId));
+        template = new Template()
+            {
+                Id = foundTemplate.Id,
+                Title = foundTemplate.Title,
+                Public = foundTemplate.Public,
+                AllowedUsers = foundTemplate.AllowedUsers,
+                Description = foundTemplate.Description,
+                Fields = foundTemplate.Fields.Where(ff => !ff.Hidden).Select((ff,i) => new TemplateField()
+                {
+                    Id = i,
+                    Title = ff.Title,
+                    Description = ff.Description,
+                    Type = ff.Type,
+                }).ToList(),
+                TopicId = foundTemplate.TopicId,
+                Tags = new List<TemplateTag>(foundTemplate.Tags),
+            };
+        StateHasChanged();
+    }
 }

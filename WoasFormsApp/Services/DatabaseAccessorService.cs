@@ -11,6 +11,8 @@ namespace WoasFormsApp.Services
 {
     public class DatabaseAccessorService : IDatabaseAccessorService
     {
+        const int MAX_AMOUNT_OF_FIELDS_PER_TYPE = 4;
+
         WoasFormsDbContext _ctx;
         AuthenticationStateProvider _asp;
         UserManager<WoasFormsAppUser> _users;
@@ -82,18 +84,16 @@ namespace WoasFormsApp.Services
         public bool ValidateTemplate(Template template)
         {
             if (string.IsNullOrWhiteSpace(template.Title)) return false;
-            if (template.Fields == null || template.Fields.Count == 0) return false;
+            if (template.Fields.Count == 0) return false;
+            if (template.Fields.GroupBy(f => f.Type.Id).Select(g => g.Count()).Max() > MAX_AMOUNT_OF_FIELDS_PER_TYPE) return false;
             return true;
         }
 
-        public async Task<Template?> CreateTemplate(Template template)
+        private async Task<HashSet<TemplateTag>> CreateNecessaryTags(Template submission)
         {
-            template.Owner ??= await GetCurrentUser();
-
-            // replacing submitted tags with existing ones if found, creating new if not found
             HashSet<TemplateTag> syncedTagList = new HashSet<TemplateTag>();
             HashSet<TemplateTag> newTags = new HashSet<TemplateTag>();
-            foreach (var tagName in template.Tags.Select(t=>t.Title))
+            foreach (var tagName in submission.Tags.Select(t => t.Title))
             {
                 TemplateTag? foundTag = await _ctx.TemplateTags.FirstOrDefaultAsync(t => t.Title == tagName);
                 if (foundTag != null)
@@ -109,9 +109,17 @@ namespace WoasFormsApp.Services
                 syncedTagList.UnionWith(newTags);
             }
 
-            template.Tags = syncedTagList;
+            return syncedTagList;
+        }
+
+        public async Task<Template?> CreateTemplate(Template template)
+        {
+            template.Owner ??= await GetCurrentUser();
+
+            template.Tags = await CreateNecessaryTags(template);
 
             template.CreatedAt = DateTime.UtcNow;
+            template.LastModifiedAt = template.CreatedAt;
 
             if (!ValidateTemplate(template)) return null;
 
@@ -202,9 +210,8 @@ namespace WoasFormsApp.Services
 
         public async Task<bool> GetCurrentUserOwnsTemplate(int templateId)
         {
-            if (await CurrentUserHasAdmin()) return true;
-            var curUser = await GetCurrentUser();
-            return curUser == (await GetTemplate(templateId))?.Owner;
+            var template = await GetTemplate(templateId);
+            return await TemplateAuthManage(template);            
         }
 
         public async Task<Template?> GetTemplate(int templateId)
@@ -240,14 +247,80 @@ namespace WoasFormsApp.Services
             return res;
         }
 
-        public async Task<Template?> UpdateTemplate(Template newTemplate, int? templateId = null)
+        public async Task<Template?> UpdateTemplate(Template submittedTemplate, int? templateId = null)
         {
-            var realTemplateId = templateId ?? newTemplate.Id;
-            Template? template = await GetTemplate(realTemplateId);
-            if (template == null) return null;
-            if (!await TemplateAuthManage(template)) return null;
-            // Complex function, comparing new fields to old+hidden, recycling data
-            throw new NotImplementedException();
+            if (!ValidateTemplate(submittedTemplate)) return null;
+
+            Template? obsoleteTemplate = await GetTemplate(templateId ?? submittedTemplate.Id);
+            if (obsoleteTemplate == null) return null;
+            if (!await TemplateAuthManage(obsoleteTemplate)) return null;
+            obsoleteTemplate.LastModifiedAt = DateTime.UtcNow;
+
+            obsoleteTemplate.Tags = await CreateNecessaryTags(submittedTemplate);
+
+            obsoleteTemplate.Fields.Sort((a, b) => a.Position.CompareTo(b.Position));
+            submittedTemplate.Fields.Sort((a,b) => a.Position.CompareTo(b.Position));
+
+            // <TemplateField.Id, TypeRelativeIndex> (Type Relative Index - how many fields of this type preceed this field)
+            static Dictionary<int, int> CountFieldsByType(Template t)
+                => t.Fields.GroupBy(f => f.Type.Id)
+                .SelectMany(g => g.Select(
+                    (ff, relIndex) => new { ff, relIndex }))
+                .ToDictionary(x => x.ff.Id, x => x.relIndex);
+
+            var oldFieldsIndexesByType = CountFieldsByType(obsoleteTemplate);
+            var newFieldsIndexesByType = CountFieldsByType(submittedTemplate);
+
+            var oldFieldsFoundReplacements = obsoleteTemplate.Fields.ToDictionary(f => f.Id, f => false);
+
+            var newFieldsToAdd = new HashSet<TemplateField>();
+            foreach (var kv_new in newFieldsIndexesByType)
+            {
+                var newField = submittedTemplate.Fields.First(sf => sf.Id == kv_new.Key);
+                var oldField = obsoleteTemplate.Fields.FirstOrDefault(of => 
+                    of.Type.Id == newField.Type.Id && 
+                    oldFieldsIndexesByType.TryGetValue(of.Id, out var x) && x == kv_new.Value);
+
+                bool FoundOldFieldToReuse = (oldField != null);
+                if (FoundOldFieldToReuse)
+                {
+                    oldFieldsFoundReplacements[oldField.Id] = true;
+                    oldField.Hidden = false;
+                    oldField.Title = newField.Title;
+                    oldField.Description = newField.Description;
+                    oldField.Position = newField.Position;
+                    oldField.ShowInAnalytics = newField.ShowInAnalytics;
+                }
+                else
+                {
+                    var newFieldToAdd = new TemplateField()
+                    {
+                        Template = obsoleteTemplate,
+                        Hidden = false,
+                        Title = newField.Title,
+                        Description = newField.Description,
+                        Type = newField.Type,
+                        Position = newField.Position,
+                        ShowInAnalytics = newField.ShowInAnalytics,
+                    };
+                    newFieldsToAdd.Add(newFieldToAdd);
+                    obsoleteTemplate.Fields.Add(newFieldToAdd);
+                }
+            }
+            foreach (var oldFieldToHideId in oldFieldsFoundReplacements.Where(kv => !kv.Value).Select(kv => kv.Key))
+                obsoleteTemplate.Fields.First(of => of.Id == oldFieldToHideId).Hidden = true;
+            
+            await _ctx.TemplateFields.AddRangeAsync(newFieldsToAdd);
+            
+            try
+            {
+                await _ctx.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            return obsoleteTemplate;
         }
 
         public async Task DeleteTemplate(int templateId)

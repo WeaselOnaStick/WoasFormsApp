@@ -1,4 +1,4 @@
-<MudDataGrid Dense="true" Class="mud-background-dark p-2 m-2" Items="Item.Fields" SortMode="SortMode.None">
+<MudDataGrid Dense="true" Class="mud-background-dark p-2 m-2" Items="Item.Fields.Where(f => !f.Hidden).OrderBy(f => f.Position)" SortMode="SortMode.None">
     <Columns>
         <PropertyColumn Title="Question" Property="x => x.Title" />
         <PropertyColumn Title="Description" Property="x => x.Description" />

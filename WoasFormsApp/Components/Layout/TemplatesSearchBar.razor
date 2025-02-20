@@ -5,6 +5,7 @@
 @bind-Value="searchText"
 @ref="searchField"
 Label="Search"
+Immediate="true"
 Variant="Variant.Filled"
 Adornment="Adornment.End"
 AdornmentIcon="@Icons.Material.Filled.Search"
@@ -20,22 +21,12 @@ Color="@Color.Inherit"
     string searchText;
     MudTextField<string> searchField;
 
-    [Parameter]
-    [SupplyParameterFromQuery(Name = "search")]
-    public string searchString { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        if (!string.IsNullOrWhiteSpace(searchString)) searchText = searchString;
-    }
-
     public void EnterKey(KeyboardEventArgs args){
         if (args.Code == "Enter") Search();
     }
 
     public void Search()
     {
-        StateHasChanged();
         var baseUri = "/SearchTemplate";
         var searchParams = new Dictionary<string, object>{
             {"search" , searchText },

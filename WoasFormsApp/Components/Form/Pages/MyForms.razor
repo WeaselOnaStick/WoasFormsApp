@@ -15,16 +15,14 @@
     }
     else
     {
-        <MudDataGrid T="Response" Items="_responses" Elevation="2">
+        <MudDataGrid T="Response" Items="_responses" Elevation="2" Striped="true" Dense="true">
             <Columns>
                 <PropertyColumn Property="@(r => (r.Template == null || r.Template.Owner == null) ? "No Owner (Orphan Template)" : r.Template.Owner.UserName)" Title="Template Author"/>
                 <PropertyColumn Property="@(r => (r.Template == null || string.IsNullOrWhiteSpace(r.Template.Title)) ? "Unnamed Template" : r.Template.Title )" Title="Template Title" />
                 <PropertyColumn Property="r => r.CreationDate" Title="Filled On" />
                 <TemplateColumn>
                     <CellTemplate>
-                        <MudButton Href="@($"/Form/{context.Item.Id}")" StartIcon="@Icons.Material.Filled.Visibility" Variant="Variant.Outlined" Color="Color.Info">
-                            View Form
-                        </MudButton>
+                        <MudFab Size="Size.Small" Href="@($"/Form/{context.Item.Id}")" StartIcon="@Icons.Material.Filled.Visibility" Variant="Variant.Filled" Color="Color.Info"/>
                     </CellTemplate>
                 </TemplateColumn>
             </Columns>

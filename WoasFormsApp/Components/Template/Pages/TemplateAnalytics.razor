@@ -16,143 +16,150 @@ else if (!_responses.Any())
 else
 {
     <PaperCenter Title=@($"Analytics for Template {TemplateTitleOrUnnamed(_template)}")>
-    <TemplateToolbar Item="_template"  ShowAnalyticsButton="false"/>
-    <MudText Align="Align.Center" Typo="Typo.h5">@($"Analytics for Template {TemplateTitleOrUnnamed(_template)}")</MudText>
-    <MudDataGrid T="Response" Items=_responses Breakpoint="Breakpoint.None" Striped="true">
-        <Columns>
-            <PropertyColumn Property="r => r.Respondent.UserName" Title="Respondent" />
-            <PropertyColumn Property="r => r.CreationDate" Title="Date" /> 
+        <TemplateToolbar Item="_template"  ShowAnalyticsButton="false"/>
+        <MudText Align="Align.Center" Typo="Typo.h5">@($"Analytics for Template {TemplateTitleOrUnnamed(_template)}")</MudText>
+        <MudDataGrid T="Response" Items=_responses Breakpoint="Breakpoint.None">
+            <Columns>
+                <PropertyColumn Property="r => r.Respondent.UserName" Title="Respondent" />
+                <PropertyColumn Property="r => r.CreationDate" Title="Date" /> 
 
-            @foreach (var field in _template.Fields.Where(f => f.ShowInAnalytics)) 
-            {
+                @foreach (var field in _template.Fields.Where(f => f.ShowInAnalytics && !f.Hidden)) 
+                {
 
-                switch (field.Type.Name) 
-                { 
-                    case "SingleLine":
-                        {
-                            Func<Response,string?> GetAnswerCase = r => GetAnswer(r, field).AnswerSingleLine;
-                            <PropertyColumn Property="r => GetAnswerCase(r)" Title="@field.Title" AggregateDefinition="@(new AggregateDefinition<Response>())">
-                                <AggregateTemplate>
-                                    <MudSimpleTable Dense="true" Hover="true">
-                                        <tbody style="white-space: break-spaces;">
-                                            <tr>
-                                                <td>Count</td>
-                                                <td>@context.Select(r => GetAnswerCase(r)).Count()</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Count Unique</td>
-                                                <td>@context.Select(r => GetAnswerCase(r)).ToHashSet().Count()</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Top @(TopN) Popular</td>
-                                                <td>@string.Join(", ", context.Select(r => GetAnswerCase(r)).GroupBy(x => x).OrderByDescending(x => x.Count()).Take(TopN).Select(g => g.Key))</td>
-                                            </tr>
-                                        </tbody>
-                                    </MudSimpleTable>
-                                </AggregateTemplate>
-                            </PropertyColumn>
-                            break;
-                        }
-                    case "MultiLine":
-                        {
-                            Func<Response, string> GetAnswerCase = r => GetAnswer(r, field).AnswerMultiLine;
-                            <PropertyColumn Property="r => GetAnswer(r,field).AnswerMultiLine" Title="@field.Title" AggregateDefinition="@(new AggregateDefinition<Response>())">
-                                <AggregateTemplate>
-                                    <MudSimpleTable Dense="true" Hover="true">
-                                        <tbody style="white-space: break-spaces;">
-                                            <tr>
-                                                <td>Count</td>
-                                                <td>@context.Select(r => GetAnswerCase(r)).Count()</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Count Unique</td>
-                                                <td>@context.Select(r => GetAnswerCase(r)).ToHashSet().Count()</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Top @(TopN) Popular</td>
-                                                <td>@string.Join("\n", context.Select(r => GetAnswerCase(r)).GroupBy(x => x).OrderByDescending(x => x.Count()).Take(TopN).Select(g => $"{g.Key} (x{g.Count()})"))</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Top @(TopN) Longest</td>
-                                                <td>@string.Join("\n", context.Select(r => GetAnswerCase(r)).OrderByDescending(x => x.Length).Take(TopN).Select(x => $"{x} (x{x.Length})"))</td>
-                                            </tr>
-                                        </tbody>
-                                    </MudSimpleTable>
-                                </AggregateTemplate>
-                            </PropertyColumn>
-                            break; 
-                        }
-                    case "PositiveInt": 
-                        {
-                            Func<Response, int?> GetAnswerCase = r => GetAnswer(r, field).AnswerPositiveInt;
-                            <PropertyColumn Property="r => GetAnswerCase(r)" Title="@field.Title" AggregateDefinition="@(new AggregateDefinition<Response>())">
-                                <AggregateTemplate>
-                                    <MudSimpleTable Dense="true" Hover="true">
-                                        <tbody style="white-space: break-spaces;">
-                                            <tr>
-                                                <td>Count</td>
-                                                <td>@context.Select(r => GetAnswerCase(r)).Count()</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Count Unique</td>
-                                                <td>@context.Select(r => GetAnswerCase(r)).ToHashSet().Count()</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Top @(TopN) Popular</td>
-                                                <td>@string.Join(", ", context.Select(r => GetAnswerCase(r)).GroupBy(x => x).OrderByDescending(x => x.Count()).Take(TopN).Select(g => $"{g.Key} (x{g.Count()})"))</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Average</td>
-                                                <td>@context.Select(r => GetAnswerCase(r)).Average()</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Min</td>
-                                                <td>@context.Select(r => GetAnswerCase(r)).Min()</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Max</td>
-                                                <td>@context.Select(r => GetAnswerCase(r)).Max()</td>
-                                            </tr>
-                                        </tbody>
-                                    </MudSimpleTable>
-                                </AggregateTemplate>
-                            </PropertyColumn>
-                            break; 
-                        }
-                    case "CheckBox": 
-                        {
-                            Func<Response, bool?> GetAnswerCase = r => GetAnswer(r, field).AnswerCheckedBox;
-                            <PropertyColumn Property="r => GetAnswerCase(r)" Title="@field.Title" AggregateDefinition="@(new AggregateDefinition<Response>())">
-                                <AggregateTemplate>
-                                    @{
-                                        var dataDict = context.Select(r => GetAnswerCase(r)).Where(x => x is not null).GroupBy(x => x).ToDictionary(g => (bool)g.Key ? "Y" : "N", g=>Convert.ToDouble(g.Count()));
-                                        <MudGrid Justify="Justify.Center">
-                                            <MudItem>
-                                                <MudChart ChartType="ChartType.Pie" Width="100px" Height="100px" InputData=@(dataDict.Values.ToArray()) InputLabels=@(dataDict.Keys.ToArray())/>
-                                                <MudSimpleTable Dense="true" Hover="true">
-                                                    <tbody style="white-space: break-spaces;">
-                                                        <tr>
-                                                            <td>Count</td>
-                                                            <td>@context.Select(r => GetAnswerCase(r)).Count()</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </MudSimpleTable>
-                                            </MudItem>
-                                        </MudGrid>
-                                    }
-                                </AggregateTemplate>
-                            </PropertyColumn>
-                            break; 
-                        }
+                    switch (field.Type.Name) 
+                    { 
+                        case "SingleLine":
+                            {
+                                Func<Response, string?> GetAnswerCase = r => GetAnswer(r, field).AnswerSingleLine;
+                                Func<IEnumerable<Response>, IEnumerable<string>> GetAnswersCase = rs => rs.Select(r => GetAnswerCase(r)).Where(a => a != null)!;
+                                <PropertyColumn Property="r => GetAnswerCase(r)" Title="@field.Title" AggregateDefinition="@(new AggregateDefinition<Response>())">
+                                    <AggregateTemplate>
+                                        <MudSimpleTable Dense="true" Hover="true">
+                                            <tbody style="white-space: break-spaces;">
+                                                <tr>
+                                                    <td>Count</td>
+                                                    <td>@GetAnswersCase(context).Count()</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Count Unique</td>
+                                                    <td>@GetAnswersCase(context).ToHashSet().Count()</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Top @(TopN) Popular</td>
+                                                    <td>@string.Join(", ", GetAnswersCase(context).GroupBy(x => x).OrderByDescending(x => x.Count()).Take(TopN).Select(g => g.Key))</td>
+                                                </tr>
+                                            </tbody>
+                                        </MudSimpleTable>
+                                    </AggregateTemplate>
+                                </PropertyColumn>
+                                break;
+                            }
+                        case "MultiLine":
+                            {
+                                Func<Response, string?> GetAnswerCase = r => GetAnswer(r, field).AnswerMultiLine;
+                                Func<IEnumerable<Response>, IEnumerable<string>> GetAnswersCase = rs => rs.Select(r => GetAnswerCase(r)).Where(a => a != null)!;
+                                <PropertyColumn Property="r => GetAnswerCase(r)" Title="@field.Title" AggregateDefinition="@(new AggregateDefinition<Response>())">
+                                    <AggregateTemplate>
+                                        <MudSimpleTable Dense="true" Hover="true">
+                                            <tbody style="white-space: break-spaces;">
+                                                <tr>
+                                                    <td>Count</td>
+                                                    <td>@GetAnswersCase(context).Count()</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Count Unique</td>
+                                                    <td>@GetAnswersCase(context).ToHashSet().Count()</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Top @(TopN) Popular</td>
+                                                    <td>@string.Join("\n", GetAnswersCase(context).GroupBy(x => x).OrderByDescending(x => x.Count()).Take(TopN).Select(g => $"{g.Key} (x{g.Count()})"))</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Top @(TopN) Longest</td>
+                                                    <td>@string.Join("\n", GetAnswersCase(context).OrderByDescending(x => x.Length).Take(TopN).Select(x => $"{x} (x{x.Length})"))</td>
+                                                </tr>
+                                            </tbody>
+                                        </MudSimpleTable>
+                                    </AggregateTemplate>
+                                </PropertyColumn>
+                                break; 
+                            }
+                        case "PositiveInt": 
+                            {
+                                Func<Response, int?> GetAnswerCase = r => GetAnswer(r, field).AnswerPositiveInt;
+                                Func<IEnumerable<Response>, IEnumerable<int>> GetAnswersCase = rs => rs.Select(r => GetAnswerCase(r)).Where(a => a != null).Select(a => a!.Value)!;
+                                <PropertyColumn Property="r => GetAnswerCase(r)" Title="@field.Title" AggregateDefinition="@(new AggregateDefinition<Response>())">
+                                    <AggregateTemplate>
+                                        <MudSimpleTable Dense="true" Hover="true">
+                                            <tbody style="white-space: break-spaces;">
+                                                <tr>
+                                                    <td>Count</td>
+                                                    <td>@GetAnswersCase(context).Count()</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Count Unique</td>
+                                                    <td>@GetAnswersCase(context).ToHashSet().Count()</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Top @(TopN) Popular</td>
+                                                    <td>@string.Join(", ", GetAnswersCase(context).GroupBy(x => x).OrderByDescending(x => x.Count()).Take(TopN).Select(g => $"{g.Key} (x{g.Count()})"))</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Average</td>
+                                                    <td>@(GetAnswersCase(context).Count() == 0 ? "---" : GetAnswersCase(context).Average())</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Min</td>
+                                                    <td>@(GetAnswersCase(context).Count() == 0 ? "---" : GetAnswersCase(context).Min())</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Max</td>
+                                                    <td>@(GetAnswersCase(context).Count() == 0 ? "---" : GetAnswersCase(context).Max())</td>
+                                                </tr>
+                                            </tbody>
+                                        </MudSimpleTable>
+                                    </AggregateTemplate>
+                                </PropertyColumn>
+                                break; 
+                            }
+                        case "CheckBox": 
+                            {
+                                Func<Response, bool?> GetAnswerCase = r => GetAnswer(r, field).AnswerCheckedBox;
+                                Func<IEnumerable<Response>, IEnumerable<bool>> GetAnswersCase = rs => rs.Select(r => GetAnswerCase(r)).Where(a => a != null).Select(a => a!.Value)!;
+                                <PropertyColumn Property="r => GetAnswerCase(r)" Title="@field.Title" AggregateDefinition="@(new AggregateDefinition<Response>())">
+                                    <AggregateTemplate>
+                                        @{
+                                            var dataDict = GetAnswersCase(context).GroupBy(x => x).ToDictionary(g => (bool)g.Key ? "Y" : "N", g=>Convert.ToDouble(g.Count()));
+                                            <MudGrid Justify="Justify.Center">
+                                                <MudItem>
+                                                    @if(GetAnswersCase(context).Count() > 0)
+                                                    {
+                                                        <MudChart ChartType="ChartType.Pie" Width="100px" Height="100px" InputData=@(dataDict.Values.ToArray()) InputLabels=@(dataDict.Keys.ToArray())/>
+                                                    }
+                                                    <MudSimpleTable Dense="true" Hover="true">
+                                                        <tbody style="white-space: break-spaces;">
+                                                            <tr>
+                                                                <td>Count</td>
+                                                                <td>@GetAnswersCase(context).Count()</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </MudSimpleTable>
+                                                </MudItem>
+                                            </MudGrid>
+                                        }
+                                    </AggregateTemplate>
+                                </PropertyColumn>
+                                break; 
+                            }
+                    } 
                 } 
-            } 
-        </Columns>
-    </MudDataGrid>
-    @if(fieldsHidden > 0)
-    { 
-        <MudText Typo="Typo.body2" Style="font-style: italic">Numder of fields omitted: @fieldsHidden</MudText>
-    }
-</PaperCenter>
+            </Columns>
+        </MudDataGrid>
+        @if(fieldsHidden > 0)
+        { 
+            <MudText Typo="Typo.body2" Style="font-style: italic">Numder of fields omitted: @fieldsHidden</MudText>
+        }
+    </PaperCenter>
 }
 
 @code
@@ -183,6 +190,7 @@ else
     }
 
     private ResponseAnswer GetAnswer(Response response, TemplateField field) 
-        => response.Answers.First(a => a.Field == field);
+        => response.Answers.FirstOrDefault(a => a.Field.Id == field.Id) ?? new ResponseAnswer();
+    
     
 }

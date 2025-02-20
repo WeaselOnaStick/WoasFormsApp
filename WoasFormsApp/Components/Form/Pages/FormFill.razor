@@ -50,7 +50,7 @@ else
     {
         _template = await dba.GetTemplate(TemplateId);
         if (_template == null) return;
-        List<ResponseAnswer> _answers = _template.Fields.Select(f => new ResponseAnswer { Field = f }).ToList();
+        List<ResponseAnswer> _answers = _template.Fields.Where(f => !f.Hidden).Select(f => new ResponseAnswer { Field = f }).ToList();
         _response = new Response()
             {
                 Template = _template,

@@ -35,6 +35,10 @@
     [SupplyParameterFromQuery(Name = "tag")]
     public string searchTag { get; set; }
 
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "topic")]
+    public string searchTopic { get; set; }
+
 
 
     protected override async Task OnInitializedAsync()
@@ -47,7 +51,7 @@
     private async Task FetchTemplates(TemplateOrderMode order)
     {
         currentMode = order;
-        _searchResults = new List<Template>(await dba.SearchTemplates(order, searchString, searchAuthor, searchTag));
+        _searchResults = new List<Template>(await dba.SearchTemplates(order, searchString, searchAuthor, searchTag, searchTopic));
         StateHasChanged();
     }
 }

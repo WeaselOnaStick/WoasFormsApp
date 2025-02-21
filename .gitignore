@@ -364,3 +364,4 @@ FodyWeavers.xsd
 /WoasFormsApp/WoasFormsAppDB.sqlite3
 /WoasFormsApp/WoasFormsAppDB.sqlite3-shm
 /WoasFormsApp/WoasFormsAppDB.sqlite3-wal
+/WoasFormsApp/.config/dotnet-tools.json

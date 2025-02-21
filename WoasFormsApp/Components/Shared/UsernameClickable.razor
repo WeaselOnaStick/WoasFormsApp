@@ -1,5 +1,6 @@
-﻿<h3>UsernameClickable</h3>
+﻿<a href="@($"/SearchTemplate?author={UserName}")">@UserName</a>
 
 @code {
-
+    [Parameter, EditorRequired]
+    required public string UserName { get; set; } = "";
 }

@@ -5,7 +5,16 @@
         <MudText style="white-space: nowrap; max-width: fit-content; display: inline; vertical-align: middle;" Class="pb-2 pr-4" Typo="Typo.h3">@TemplateTitleOrUnnamed(Item)</MudText>
         <MudButton StartIcon="@Icons.Material.Filled.Checklist" IconSize="Size.Large" Class="rounded-pill mx-1" Color="Color.Info" Variant="Variant.Filled" Href=@($"/Template/{Item.Id}/Fill")>Fill Form</MudButton>
 
-        <MudText Typo="Typo.body1" Style="font-style: italic;">Created by @(Item.Owner?.UserName ?? "(Orphan Template)") on @(Item.CreatedAt.ToLocalTime().ToLongDateString()) @(Item.CreatedAt.ToLocalTime().ToShortTimeString()) </MudText>
+        <MudText Typo="Typo.body1" Style="font-style: italic;">Created by 
+            @if(Item.Owner != null)
+            {
+                <UsernameClickable UserName="@Item.Owner.UserName"/>
+            }
+            else
+            {
+                @("(Missing User)")
+            }
+            on @(Item.CreatedAt.ToLocalTime().ToLongDateString()) @(Item.CreatedAt.ToLocalTime().ToShortTimeString()) </MudText>
     </MudItem>
     <MudItem md="4" xs="12">
         <div class="rounded-pill mud-theme-secondary py-2 px-6 mx-4 my-6">
@@ -15,7 +24,7 @@
             @foreach (var tag in Item.Tags)
             {
                 <MudItem>
-                    <MudChip T="string" Icon="@Icons.Material.Filled.Tag" Color="Color.Info" Variant="Variant.Filled">@tag.Title</MudChip>
+                    <TagClickable TagText="@tag.Title"/>
                 </MudItem>
             }
 

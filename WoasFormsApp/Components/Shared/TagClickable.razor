@@ -1,5 +1,6 @@
-﻿<h3>TagClickable</h3>
+﻿<MudChip Href=@($"/SearchTemplate?tag={TagText}") T="string" Icon="@Icons.Material.Filled.Tag" Color="Color.Info" Variant="Variant.Filled">@TagText</MudChip>
 
 @code {
-
+    [Parameter, EditorRequired]
+    required public string TagText { get; set; } = "";
 }

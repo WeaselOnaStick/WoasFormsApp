@@ -66,15 +66,15 @@ else
                                     <AuthorizeView>
                                         <Authorized>
                                             <MudChip T="int" OnClick="async () => await TemplateLike(templateView)"
-                                                     Variant="@(templateView.liked ? Variant.Filled : Variant.Text)"
-                                                     Color="@(templateView.liked ? Color.Primary : Color.Surface)"
-                                                     Icon="@(templateView.liked ? Icons.Material.Filled.Favorite : Icons.Material.Outlined.FavoriteBorder)">@templateView.likes</MudChip>
+                                            Variant="@(templateView.liked ? Variant.Filled : Variant.Text)"
+                                            Color="@(templateView.liked ? Color.Primary : Color.Surface)"
+                                            Icon="@(templateView.liked ? Icons.Material.Filled.Favorite : Icons.Material.Outlined.FavoriteBorder)">@templateView.likes</MudChip>
                                         </Authorized>
                                         <NotAuthorized>
                                             <MudChip T="int"
-                                                     Variant="Variant.Filled"
-                                                     Color="Color.Surface"
-                                                     Icon="@Icons.Material.Filled.Favorite">@templateView.likes</MudChip>
+                                            Variant="Variant.Filled"
+                                            Color="Color.Surface"
+                                            Icon="@Icons.Material.Filled.Favorite">@templateView.likes</MudChip>
                                         </NotAuthorized>
                                     </AuthorizeView>
 
@@ -132,48 +132,56 @@ else
     [Parameter]
     public int skeletonsCount { get; set; } = 12;
 
+    [Parameter]
+    public int? TakeAmount { get; set; }
+
+    [Parameter]
+    public string? CustomHeaderText { get; set; }
+
 
     List<TemplateView> templates = new();
 
     private WoasFormsAppUser? curUser;
 
-    string _headerText => Mode switch
-    {
-        GalleryMode.GlobalNewest => "Newest Templates",
-        GalleryMode.GlobalPopular => "Popular Templates",
-        GalleryMode.BySpecificUser => $"Templates by {TargetUsername}",
-        GalleryMode.CustomList => CustomTemplatesHeaderText,
-        _ => "Templates"
-    };
+    string _headerText = "";
 
     protected override async Task OnParametersSetAsync()
     {
+        var fallbackHeaderText = Mode switch
+        {
+            GalleryMode.GlobalNewest => "Newest Templates",
+            GalleryMode.GlobalPopular => "Popular Templates",
+            GalleryMode.CustomList => CustomTemplatesHeaderText,
+            _ => ""
+
+        };
+        _headerText = CustomHeaderText ?? fallbackHeaderText;
+
         var authState = await auth.GetAuthenticationStateAsync();
         var userId = authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
         curUser = await userManager.FindByIdAsync(userId);
 
 
-        List<Template> prepList = new();
+        IEnumerable<Template> prepList;
         switch (Mode)
         {
             case GalleryMode.GlobalNewest: 
-                prepList = new List<Template>(await dba.GetAvailableTemplates());
+                prepList = await dba.GetAvailableTemplates();
                 prepList = prepList.OrderByDescending(t => t.CreatedAt).ToList();
                 break;
             case GalleryMode.GlobalPopular:
-                prepList = new List<Template>(await dba.GetAvailableTemplates());
-                prepList = prepList.OrderBy(t => t.Responses.Count).ThenByDescending(t => t.CreatedAt).ToList();
-                break;
-            case GalleryMode.BySpecificUser:
-                if (TargetUsername == null) throw new Exception("TargetUsername parameter required");
-                prepList = new List<Template>(await dba.GetTemplatesByOwner(TargetUsername));
+                prepList = await dba.GetAvailableTemplates();
+                prepList = prepList.OrderByDescending(t => t.Responses.Count).ThenByDescending(t => t.CreatedAt).ToList();
                 break;
             case GalleryMode.CustomList:
                 if (CustomTemplates == null) throw new Exception("CustomTemplates parameter required");
                 prepList = CustomTemplates;
                 break;
+            default:
+                prepList = new List<Template>();
+                break;
         }
-        prepList ??= new List<Template>();
+        prepList = prepList.Take(TakeAmount ?? prepList.Count());
         templates = prepList.Select(
             t => new TemplateView()
                 {

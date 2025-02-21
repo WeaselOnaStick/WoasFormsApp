@@ -1,7 +1,12 @@
-﻿namespace WoasFormsApp.Data
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+namespace WoasFormsApp.Data
 {
     public class TemplateField
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         public Template Template { get; set; }
@@ -23,6 +28,8 @@
 
     public class TemplateFieldType
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string Name { get; set; } = "";
     }

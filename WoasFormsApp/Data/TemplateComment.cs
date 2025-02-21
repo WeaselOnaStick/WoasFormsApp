@@ -1,7 +1,12 @@
-﻿namespace WoasFormsApp.Data
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+namespace WoasFormsApp.Data
 {
     public class TemplateComment
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         
         public WoasFormsAppUser User { get; set; }

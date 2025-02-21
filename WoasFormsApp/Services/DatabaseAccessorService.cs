@@ -115,6 +115,19 @@ namespace WoasFormsApp.Services
         public async Task<Template?> CreateTemplate(Template template)
         {
             template.Owner ??= await GetCurrentUser();
+            template.Fields = template.Fields.Select(f =>
+            new TemplateField
+            {
+                Title = f.Title,
+                Template = template,
+                Description = f.Description,
+                Hidden = false,
+                ShowInAnalytics = f.ShowInAnalytics,
+                Type = f.Type,
+                Position = f.Position,
+
+            }
+            ).ToList();
 
             template.Tags = await CreateNecessaryTags(template);
 

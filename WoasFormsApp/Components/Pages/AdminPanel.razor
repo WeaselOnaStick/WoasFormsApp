@@ -84,8 +84,8 @@
             foreach (var user in _selected.Select(x=>x.user))
                 await action(user);
             snack.Add(SuccessTextFormatted, Severity.Success);
-            StateHasChanged();
         }
+        StateHasChanged();
     }
 
     private async Task GiveAdmins() => await AdminAction(

@@ -63,16 +63,26 @@ else
                         <MudCardHeader>
                             <CardHeaderActions> 
                                 <MudContainer Class="p-2">
-                                    <MudChip T="int" OnClick="async () => await TemplateLike(templateView)" 
-                                    Variant="@(templateView.liked ? Variant.Filled : Variant.Text)"
-                                    Color="@(templateView.liked ? Color.Primary : Color.Surface)"
-                                    Icon="@(templateView.liked ? Icons.Material.Filled.Favorite : Icons.Material.Outlined.FavoriteBorder)">@templateView.likes</MudChip>
+                                    <AuthorizeView>
+                                        <Authorized>
+                                            <MudChip T="int" OnClick="async () => await TemplateLike(templateView)"
+                                                     Variant="@(templateView.liked ? Variant.Filled : Variant.Text)"
+                                                     Color="@(templateView.liked ? Color.Primary : Color.Surface)"
+                                                     Icon="@(templateView.liked ? Icons.Material.Filled.Favorite : Icons.Material.Outlined.FavoriteBorder)">@templateView.likes</MudChip>
+                                        </Authorized>
+                                        <NotAuthorized>
+                                            <MudChip T="int"
+                                                     Variant="Variant.Filled"
+                                                     Color="Color.Surface"
+                                                     Icon="@Icons.Material.Filled.Favorite">@templateView.likes</MudChip>
+                                        </NotAuthorized>
+                                    </AuthorizeView>
 
                                     <MudChip T="int" Icon="@Icons.Material.Filled.Comment" Color="Color.Surface">@templateView.comments</MudChip>
 
                                     <MudChip T="int" Icon="@Icons.Material.Filled.Description" Color="Color.Surface">@templateView.responses</MudChip>
                                 </MudContainer>
-                                
+
                             </CardHeaderActions>
                             <CardHeaderContent>
                                 <MudText Typo="Typo.h6">@TemplateTitleOrUnnamed(templateView.template)</MudText>
@@ -80,7 +90,7 @@ else
                             </CardHeaderContent>
                         </MudCardHeader>
                         <MudCardMedia Style="width: 300px; height: 200px; align-self: center;"
-                                      Image="@(string.IsNullOrWhiteSpace(templateView.template.CoverImageUrl) ? Assets["BlankThumbnail.png"] : templateView.template.CoverImageUrl)" />
+                        Image="@(string.IsNullOrWhiteSpace(templateView.template.CoverImageUrl) ? Assets["BlankThumbnail.png"] : templateView.template.CoverImageUrl)" />
                         <MudCardContent>
                             <MudText Typo="Typo.subtitle1">@($"Created at {templateView.template.CreatedAt.ToLocalTime().ToShortDateString()}")</MudText>
                         </MudCardContent>
@@ -120,7 +130,7 @@ else
 
     List<TemplateView> templates = new();
 
-    private WoasFormsAppUser curUser;
+    private WoasFormsAppUser? curUser;
 
     string _headerText => Mode switch
     {
@@ -137,7 +147,7 @@ else
         var userId = authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
         curUser = await userManager.FindByIdAsync(userId);
 
-        
+
         List<Template> prepList = new();
         switch (Mode)
         {
@@ -182,8 +192,10 @@ else
 
     private async Task TemplateLike(TemplateView target)
     {
-        await dba.LikeTemplate(target.template.Id, !target.liked);
-        target.liked = (curUser == null) ? false : target.template.UsersWhoLiked.Contains(curUser);
+        target.liked ^= true;
+        target.likes += target.liked ? 1 : -1;
+        await dba.LikeTemplate(target.template.Id, target.liked);
+        target.liked = (curUser == null) ? false : (await dba.GetTemplate(target.template.Id)).UsersWhoLiked.Contains(await dba.GetCurrentUser()!);
         StateHasChanged();
     }
 }

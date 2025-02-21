@@ -1,7 +1,6 @@
 ﻿@using FluentValidation
 @using MudBlazor.Utilities
 
-@rendermode InteractiveServer
 @inject IDatabaseAccessorService dba
 @inject NavigationManager nav
 @inject ISnackbar snack
@@ -58,7 +57,7 @@
 
             <!-- META-TOPIC -->
             <MudSelect @bind-Value="templateModel.TopicId" T="int" Variant="Variant.Outlined" Label="Topic" Required="true" RequiredError="Topic is required!">
-                @foreach (var item in _topicsCache)
+                @foreach (var item in (_topicsCache ?? new()))
                 {
                     <MudSelectItem Value="item.Id">@item.Title</MudSelectItem>
                 }
@@ -83,7 +82,7 @@
                 <!-- AMMO -->
                 <MudExpansionPanel Text="Fields">
                     <MudButtonGroup Vertical="true" Variant="Variant.Outlined" Style="display: flex;">
-                        @foreach (var item in _fieldTypesCache)
+                        @foreach (var item in (_fieldTypesCache ?? new()))
                         {
                             <MudButton Disabled="@(_fieldCounts[item.Id].CurAmount >= _fieldCounts[item.Id].MaxAmount)"
                             StartIcon="@Icons.Material.Outlined.AddCircleOutline"
@@ -161,9 +160,9 @@
 
     public static int MaxQuestionPerType = 4;
 
-    private HashSet<TemplateFieldType> _fieldTypesCache = new();
-    private HashSet<TemplateTopic> _topicsCache = new();
-    private HashSet<TemplateTag> _tagsCache = new();
+    private HashSet<TemplateFieldType>? _fieldTypesCache;
+    private HashSet<TemplateTopic>? _topicsCache;
+    private HashSet<TemplateTag>? _tagsCache;
 
     private class FieldCounts
     {
@@ -221,7 +220,7 @@
                 {
                     Id = templateModel.Fields.Count,
                     Hidden = false,
-                    Type = _fieldTypesCache.First(tfc => tfc.Id == typeId),
+                    Type = _fieldTypesCache!.First(tfc => tfc.Id == typeId),
                     Template = templateModel,
                     Position = templateModel.Fields.Count + 1,
                 }
@@ -287,8 +286,10 @@
         {
             formErrors = wholeCheck.Errors.Select(e => e.ErrorMessage).ToArray();
             snack.Add("Form invalid", MudBlazor.Severity.Error);
+            StateHasChanged();
             return false;
         }
+        StateHasChanged();
         return true;
     }
 

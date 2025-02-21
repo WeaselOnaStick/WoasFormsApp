@@ -157,7 +157,7 @@ namespace WoasFormsApp.Migrations
 
                     b.HasIndex("TemplateId");
 
-                    b.ToTable("TemplateTemplateTag");
+                    b.ToTable("TemplateTemplateTag", (string)null);
                 });
 
             modelBuilder.Entity("TemplateWoasFormsAppUser", b =>
@@ -172,7 +172,7 @@ namespace WoasFormsApp.Migrations
 
                     b.HasIndex("UsersWhoLikedId");
 
-                    b.ToTable("TemplateWoasFormsAppUser");
+                    b.ToTable("TemplateWoasFormsAppUser", (string)null);
                 });
 
             modelBuilder.Entity("TemplateWoasFormsAppUser1", b =>
@@ -187,7 +187,7 @@ namespace WoasFormsApp.Migrations
 
                     b.HasIndex("Template1Id");
 
-                    b.ToTable("TemplateWoasFormsAppUser1");
+                    b.ToTable("TemplateWoasFormsAppUser1", (string)null);
                 });
 
             modelBuilder.Entity("WoasFormsApp.Data.Response", b =>
@@ -211,7 +211,7 @@ namespace WoasFormsApp.Migrations
 
                     b.HasIndex("TemplateId");
 
-                    b.ToTable("Responses");
+                    b.ToTable("Responses", (string)null);
                 });
 
             modelBuilder.Entity("WoasFormsApp.Data.ResponseAnswer", b =>
@@ -244,7 +244,7 @@ namespace WoasFormsApp.Migrations
 
                     b.HasIndex("ResponseId");
 
-                    b.ToTable("ResponseAnswer");
+                    b.ToTable("ResponseAnswer", (string)null);
                 });
 
             modelBuilder.Entity("WoasFormsApp.Data.Template", b =>
@@ -284,7 +284,7 @@ namespace WoasFormsApp.Migrations
 
                     b.HasIndex("TopicId");
 
-                    b.ToTable("Templates");
+                    b.ToTable("Templates", (string)null);
                 });
 
             modelBuilder.Entity("WoasFormsApp.Data.TemplateComment", b =>
@@ -312,7 +312,7 @@ namespace WoasFormsApp.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TemplateComments");
+                    b.ToTable("TemplateComments", (string)null);
                 });
 
             modelBuilder.Entity("WoasFormsApp.Data.TemplateField", b =>
@@ -350,7 +350,7 @@ namespace WoasFormsApp.Migrations
 
                     b.HasIndex("TypeId");
 
-                    b.ToTable("TemplateFields");
+                    b.ToTable("TemplateFields", (string)null);
                 });
 
             modelBuilder.Entity("WoasFormsApp.Data.TemplateFieldType", b =>
@@ -365,7 +365,7 @@ namespace WoasFormsApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FieldTypes");
+                    b.ToTable("FieldTypes", (string)null);
                 });
 
             modelBuilder.Entity("WoasFormsApp.Data.TemplateTag", b =>
@@ -380,7 +380,7 @@ namespace WoasFormsApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TemplateTags");
+                    b.ToTable("TemplateTags", (string)null);
                 });
 
             modelBuilder.Entity("WoasFormsApp.Data.TemplateTopic", b =>
@@ -395,7 +395,7 @@ namespace WoasFormsApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TemplateTopics");
+                    b.ToTable("TemplateTopics", (string)null);
                 });
 
             modelBuilder.Entity("WoasFormsApp.Data.WoasFormsAppUser", b =>

@@ -1,5 +1,6 @@
-﻿<h3>TopicClickable</h3>
+﻿<a href="@($"/SearchTemplate?topic={TopicText}")">@TopicText</a>
 
 @code {
-
+    [Parameter, EditorRequired]
+    required public string TopicText { get; set; } = "";
 }

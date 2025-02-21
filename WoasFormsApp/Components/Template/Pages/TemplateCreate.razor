@@ -1,12 +1,12 @@
 ﻿@page "/Template/Create"
-@rendermode InteractiveServer
+@rendermode InteractiveAuto
 
 @attribute [Authorize]
 
 <PageTitle>Template Editor - WoasForms</PageTitle>
 
 <MudText Typo="Typo.h3" Align="Align.Center">Creating New Template</MudText>
-<TemplateEditor editorMode="TemplateEditor.EditorMode.Create" templateModel="@template"/>
+<TemplateEditor editorMode="TemplateEditor.EditorMode.Create" templateModel="@template" @rendermode="InteractiveAuto"/>
 
 @code
 {

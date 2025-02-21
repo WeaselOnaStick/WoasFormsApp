@@ -1,5 +1,5 @@
 ﻿@page "/Template/{TemplateId:int}/Edit"
-@rendermode InteractiveServer
+@rendermode InteractiveAuto
 
 @inject IDatabaseAccessorService dba
 
@@ -9,9 +9,7 @@
 
 @if (AccessDenied || template == null)
 {
-    <PaperCenter>
-        <TemplateInaccessible />
-    </PaperCenter>
+    <TemplateInaccessible />
 }
 else
 {
@@ -49,7 +47,7 @@ else
                 Description = foundTemplate.Description,
                 Fields = foundTemplate.Fields.Where(ff => !ff.Hidden).Select((ff,i) => new TemplateField()
                 {
-                    Id = i,
+                    Id = ff.Id,
                     Title = ff.Title,
                     Description = ff.Description,
                     Type = ff.Type,

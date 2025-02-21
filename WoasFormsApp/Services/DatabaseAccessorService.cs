@@ -156,13 +156,14 @@ namespace WoasFormsApp.Services
             if (curUserHasAdmin) return query;
 
             var curUser = await GetCurrentUser();
-            return query.Where(t => t.Public || t.Owner == curUser || t.AllowedUsers.Contains(curUser));
+            return query.Where(t => t.Public || t.Owner != null && (t.Owner == curUser || curUser != null && t.AllowedUsers.Contains(curUser)));
         }
 
         private async Task<bool> TemplateAuthManage(Template template)
         {
             var curUserHasAdmin = await CurrentUserHasAdmin();
             if (curUserHasAdmin) return true;
+            if (template.Owner == null) return false;
 
             var curUser = await GetCurrentUser();
             return template.Owner == curUser;
@@ -184,7 +185,7 @@ namespace WoasFormsApp.Services
 
         public Dictionary<TemplateOrderMode, TemplateOrderModeData> GetTemplateOrdersData() => TemplateOrdersData;
 
-        public async Task<IList<Template>> SearchTemplates(TemplateOrderMode order = TemplateOrderMode.Newest, string? query = default, string? username = default, string? tag = default)
+        public async Task<IList<Template>> SearchTemplates(TemplateOrderMode order = TemplateOrderMode.Newest, string? query = default, string? username = default, string? tag = default, string? topic = default)
         {
             var res = await GetAvailableTemplates();
 
@@ -203,6 +204,9 @@ namespace WoasFormsApp.Services
                 res = res.Where(template => (template.Tags.Any(t => 
                 t.Title.Contains(tag) || tag.Contains(t.Title)
                 )));
+
+            if (!string.IsNullOrWhiteSpace(topic))
+                res = res.Where(template => template.Topic.Title == topic);
 
             var curOrderModeData = TemplateOrdersData[order];
             return res.OrderByDirection(curOrderModeData.Direction, curOrderModeData.Selector).ToList();
@@ -527,5 +531,11 @@ namespace WoasFormsApp.Services
             }
         }
 
+        public async Task<Dictionary<TemplateTag, int>> GetTemplateCountsByTag()
+        {
+            var res = await _ctx.Templates.Include(t => t.Tags).SelectMany(t => t.Tags).GroupBy(x => x).ToDictionaryAsync(g => g.Key, g => g.Count());
+            
+            return res;
+        }
     }
 }

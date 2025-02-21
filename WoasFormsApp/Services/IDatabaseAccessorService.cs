@@ -1,6 +1,5 @@
 ﻿using MudBlazor;
 using WoasFormsApp.Data;
-using static WoasFormsApp.Services.DatabaseAccessorService;
 
 namespace WoasFormsApp.Services
 {
@@ -32,7 +31,7 @@ namespace WoasFormsApp.Services
         Task<HashSet<TemplateFieldType>> GetTemplateFieldTypes();
 
         Dictionary<TemplateOrderMode, TemplateOrderModeData> GetTemplateOrdersData();
-        Task<IList<Template>> SearchTemplates(TemplateOrderMode order = TemplateOrderMode.Newest, string? query = default, string? username = default, string? tag = default);
+        Task<IList<Template>> SearchTemplates(TemplateOrderMode order = TemplateOrderMode.Newest, string? query = default, string? username = default, string? tag = default, string? topic = default);
         Task<bool> GetCurrentUserOwnsTemplate(int templateId);
         Task<Template?> GetTemplate(int templateId);
         Task<IEnumerable<Template>> GetAvailableTemplates();
@@ -50,6 +49,8 @@ namespace WoasFormsApp.Services
         Task<IEnumerable<Response>> GetResponsesByTemplate(int templateId);
         Task<IEnumerable<Response>> GetResponsesByRespondent(string userId);
         Task<IEnumerable<Response>> GetResponsesByCurrentUser();
+
+        Task<Dictionary<TemplateTag, int>> GetTemplateCountsByTag();
 
         Task<WoasFormsAppUser?> GetUser(string userId);
         Task<List<WoasFormsAppUser>> GetAllUsers();

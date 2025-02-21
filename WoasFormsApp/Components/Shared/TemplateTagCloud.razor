@@ -1,0 +1,86 @@
+﻿@using System.Text.Json
+@using KnowledgePicker.WordCloud
+@using KnowledgePicker.WordCloud.Coloring
+@using KnowledgePicker.WordCloud.Drawing
+@using KnowledgePicker.WordCloud.Layouts
+@using KnowledgePicker.WordCloud.Primitives
+@using KnowledgePicker.WordCloud.Sizers
+@using SkiaSharp
+@inject IDatabaseAccessorService dba
+
+<MudGrid Justify="Justify.Center" Class="py-8">
+    <MudItem xs="8">
+        <MudCard>
+            <MudCardHeader Class="align-self-center">
+                <CardHeaderContent>
+                    <MudIcon Icon="@Icons.Material.Filled.Cloud" />
+                    <MudText Inline="true" Style="vertical-align: middle">
+                        Tag Cloud
+                    </MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <svg width="auto" height="@HEIGHT">
+                    <defs>
+                        <filter id="textOutline" x="-50%" y="-50%" width="200%" height="200%">
+                            <feMorphology in="SourceAlpha" operator="dilate" radius="3" result="dilated" />
+                            <feGaussianBlur in="dilated" stdDeviation="4" result="blurred" />
+                            <feFlood flood-color="#00000066" result="flood" />
+                            <feComposite in="flood" in2="blurred" operator="in" result="outline" />
+                            <feMerge>
+                                <feMergeNode in="outline" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    @foreach (var (item, fontSize) in items)
+                    {
+                        var x = MathF.Round((float)(item.Location.X - item.Measured.Left),2);
+                        var y = MathF.Round((float)(item.Location.Y - item.Measured.Top), 2);
+                        var fs = MathF.Round((float)fontSize,0);
+                        var color = wcg.GetColorHexString(item);
+                        <text>
+                            <a href=@($"/SearchTemplate?tag={item.Entry.Word}")>
+                                <text font-family="Roboto, Helvetica, Arial, sans-serif" transform="translate(@x, @y)" font-size="@fs" fill="#FFFFFF" filter="url(#textOutline)">@item.Entry.Word</text>
+                            </a>
+                        </text>
+                    }
+                </svg>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+
+
+@code {
+    int WIDTH = 900;
+    int HEIGHT = 400;
+
+    Dictionary<TemplateTag, int> _counts = new();
+    WordCloudInput wordCloud;
+    WordCloudGenerator<SKBitmap> wcg;
+    IEnumerable<(LayoutItem Item, double FontSize)> items;
+
+    bool wordCloudReady = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var _counts = await dba.GetTemplateCountsByTag();
+        IEnumerable<WordCloudEntry> wordEntries = _counts.Select(p => new WordCloudEntry(p.Key.Title, p.Value));
+        var wordCloud = new WordCloudInput(wordEntries)
+        {
+            Width = WIDTH,
+            Height = HEIGHT,
+            MinFontSize=4,
+            MaxFontSize=24,
+            ItemMargin = 8,
+        };
+        var sizer = new LogSizer(wordCloud);
+        var engine = new SkGraphicEngine(sizer, wordCloud);
+        var layout = new SpiralLayout(wordCloud);
+        var colorizer = new RandomColorizer(); // optional
+        wcg = new WordCloudGenerator<SKBitmap>(wordCloud, engine, layout);
+        items = wcg.Arrange();
+        wordCloudReady = true;
+    }
+}

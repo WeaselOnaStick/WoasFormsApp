@@ -19,8 +19,8 @@
                     </MudText>
                 </CardHeaderContent>
             </MudCardHeader>
-            <MudCardContent>
-                <svg width="auto" height="@HEIGHT">
+            <MudCardContent Class="align-self-center">
+                <svg width="@WIDTH" height="@HEIGHT">
                     <defs>
                         <filter id="textOutline" x="-50%" y="-50%" width="200%" height="200%">
                             <feMorphology in="SourceAlpha" operator="dilate" radius="3" result="dilated" />
@@ -53,7 +53,7 @@
 
 
 @code {
-    int WIDTH = 900;
+    int WIDTH = 600;
     int HEIGHT = 400;
 
     Dictionary<TemplateTag, int> _counts = new();
@@ -71,9 +71,9 @@
         {
             Width = WIDTH,
             Height = HEIGHT,
-            MinFontSize=4,
-            MaxFontSize=24,
-            ItemMargin = 8,
+            MinFontSize=12,
+            MaxFontSize=96,
+            ItemMargin = 4,
         };
         var sizer = new LogSizer(wordCloud);
         var engine = new SkGraphicEngine(sizer, wordCloud);

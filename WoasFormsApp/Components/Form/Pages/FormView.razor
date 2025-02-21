@@ -37,7 +37,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         _response = await dba.GetResponse(FormId);
-        if (_response == null) return;
+        if (_response == null || _response.Template == null) return;
         _template = await dba.GetTemplate(_response.Template.Id);
         if (_template == null) return;
     }

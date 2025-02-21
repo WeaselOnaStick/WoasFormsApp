@@ -22,7 +22,7 @@
                 <PropertyColumn Property="r => r.CreationDate" Title="Filled On" />
                 <TemplateColumn>
                     <CellTemplate>
-                        <MudFab Size="Size.Small" Href="@($"/Form/{context.Item.Id}")" StartIcon="@Icons.Material.Filled.Visibility" Variant="Variant.Filled" Color="Color.Info"/>
+                        <MudFab Size="Size.Small" Href="@($"/Form/{context.Item.Id}")" StartIcon="@Icons.Material.Filled.Visibility" Color="Color.Info" Disabled=@(context.Item.Template == null)/>
                     </CellTemplate>
                 </TemplateColumn>
             </Columns>

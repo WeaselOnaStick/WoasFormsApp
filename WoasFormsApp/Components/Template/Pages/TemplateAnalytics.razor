@@ -17,7 +17,7 @@ else
 {
     <PaperCenter PageTitle=@($"Analytics for Template {TemplateTitleOrUnnamed(_template)}")>
         <TemplateToolbar Item="_template"  ShowAnalyticsButton="false"/>
-        <MudDataGrid T="Response" Items=_responses Breakpoint="Breakpoint.None" Dense="true">
+        <MudDataGrid T="Response" Items=_responses Breakpoint="Breakpoint.None" Dense="true" Bordered="true" Hover="true">
             <Columns>
                 <PropertyColumn Property="r => r.Respondent.UserName" Title="Respondent" />
                 <PropertyColumn Property="r => r.CreationDate" Title="Date" /> 
@@ -128,10 +128,11 @@ else
                                 <PropertyColumn Property="r => GetAnswerCase(r)" Title="@field.Title" AggregateDefinition="@(new AggregateDefinition<Response>())">
                                     <AggregateTemplate>
                                         @{
+                                            var totalCount = GetAnswersCase(context).Count();
                                             var dataDict = GetAnswersCase(context).GroupBy(x => x).ToDictionary(g => (bool)g.Key ? "Y" : "N", g=>Convert.ToDouble(g.Count()));
                                             <MudGrid Justify="Justify.Center">
                                                 <MudItem>
-                                                    @if(GetAnswersCase(context).Count() > 0)
+                                                    @if (totalCount > 0)
                                                     {
                                                         <MudChart ChartType="ChartType.Pie" Width="100px" Height="100px" InputData=@(dataDict.Values.ToArray()) InputLabels=@(dataDict.Keys.ToArray())/>
                                                     }
@@ -139,7 +140,15 @@ else
                                                         <tbody style="white-space: break-spaces;">
                                                             <tr>
                                                                 <td>Count</td>
-                                                                <td>@GetAnswersCase(context).Count()</td>
+                                                                <td>@totalCount</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Y:</td>
+                                                                <td>@($"{(dataDict["Y"] / totalCount):0.00%}")</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>N:</td>
+                                                                <td>@($"{(dataDict["N"] / totalCount):0.00%}")</td>
                                                             </tr>
                                                         </tbody>
                                                     </MudSimpleTable>

@@ -10,8 +10,8 @@
         <Columns>
             <HierarchyColumn />
             <PropertyColumn Property="t => TemplateTitleOrUnnamed(t, default)" StickyLeft="true" Title="Template"/>
+            <PropertyColumn Property="t => t.LastModifiedAt" Title="Last Modified" InitialDirection="SortDirection.Descending" Sortable="true" />
             <PropertyColumn Property="t => t.CreatedAt" Title="Created" />
-            <PropertyColumn Property="t => t.LastModifiedAt" Title="Last Modified" />
             <PropertyColumn Property="t => t.UsersWhoLiked.Count" Title="Likes" />
             <PropertyColumn Property="t => t.Comments.Count" Title="Comments" />
             <PropertyColumn Property="t => t.Responses.Count" Title="Responses" />
@@ -30,5 +30,8 @@
     protected override async Task OnInitializedAsync()
     {
         _templates = await dba.GetTemplatesByCurrentUser();
+        // _templates = _templates.OrderByDescending(t => t.LastModifiedAt);
+        await base.OnInitializedAsync();
+        StateHasChanged();
     }
 }

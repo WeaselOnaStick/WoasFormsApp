@@ -19,7 +19,7 @@
             <Columns>
                 <PropertyColumn Property="@(r => (r.Template == null || r.Template.Owner == null) ? "No Owner (Orphan Template)" : r.Template.Owner.UserName)" Title="Template Author"/>
                 <PropertyColumn Property="@(r => (r.Template == null || string.IsNullOrWhiteSpace(r.Template.Title)) ? "Unnamed Template" : r.Template.Title )" Title="Template Title" />
-                <PropertyColumn Property="r => r.CreationDate" Title="Filled On" />
+                <PropertyColumn Property="r => r.CreationDate" Title="Filled On" Sortable="true" InitialDirection="SortDirection.Descending"/>
                 <TemplateColumn>
                     <CellTemplate>
                         <MudFab Size="Size.Small" Href="@($"/Form/{context.Item.Id}")" StartIcon="@Icons.Material.Filled.Visibility" Color="Color.Info" Disabled=@(context.Item.Template == null)/>
@@ -39,5 +39,6 @@
     protected override async Task OnInitializedAsync()
     {
         _responses = await dba.GetResponsesByCurrentUser();
+        StateHasChanged();
     }
 }

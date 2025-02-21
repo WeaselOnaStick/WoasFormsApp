@@ -1,9 +1,15 @@
-﻿@if (Title != null)
+﻿@if (PageTitle != null)
 {
-    <PageTitle>@Title - WoasForms</PageTitle>
+    <PageTitle>@PageTitle - WoasForms</PageTitle>
 }
 
 <MudGrid Justify="Justify.Center" Class="pt-12">
+    @if (RenderPageTitle)
+    {
+        <MudItem xs="12">
+            <MudText Align="Align.Center" Class="m-2 p-2" Typo="Typo.h3">@PageTitle</MudText>
+        </MudItem>
+    }
     <MudItem xs="10">
         <MudPaper Class="p-4">
             @ChildContent
@@ -15,6 +21,9 @@
     [Parameter, EditorRequired]
     public RenderFragment ChildContent { get; set; }
 
+    [Parameter, EditorRequired]
+    public required string PageTitle { get; set; }
+
     [Parameter]
-    public string? Title { get; set; }
+    public bool RenderPageTitle { get; set; } = true;
 }

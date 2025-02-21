@@ -15,9 +15,8 @@ else if (!_responses.Any())
 }
 else
 {
-    <PaperCenter Title=@($"Analytics for Template {TemplateTitleOrUnnamed(_template)}")>
+    <PaperCenter PageTitle=@($"Analytics for Template {TemplateTitleOrUnnamed(_template)}")>
         <TemplateToolbar Item="_template"  ShowAnalyticsButton="false"/>
-        <MudText Align="Align.Center" Typo="Typo.h5">@($"Analytics for Template {TemplateTitleOrUnnamed(_template)}")</MudText>
         <MudDataGrid T="Response" Items=_responses Breakpoint="Breakpoint.None" Dense="true">
             <Columns>
                 <PropertyColumn Property="r => r.Respondent.UserName" Title="Respondent" />

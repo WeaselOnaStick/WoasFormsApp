@@ -4,10 +4,9 @@
 @inject IDatabaseAccessorService dba
 
 
-<PaperCenter Title="Search">
-    <div style="display:block">
-        <MudText Align="Align.Center" Class="p-2 m-2" Typo="Typo.h5">Templates Search</MudText>
-        <MudMenu Label=@($"Search Options ({_modesCache[currentMode].DisplayName})") Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FilterList" Class="justify-self-center p-2">
+<PaperCenter PageTitle="Template Search">
+    <div style="display: grid; justify-items: center;">
+        <MudMenu Label=@($"Search Options ({_modesCache[currentMode].DisplayName})") Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FilterList" Class="p-2">
             @foreach (var kv in _modesCache)
             {
                 <MudMenuItem Label=@kv.Value.DisplayName OnClick="async () => await FetchTemplates(kv.Key)" ForceLoad="true" Icon="@kv.Value.Icon"/>

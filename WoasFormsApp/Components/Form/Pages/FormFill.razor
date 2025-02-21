@@ -11,7 +11,7 @@
 }
 else
 {
-    <PaperCenter Title=@($"Filling Form for Template {_template.Title}")>
+    <PaperCenter PageTitle=@($"Filling Form for Template {_template.Title}")>
         <MudForm Model="_response" @ref=form>
             <MudText style="white-space: nowrap; max-width: fit-content" Class="pt-4 px-4 pb-1" Align="Align.Center" Typo="Typo.h2">@_template.Title</MudText>
             <MudText Class="px-4" Typo="Typo.body1" style="font-style: italic;">Created by <b>@(_template.Owner.UserName ?? "(Orphan Template)")</b> on @(_template.CreatedAt.ToLocalTime().ToLongDateString()) @(_template.CreatedAt.ToLocalTime().ToShortTimeString()) </MudText>

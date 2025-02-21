@@ -11,7 +11,7 @@
 }
 else
 {
-    <PaperCenter Title=@($"Form for Template {_template.Title}")>
+    <PaperCenter PageTitle=@($"Form for Template {TemplateTitleOrUnnamed(_template)}")>
         <TemplateMetaInfo Item="@_template" />
 
         <MudText Typo="Typo.body2" Style="font-style: italic;">

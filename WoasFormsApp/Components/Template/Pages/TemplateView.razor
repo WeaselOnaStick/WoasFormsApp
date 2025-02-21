@@ -10,12 +10,11 @@
 }
 else
 {
-    <PaperCenter Title="@($"Template {_template.Title}")">
+    <PaperCenter PageTitle="@($"Template {TemplateTitleOrUnnamed(_template)}")" RenderPageTitle="false">
         <TemplateToolbar Item="_template" ShowViewButton="false" />
         <TemplateMetaInfo Item="_template" />
         <MudText Typo="Typo.body2">Form includes following questions:</MudText>
         <TemplateQuestionsPreview Item="_template" />
-
         <TemplateCommentsSection Item="_template" />
     </PaperCenter>
 }
@@ -25,7 +24,7 @@ else
     [Parameter]
     public int TemplateId { get; set; }
 
-    private Template _template { get; set; }
+    private Template? _template { get; set; }
 
     protected override async Task OnInitializedAsync()
     {

@@ -7,6 +7,7 @@
 @using KnowledgePicker.WordCloud.Sizers
 @using SkiaSharp
 @inject IDatabaseAccessorService dba
+@inject IConfiguration config
 
 <MudGrid Justify="Justify.Center" Class="py-8">
     <MudItem xs="8">
@@ -55,6 +56,8 @@
 @code {
     int WIDTH = 600;
     int HEIGHT = 400;
+    int MINFONTSIZE = 12;
+    int MAXFONTSIZE = 42;
 
     Dictionary<TemplateTag, int> _counts = new();
     WordCloudInput wordCloud;
@@ -65,16 +68,21 @@
 
     protected override async Task OnInitializedAsync()
     {
+        WIDTH = config.GetSection("WoasForms").GetValue<int?>("TagCloudWidth") ?? WIDTH;
+        HEIGHT = config.GetSection("WoasForms").GetValue<int?>("TagCloudHeight") ?? HEIGHT;
+        MINFONTSIZE = config.GetSection("WoasForms").GetValue<int?>("TagCloudMinFontSize") ?? MINFONTSIZE;
+        MAXFONTSIZE = config.GetSection("WoasForms").GetValue<int?>("TagCloudMaxFontSize") ?? MAXFONTSIZE;
+
         var _counts = await dba.GetTemplateCountsByTag();
         IEnumerable<WordCloudEntry> wordEntries = _counts.Select(p => new WordCloudEntry(p.Key.Title, p.Value));
         var wordCloud = new WordCloudInput(wordEntries)
-        {
-            Width = WIDTH,
-            Height = HEIGHT,
-            MinFontSize=12,
-            MaxFontSize=96,
-            ItemMargin = 4,
-        };
+            {
+                Width = WIDTH,
+                Height = HEIGHT,
+                MinFontSize = MINFONTSIZE,
+                MaxFontSize = MAXFONTSIZE,
+                ItemMargin = 4,
+            };
         var sizer = new LogSizer(wordCloud);
         var engine = new SkGraphicEngine(sizer, wordCloud);
         var layout = new SpiralLayout(wordCloud);

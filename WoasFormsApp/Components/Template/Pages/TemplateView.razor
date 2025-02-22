@@ -10,10 +10,12 @@
 }
 else
 {
-    <PaperCenter PageTitle="@($"Template {TemplateTitleOrUnnamed(_template)}")" RenderPageTitle="false">
+    <PaperCenter PageTitle=@loc["TEMPLATE_NAMED", TemplateTitleOrUnnamed(_template, loc)] RenderPageTitle="false">
         <TemplateToolbar Item="_template" ShowViewButton="false" />
         <TemplateMetaInfo Item="_template" />
-        <MudText Typo="Typo.body2">Form includes following questions:</MudText>
+        <MudText Typo="Typo.body2">
+            @loc["TEMPLATE_QUESTIONS_PREVIEW_HEADER"]
+        </MudText>
         <TemplateQuestionsPreview Item="_template" />
         <TemplateCommentsSection Item="_template" />
     </PaperCenter>

@@ -1,0 +1,438 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ADD_FIELD" xml:space="preserve">
+    <value>Добавить {0}</value>
+  </data>
+  <data name="ADD_TAG" xml:space="preserve">
+    <value>Добавить тэг</value>
+  </data>
+  <data name="ADMIN_PANEL" xml:space="preserve">
+    <value>Администрация</value>
+  </data>
+  <data name="ANALYTICS" xml:space="preserve">
+    <value>Аналитика</value>
+  </data>
+  <data name="ANALYTICS_AVERAGE" xml:space="preserve">
+    <value>Среднее</value>
+  </data>
+  <data name="ANALYTICS_COUNT" xml:space="preserve">
+    <value>Количество</value>
+  </data>
+  <data name="ANALYTICS_COUNT_UNIQUE" xml:space="preserve">
+    <value>Количество уникальных</value>
+  </data>
+  <data name="ANALYTICS_DISABLED" xml:space="preserve">
+    <value>Включить в аналитику</value>
+  </data>
+  <data name="ANALYTICS_ENABLED" xml:space="preserve">
+    <value>Без Аналитики</value>
+  </data>
+  <data name="ANALYTICS_FIELDS_OMITTED_N" xml:space="preserve">
+    <value>Количество пропущеных полей - {0}</value>
+  </data>
+  <data name="ANALYTICS_HEADER_NAMED" xml:space="preserve">
+    <value>Аналитика шаблона {0}</value>
+  </data>
+  <data name="ANALYTICS_MAX" xml:space="preserve">
+    <value>Максимум</value>
+  </data>
+  <data name="ANALYTICS_MIN" xml:space="preserve">
+    <value>Минимум</value>
+  </data>
+  <data name="ANALYTICS_N" xml:space="preserve">
+    <value>Нет</value>
+  </data>
+  <data name="ANALYTICS_TOP_LONGEST" xml:space="preserve">
+    <value>Топ {0} по длине</value>
+  </data>
+  <data name="ANALYTICS_TOP_POPULAR" xml:space="preserve">
+    <value>Топ {0} по частоте</value>
+  </data>
+  <data name="ANALYTICS_Y" xml:space="preserve">
+    <value>Да</value>
+  </data>
+  <data name="BROWSE_TEMPLATES" xml:space="preserve">
+    <value>Каталог Шаблонов</value>
+  </data>
+  <data name="CANCEL" xml:space="preserve">
+    <value>Отменить</value>
+  </data>
+  <data name="CheckBox" xml:space="preserve">
+    <value>Флажок</value>
+  </data>
+  <data name="CLICK_TO_GO_HOME" xml:space="preserve">
+    <value>Нажмите для перехода на домашнюю страницу</value>
+  </data>
+  <data name="COMMENTS" xml:space="preserve">
+    <value>Комментарии</value>
+  </data>
+  <data name="CONFIRM" xml:space="preserve">
+    <value>Подтвердить</value>
+  </data>
+  <data name="CONFIRM_DELETE" xml:space="preserve">
+    <value>Подтвердить удаление</value>
+  </data>
+  <data name="CONFIRM_DELETE_DESC" xml:space="preserve">
+    <value>Вы уверены, что хотите удалить этот шаблон?</value>
+  </data>
+  <data name="CREATED_AT" xml:space="preserve">
+    <value>Создан</value>
+  </data>
+  <data name="CREATE_TEMPLATE" xml:space="preserve">
+    <value>Создать шаблон</value>
+  </data>
+  <data name="DELETED_USER" xml:space="preserve">
+    <value>Удалённый пользователь</value>
+  </data>
+  <data name="DELETE_TEMPLATE" xml:space="preserve">
+    <value>Удалить шаблон</value>
+  </data>
+  <data name="DESCRIPTION" xml:space="preserve">
+    <value>Описание</value>
+  </data>
+  <data name="EDIT_DESCRIPTION" xml:space="preserve">
+    <value>Редактировать описание</value>
+  </data>
+  <data name="EDIT_TEMPLATE" xml:space="preserve">
+    <value>Редактировать шаблон</value>
+  </data>
+  <data name="Education" xml:space="preserve">
+    <value>Образование</value>
+  </data>
+  <data name="ERROR" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+  <data name="FIELD_DESCRIPTION" xml:space="preserve">
+    <value>Описание поля</value>
+  </data>
+  <data name="FIELD_THIS_IS_FILLED_BY_RESPONDENT" xml:space="preserve">
+    <value>Это полё ({0}) заполняется респондентами</value>
+  </data>
+  <data name="FIELD_TITLE" xml:space="preserve">
+    <value>Название поля</value>
+  </data>
+  <data name="FORM_FILL" xml:space="preserve">
+    <value>Заполнить форму</value>
+  </data>
+  <data name="FORM_FILL_DATE" xml:space="preserve">
+    <value>Дата заполнения</value>
+  </data>
+  <data name="LAST_MODIFIED" xml:space="preserve">
+    <value>Последнее изменение</value>
+  </data>
+  <data name="LIKES" xml:space="preserve">
+    <value>Лайки</value>
+  </data>
+  <data name="LOGGED_AS" xml:space="preserve">
+    <value>Пользователь {0}</value>
+  </data>
+  <data name="LOGIN_FAILED" xml:space="preserve">
+    <value>Вход не удался</value>
+  </data>
+  <data name="LOG_IN_TO_CREATE_TEMPLATE" xml:space="preserve">
+    <value>Войдите чтобы создать шаблон</value>
+  </data>
+  <data name="LOG_OUT" xml:space="preserve">
+    <value>Выйти</value>
+  </data>
+  <data name="MISSING_USER" xml:space="preserve">
+    <value>Удалённый пользователь</value>
+  </data>
+  <data name="MultiLine" xml:space="preserve">
+    <value>Многострочный</value>
+  </data>
+  <data name="MY_FORMS" xml:space="preserve">
+    <value>Мои формы</value>
+  </data>
+  <data name="MY_TEMPLATES" xml:space="preserve">
+    <value>Мои Шаблоны</value>
+  </data>
+  <data name="NOT_ENOUGH_FORMS" xml:space="preserve">
+    <value>Недостаточно форм</value>
+  </data>
+  <data name="NO_COMMENTS" xml:space="preserve">
+    <value>Комментариев нет...</value>
+  </data>
+  <data name="NO_DESCRIPTION_MARKDOWN" xml:space="preserve">
+    <value>__(Без описания)__</value>
+  </data>
+  <data name="NO_TEMPLATES" xml:space="preserve">
+    <value>Пока шаблонов нет...</value>
+  </data>
+  <data name="Other" xml:space="preserve">
+    <value>Другое</value>
+  </data>
+  <data name="PASSWORD" xml:space="preserve">
+    <value>Пароль</value>
+  </data>
+  <data name="PositiveInt" xml:space="preserve">
+    <value>Положительное целое число</value>
+  </data>
+  <data name="POST_A_COMMENT" xml:space="preserve">
+    <value>Добавить комментарий</value>
+  </data>
+  <data name="PRIVACY" xml:space="preserve">
+    <value>Приватность</value>
+  </data>
+  <data name="PUBLIC" xml:space="preserve">
+    <value>Публичный</value>
+  </data>
+  <data name="QUESTIONS" xml:space="preserve">
+    <value>Вопросы</value>
+  </data>
+  <data name="Quiz" xml:space="preserve">
+    <value>Викторина</value>
+  </data>
+  <data name="REMEMBER_ME" xml:space="preserve">
+    <value>Запомнить меня</value>
+  </data>
+  <data name="REQUIRED" xml:space="preserve">
+    <value>Обязателен</value>
+  </data>
+  <data name="RESPONDENT" xml:space="preserve">
+    <value>Респондент</value>
+  </data>
+  <data name="RESPONSES" xml:space="preserve">
+    <value>Формы</value>
+  </data>
+  <data name="SEARCH_USER_TO_WHITELIST" xml:space="preserve">
+    <value>Добавить пользователя в белый список</value>
+  </data>
+  <data name="SIGN_IN" xml:space="preserve">
+    <value>Войти</value>
+  </data>
+  <data name="SingleLine" xml:space="preserve">
+    <value>Однострочное поле</value>
+  </data>
+  <data name="TAG_CLOUD" xml:space="preserve">
+    <value>Облако тэгов</value>
+  </data>
+  <data name="TEMPLATE" xml:space="preserve">
+    <value>Шаблон</value>
+  </data>
+  <data name="TEMPLATES_NEWEST" xml:space="preserve">
+    <value>Новые шаблоны</value>
+  </data>
+  <data name="TEMPLATES_POPULAR" xml:space="preserve">
+    <value>Популярные шаблоны</value>
+  </data>
+  <data name="TEMPLATE_ANALYTICS_NOT_ENOUGH_FORMS" xml:space="preserve">
+    <value>Этот шаблон ещё никто не заполнил</value>
+  </data>
+  <data name="TEMPLATE_CREATE_ERROR" xml:space="preserve">
+    <value>Произошла ошибка при создании шаблона</value>
+  </data>
+  <data name="TEMPLATE_CREATE_SUCCESS" xml:space="preserve">
+    <value>Шаблон "{0}" успешно создан!</value>
+  </data>
+  <data name="TEMPLATE_CREATOR" xml:space="preserve">
+    <value>Создание шаблона</value>
+  </data>
+  <data name="TEMPLATE_CREATOR_HEADER" xml:space="preserve">
+    <value>Создание шаблона</value>
+  </data>
+  <data name="TEMPLATE_DELETED" xml:space="preserve">
+    <value>Шаблон удалён</value>
+  </data>
+  <data name="TEMPLATE_DESCRIPTION" xml:space="preserve">
+    <value>Описание шаблона</value>
+  </data>
+  <data name="TEMPLATE_DESCRIPTION_PREVIEW_MARKDOWN" xml:space="preserve">
+    <value>Предпросмотр Markdown</value>
+  </data>
+  <data name="TEMPLATE_EDITING_NAMED" xml:space="preserve">
+    <value>Редактирование шаблона "{0}"</value>
+  </data>
+  <data name="TEMPLATE_EDITOR" xml:space="preserve">
+    <value>Редактор шаблона</value>
+  </data>
+  <data name="TEMPLATE_EDIT_CONFIRM" xml:space="preserve">
+    <value>Подтвердить редактирование</value>
+  </data>
+  <data name="TEMPLATE_EDIT_CONFIRM_DESC" xml:space="preserve">
+    <value>Текущий шаблон уже был заполнен пользователями. При изменении или удалении полей, соответствующие данные могут привести к мисинтерпритации. Ответы на удалённые поля будут невидимы, до тех пор, пока не будут созданы новые поля этого типа.</value>
+  </data>
+  <data name="TEMPLATE_EDIT_ERROR" xml:space="preserve">
+    <value>Произошла ошибка при обновлении шаблона</value>
+  </data>
+  <data name="TEMPLATE_EDIT_SUCCESS" xml:space="preserve">
+    <value>Шаблон "{0}" успешно создан!</value>
+  </data>
+  <data name="TEMPLATE_MISSING" xml:space="preserve">
+    <value>Шаблон не найден</value>
+  </data>
+  <data name="TEMPLATE_MISSING_DESC" xml:space="preserve">
+    <value>Шаблон не найден или у вас недостаточно прав</value>
+  </data>
+  <data name="TEMPLATE_NAMED" xml:space="preserve">
+    <value>Шаблон "{0}"</value>
+  </data>
+  <data name="TEMPLATE_PAGE" xml:space="preserve">
+    <value>Страница шаблона</value>
+  </data>
+  <data name="TEMPLATE_QUESTIONS_PREVIEW_HEADER" xml:space="preserve">
+    <value>Шаблон включает в себя следующие вопросы:</value>
+  </data>
+  <data name="TEMPLATE_TITLE" xml:space="preserve">
+    <value>Название шаблона</value>
+  </data>
+  <data name="TOPIC" xml:space="preserve">
+    <value>Тема</value>
+  </data>
+  <data name="UNNAMED_TEMPLATE_ID" xml:space="preserve">
+    <value>Безымянный шаблон (ID {0})</value>
+  </data>
+  <data name="USERNAME" xml:space="preserve">
+    <value>Имя пользователя</value>
+  </data>
+  <data name="USER_IS_BLOCKED" xml:space="preserve">
+    <value>Пользователь заблокирован</value>
+  </data>
+  <data name="USER_LOGGED_IN" xml:space="preserve">
+    <value>Вход выполнен</value>
+  </data>
+  <data name="VALID_FIELD_MISSING_TITLE" xml:space="preserve">
+    <value>У поля №{0} отсутствует название!</value>
+  </data>
+  <data name="VALID_NO_FIELDS" xml:space="preserve">
+    <value>Добавьте минимум 1 поле</value>
+  </data>
+  <data name="VALID_TEMPLATE_INVALID" xml:space="preserve">
+    <value>Шаблон недействителен</value>
+  </data>
+  <data name="VALID_TITLE_REQUIRED" xml:space="preserve">
+    <value>Добавьте название шаблона!</value>
+  </data>
+  <data name="VALID_TOO_MANY_FIELDS_PER_TYPE" xml:space="preserve">
+    <value>Шаблон не может содержать более {0} полей на тип</value>
+  </data>
+  <data name="VALID_TOPIC_EMPTY" xml:space="preserve">
+    <value>Тема обязательна</value>
+  </data>
+  <data name="VALID_TOPIC_REQUIRED" xml:space="preserve">
+    <value>Тема обязательна</value>
+  </data>
+  <data name="VIEW_TEMPLATE" xml:space="preserve">
+    <value>Открыть шаблон</value>
+  </data>
+  <data name="WOASFORMS" xml:space="preserve">
+    <value>WoasForms</value>
+  </data>
+</root>

@@ -5,7 +5,11 @@
         <AuthorizeView>
             <Authorized>
                 <MudItem xs="10">
-                    <MudTextField Variant="Variant.Filled" Label="Post a comment..." Lines="2" @bind-Value=_userComment Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AddComment" OnAdornmentClick="AddUsercomment" OnKeyDown="@(e => {if (e.Code=="Enter") AddUsercomment();})" />
+                    <MudTextField Variant="Variant.Filled" 
+                    Label=@loc["POST_A_COMMENT"] Lines="2" 
+                    @bind-Value=_userComment 
+                    Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AddComment" OnAdornmentClick="AddUsercomment" 
+                    OnKeyDown="@(e => {if (e.Code=="Enter") AddUsercomment();})" />
                 </MudItem>
             </Authorized>
         </AuthorizeView>
@@ -13,7 +17,9 @@
             <MudPaper Elevation="0">
                 @if(!_comments.Any())
                 {
-                    <MudText Typo="Typo.h6" Align="Align.Center" Class="m-4 p-4">No comments yet...</MudText>
+                <MudText Typo="Typo.h6" Align="Align.Center" Class="m-4 p-4">
+                    @loc["NO_COMMENTS"]
+                </MudText>
                 }
                 else{
                     @foreach (var comment in _comments)
@@ -59,7 +65,7 @@
         }
         _comments = Item.Comments.Select(c => new CommentView
             {
-                Author = c.User.UserName ?? "deleted user",
+                Author = c.User.UserName ?? loc["DELETED_USER"],
                 Content = c.Text,
                 PostedAt = c.PostedAt
             })

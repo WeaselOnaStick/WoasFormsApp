@@ -1,0 +1,438 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ADD_FIELD" xml:space="preserve">
+    <value>Add {0}</value>
+  </data>
+  <data name="ADD_TAG" xml:space="preserve">
+    <value>Add Tag</value>
+  </data>
+  <data name="ADMIN_PANEL" xml:space="preserve">
+    <value>Admin Panel</value>
+  </data>
+  <data name="ANALYTICS" xml:space="preserve">
+    <value>Analytics</value>
+  </data>
+  <data name="ANALYTICS_AVERAGE" xml:space="preserve">
+    <value>Average</value>
+  </data>
+  <data name="ANALYTICS_COUNT" xml:space="preserve">
+    <value>Count</value>
+  </data>
+  <data name="ANALYTICS_COUNT_UNIQUE" xml:space="preserve">
+    <value>Count Unique</value>
+  </data>
+  <data name="ANALYTICS_DISABLED" xml:space="preserve">
+    <value>Analytics Disabled</value>
+  </data>
+  <data name="ANALYTICS_ENABLED" xml:space="preserve">
+    <value>Analytics Enabled</value>
+  </data>
+  <data name="ANALYTICS_FIELDS_OMITTED_N" xml:space="preserve">
+    <value>Number of fields hidden {0}</value>
+  </data>
+  <data name="ANALYTICS_HEADER_NAMED" xml:space="preserve">
+    <value>Analytics for Template {0}</value>
+  </data>
+  <data name="ANALYTICS_MAX" xml:space="preserve">
+    <value>Maximum</value>
+  </data>
+  <data name="ANALYTICS_MIN" xml:space="preserve">
+    <value>Minimum</value>
+  </data>
+  <data name="ANALYTICS_N" xml:space="preserve">
+    <value>Unchecked</value>
+  </data>
+  <data name="ANALYTICS_TOP_LONGEST" xml:space="preserve">
+    <value>Top {0} Longest</value>
+  </data>
+  <data name="ANALYTICS_TOP_POPULAR" xml:space="preserve">
+    <value>Top {0} Popular</value>
+  </data>
+  <data name="ANALYTICS_Y" xml:space="preserve">
+    <value>Checked</value>
+  </data>
+  <data name="BROWSE_TEMPLATES" xml:space="preserve">
+    <value>Browse Templates</value>
+  </data>
+  <data name="CANCEL" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="CheckBox" xml:space="preserve">
+    <value>Checkbox</value>
+  </data>
+  <data name="CLICK_TO_GO_HOME" xml:space="preserve">
+    <value>Click here to return to home page</value>
+  </data>
+  <data name="COMMENTS" xml:space="preserve">
+    <value>Comments</value>
+  </data>
+  <data name="CONFIRM" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="CONFIRM_DELETE" xml:space="preserve">
+    <value>Confirm Delete</value>
+  </data>
+  <data name="CONFIRM_DELETE_DESC" xml:space="preserve">
+    <value>Are you sure you want to delete this template?</value>
+  </data>
+  <data name="CREATED_AT" xml:space="preserve">
+    <value>Created</value>
+  </data>
+  <data name="CREATE_TEMPLATE" xml:space="preserve">
+    <value>Create Template</value>
+  </data>
+  <data name="DELETED_USER" xml:space="preserve">
+    <value>Deleted User</value>
+  </data>
+  <data name="DELETE_TEMPLATE" xml:space="preserve">
+    <value>Delete Template</value>
+  </data>
+  <data name="DESCRIPTION" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="EDIT_DESCRIPTION" xml:space="preserve">
+    <value>Edit Description</value>
+  </data>
+  <data name="EDIT_TEMPLATE" xml:space="preserve">
+    <value>Edit Template</value>
+  </data>
+  <data name="Education" xml:space="preserve">
+    <value>Education</value>
+  </data>
+  <data name="ERROR" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="FIELD_DESCRIPTION" xml:space="preserve">
+    <value>Field Description</value>
+  </data>
+  <data name="FIELD_THIS_IS_FILLED_BY_RESPONDENT" xml:space="preserve">
+    <value>This field ({0}) is to be filled by the respondent</value>
+  </data>
+  <data name="FIELD_TITLE" xml:space="preserve">
+    <value>Field Title</value>
+  </data>
+  <data name="FORM_FILL" xml:space="preserve">
+    <value>Fill Form</value>
+  </data>
+  <data name="FORM_FILL_DATE" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="LAST_MODIFIED" xml:space="preserve">
+    <value>Last Modified</value>
+  </data>
+  <data name="LIKES" xml:space="preserve">
+    <value>Likes</value>
+  </data>
+  <data name="LOGGED_AS" xml:space="preserve">
+    <value>Logged in as {0}</value>
+  </data>
+  <data name="LOGIN_FAILED" xml:space="preserve">
+    <value>Login failed</value>
+  </data>
+  <data name="LOG_IN_TO_CREATE_TEMPLATE" xml:space="preserve">
+    <value>Log in to Create Template</value>
+  </data>
+  <data name="LOG_OUT" xml:space="preserve">
+    <value>Log out</value>
+  </data>
+  <data name="MISSING_USER" xml:space="preserve">
+    <value>Missing User</value>
+  </data>
+  <data name="MultiLine" xml:space="preserve">
+    <value>Multiple Lines</value>
+  </data>
+  <data name="MY_FORMS" xml:space="preserve">
+    <value>My Forms</value>
+  </data>
+  <data name="MY_TEMPLATES" xml:space="preserve">
+    <value>My Templates</value>
+  </data>
+  <data name="NOT_ENOUGH_FORMS" xml:space="preserve">
+    <value>Not Enough Forms</value>
+  </data>
+  <data name="NO_COMMENTS" xml:space="preserve">
+    <value>No comments yet...</value>
+  </data>
+  <data name="NO_DESCRIPTION_MARKDOWN" xml:space="preserve">
+    <value>__(No Description Provided)__</value>
+  </data>
+  <data name="NO_TEMPLATES" xml:space="preserve">
+    <value>No templates yet...</value>
+  </data>
+  <data name="Other" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="PASSWORD" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="PositiveInt" xml:space="preserve">
+    <value>Positive Integer</value>
+  </data>
+  <data name="POST_A_COMMENT" xml:space="preserve">
+    <value>Post a comment...</value>
+  </data>
+  <data name="PRIVACY" xml:space="preserve">
+    <value>Privacy</value>
+  </data>
+  <data name="PUBLIC" xml:space="preserve">
+    <value>Public</value>
+  </data>
+  <data name="QUESTIONS" xml:space="preserve">
+    <value>Questions</value>
+  </data>
+  <data name="Quiz" xml:space="preserve">
+    <value>Quiz</value>
+  </data>
+  <data name="REMEMBER_ME" xml:space="preserve">
+    <value>Remember me</value>
+  </data>
+  <data name="REQUIRED" xml:space="preserve">
+    <value>Required</value>
+  </data>
+  <data name="RESPONDENT" xml:space="preserve">
+    <value>Respondent</value>
+  </data>
+  <data name="RESPONSES" xml:space="preserve">
+    <value>Responses</value>
+  </data>
+  <data name="SEARCH_USER_TO_WHITELIST" xml:space="preserve">
+    <value>Search for a user to whitelist</value>
+  </data>
+  <data name="SIGN_IN" xml:space="preserve">
+    <value>Sign in</value>
+  </data>
+  <data name="SingleLine" xml:space="preserve">
+    <value>Single Line</value>
+  </data>
+  <data name="TAG_CLOUD" xml:space="preserve">
+    <value>Tag Cloud</value>
+  </data>
+  <data name="TEMPLATE" xml:space="preserve">
+    <value>Template</value>
+  </data>
+  <data name="TEMPLATES_NEWEST" xml:space="preserve">
+    <value>Newest Templates</value>
+  </data>
+  <data name="TEMPLATES_POPULAR" xml:space="preserve">
+    <value>Popular Templates</value>
+  </data>
+  <data name="TEMPLATE_ANALYTICS_NOT_ENOUGH_FORMS" xml:space="preserve">
+    <value>Template hasn't received any forms yet</value>
+  </data>
+  <data name="TEMPLATE_CREATE_ERROR" xml:space="preserve">
+    <value>There was an error creating the template</value>
+  </data>
+  <data name="TEMPLATE_CREATE_SUCCESS" xml:space="preserve">
+    <value>Template "{0}" created successfully!</value>
+  </data>
+  <data name="TEMPLATE_CREATOR" xml:space="preserve">
+    <value>Template Creator</value>
+  </data>
+  <data name="TEMPLATE_CREATOR_HEADER" xml:space="preserve">
+    <value>Creating New Template</value>
+  </data>
+  <data name="TEMPLATE_DELETED" xml:space="preserve">
+    <value>Template Deleted</value>
+  </data>
+  <data name="TEMPLATE_DESCRIPTION" xml:space="preserve">
+    <value>Template Description</value>
+  </data>
+  <data name="TEMPLATE_DESCRIPTION_PREVIEW_MARKDOWN" xml:space="preserve">
+    <value>Preview Markdown</value>
+  </data>
+  <data name="TEMPLATE_EDITING_NAMED" xml:space="preserve">
+    <value>Editing Template "{0}"</value>
+  </data>
+  <data name="TEMPLATE_EDITOR" xml:space="preserve">
+    <value>Template Editor</value>
+  </data>
+  <data name="TEMPLATE_EDIT_CONFIRM" xml:space="preserve">
+    <value>Confirm Edit</value>
+  </data>
+  <data name="TEMPLATE_EDIT_CONFIRM_DESC" xml:space="preserve">
+    <value>Current Template already received forms. Changing or deleting fields will keep respective data but could lead to data misinterpretation. Answers to deleted fields won't be visible until new fields of respective types are created.</value>
+  </data>
+  <data name="TEMPLATE_EDIT_ERROR" xml:space="preserve">
+    <value>There was an error updating the template</value>
+  </data>
+  <data name="TEMPLATE_EDIT_SUCCESS" xml:space="preserve">
+    <value>Template "{0}" updated successfully!</value>
+  </data>
+  <data name="TEMPLATE_MISSING" xml:space="preserve">
+    <value>Template Missing</value>
+  </data>
+  <data name="TEMPLATE_MISSING_DESC" xml:space="preserve">
+    <value>Template not found or you don't have permission</value>
+  </data>
+  <data name="TEMPLATE_NAMED" xml:space="preserve">
+    <value>Template "{0}"</value>
+  </data>
+  <data name="TEMPLATE_PAGE" xml:space="preserve">
+    <value>Template Page</value>
+  </data>
+  <data name="TEMPLATE_QUESTIONS_PREVIEW_HEADER" xml:space="preserve">
+    <value>Form includes following questions:</value>
+  </data>
+  <data name="TEMPLATE_TITLE" xml:space="preserve">
+    <value>Template Title</value>
+  </data>
+  <data name="TOPIC" xml:space="preserve">
+    <value>Topic</value>
+  </data>
+  <data name="UNNAMED_TEMPLATE_ID" xml:space="preserve">
+    <value>Unnamed Template (ID {0})</value>
+  </data>
+  <data name="USERNAME" xml:space="preserve">
+    <value>User name</value>
+  </data>
+  <data name="USER_IS_BLOCKED" xml:space="preserve">
+    <value>User is Blocked</value>
+  </data>
+  <data name="USER_LOGGED_IN" xml:space="preserve">
+    <value>User logged in</value>
+  </data>
+  <data name="VALID_FIELD_MISSING_TITLE" xml:space="preserve">
+    <value>Field #{0} is missing a title!</value>
+  </data>
+  <data name="VALID_NO_FIELDS" xml:space="preserve">
+    <value>Add at least 1 template field!</value>
+  </data>
+  <data name="VALID_TEMPLATE_INVALID" xml:space="preserve">
+    <value>Template invalid</value>
+  </data>
+  <data name="VALID_TITLE_REQUIRED" xml:space="preserve">
+    <value>Title is required!</value>
+  </data>
+  <data name="VALID_TOO_MANY_FIELDS_PER_TYPE" xml:space="preserve">
+    <value>You can't have more than {0} field per type!</value>
+  </data>
+  <data name="VALID_TOPIC_EMPTY" xml:space="preserve">
+    <value>Topic can't be empty!</value>
+  </data>
+  <data name="VALID_TOPIC_REQUIRED" xml:space="preserve">
+    <value>Topic required!</value>
+  </data>
+  <data name="VIEW_TEMPLATE" xml:space="preserve">
+    <value>View Template</value>
+  </data>
+  <data name="WOASFORMS" xml:space="preserve">
+    <value>WoasForms</value>
+  </data>
+</root>

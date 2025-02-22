@@ -12,13 +12,13 @@
 @if (templates != null && templates.Count == 0) // 0 Templates loaded
 {
     <MudPaper Class="d-flex flex-column pa-4 mx-auto align-center gap-4 justify-center text-center" Style="max-width: fit-content" Elevation="2">
-        <MudText Typo="Typo.h4">No templates yet...</MudText>
+        <MudText Typo="Typo.h4">@loc["NO_TEMPLATES"]</MudText>
         <AuthorizeView>
             <Authorized>
-                <MudButton Href="/Template/Create" Color="Color.Primary" Variant="Variant.Filled">Create Template</MudButton>
+                <MudButton Href="/Template/Create" Color="Color.Primary" Variant="Variant.Filled">@loc["CREATE_TEMPLATE"]</MudButton>
             </Authorized>
             <NotAuthorized>
-                <MudButton Href="/Account/Login" Variant="Variant.Filled" Color="Color.Primary">Log in to Create Template</MudButton>
+                <MudButton Href="/Account/Login" Variant="Variant.Filled" Color="Color.Primary">@loc["LOG_IN_TO_CREATE_TEMPLATE"]</MudButton>
             </NotAuthorized>
         </AuthorizeView>
     </MudPaper>
@@ -85,7 +85,7 @@ else
 
                             </CardHeaderActions>
                             <CardHeaderContent>
-                                <MudText Typo="Typo.h6">@TemplateTitleOrUnnamed(templateView.template)</MudText>
+                                <MudText Typo="Typo.h6">@TemplateTitleOrUnnamed(templateView.template, loc)</MudText>
                                 @if(templateView.template.Owner != null)
                                 {
                                     <MudText Inline="true" Typo="Typo.subtitle1" style="font-style: italic;">
@@ -98,7 +98,7 @@ else
                         <MudCardMedia Style="width: 300px; height: 200px; align-self: center;"
                         Image="@(string.IsNullOrWhiteSpace(templateView.template.CoverImageUrl) ? Assets["BlankThumbnail.png"] : templateView.template.CoverImageUrl)" />
                         <MudCardActions Class="justify-space-around my-2">
-                            <MudButton Class="rounded-pill" Variant="Variant.Filled" Color="Color.Info" Href="@($"/Template/{templateView.template.Id}")">View Template</MudButton>
+                            <MudButton Class="rounded-pill" Variant="Variant.Filled" Color="Color.Info" Href="@($"/Template/{templateView.template.Id}")">@loc["VIEW_TEMPLATE"]</MudButton>
                         </MudCardActions>
                     </MudCard>
                 </MudItem>
@@ -147,8 +147,8 @@ else
     {
         var fallbackHeaderText = Mode switch
         {
-            GalleryMode.GlobalNewest => "Newest Templates",
-            GalleryMode.GlobalPopular => "Popular Templates",
+            GalleryMode.GlobalNewest => loc["TEMPLATES_NEWEST"],
+            GalleryMode.GlobalPopular => loc["TEMPLATES_POPULAR"],
             GalleryMode.CustomList => CustomTemplatesHeaderText,
             _ => ""
 

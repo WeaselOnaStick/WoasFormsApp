@@ -30,19 +30,19 @@
             <MudGrid>
                 <MudItem md="12">
                     <MudStaticTextField ShrinkLabel="true" For="@(() => Input.Username)" @bind-Value="Input.Username"
-                    Label="User name"
+                    Label=@loc["USERNAME"]
                     UserAttributes="@(new() { { "autocomplete", "username" }, { "aria-required", "true" } } )" />
                 </MudItem>
                 <MudItem md="12">
                     <MudStaticTextField ShrinkLabel="true" For="@(() => Input.Password)" @bind-Value="Input.Password"
-                                        Label="Password" InputType="InputType.Password"  
+                                        Label=@loc["PASSWORD"] InputType="InputType.Password"  
                     UserAttributes="@(new() { { "autocomplete", "current-password" }, { "aria-required", "true" } } )" />
                 </MudItem>
                 <MudItem md="12">
-                    <MudStaticCheckBox For="@(() => Input.RememberMe)" @bind-Value="Input.RememberMe">Remember me</MudStaticCheckBox>
+                    <MudStaticCheckBox For="@(() => Input.RememberMe)" @bind-Value="Input.RememberMe">@loc["REMEMBER_ME"]</MudStaticCheckBox>
                 </MudItem>
                 <MudItem md="12">
-                    <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" FormAction="FormAction.Submit">Log in</MudStaticButton>
+                    <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" FormAction="FormAction.Submit">@loc["SIGN_IN"]</MudStaticButton>
                 </MudItem>
             </MudGrid>
         </EditForm>
@@ -79,20 +79,20 @@
         var user = await UserManager.FindByNameAsync(Input.Username);
         if (user != null && user.IsBlocked)
         {
-            SnackBar.Add("User is Blocked", Severity.Error);
-            errorMessage = "Error: User is blocked.";
+            SnackBar.Add(loc["USER_IS_BLOCKED"], Severity.Error);
+            errorMessage = loc["USER_IS_BLOCKED"];
             return;
         }
         var result = await SignInManager.PasswordSignInAsync(Input.Username, Input.Password, Input.RememberMe, lockoutOnFailure: false);
         if (result.Succeeded)
         {
-            Logger.LogInformation("User logged in.");
+            Logger.LogInformation(loc["USER_LOGGED_IN"]);
             NavigationManager.NavigateTo("/", forceLoad: true);
         }
         else
         {
-            SnackBar.Add("Login failed", Severity.Error);
-            errorMessage = "Error: Invalid login attempt.";
+            SnackBar.Add(loc["LOGIN_FAILED"], Severity.Error);
+            errorMessage = loc["LOGIN_FAILED"];
         }
     }
 

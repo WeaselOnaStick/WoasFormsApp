@@ -15,12 +15,14 @@ else if (!_responses.Any())
 }
 else
 {
-    <PaperCenter PageTitle=@($"Analytics for Template {TemplateTitleOrUnnamed(_template)}")>
+
+    <PaperCenter PageTitle=@loc["ANALYTICS_HEADER_NAMED", TemplateTitleOrUnnamed(_template, loc)]>
         <TemplateToolbar Item="_template"  ShowAnalyticsButton="false"/>
-        <MudDataGrid T="Response" Items=_responses Breakpoint="Breakpoint.None" Dense="true" Bordered="true" Hover="true">
+        <MudDataGrid T="Response" Items=_responses 
+            Breakpoint="Breakpoint.None" Dense="true" Bordered="true" Hover="true">
             <Columns>
-                <PropertyColumn Property="r => r.Respondent.UserName" Title="Respondent" />
-                <PropertyColumn Property="r => r.CreationDate" Title="Date" /> 
+                <PropertyColumn Property="r => r.Respondent.UserName" Title=@loc["RESPONDENT"] />
+                <PropertyColumn Property="r => r.CreationDate" Title=@loc["FORM_FILL_DATE"] /> 
 
                 @foreach (var field in _template.Fields.Where(f => f.ShowInAnalytics && !f.Hidden)) 
                 {
@@ -31,20 +33,20 @@ else
                             {
                                 Func<Response, string?> GetAnswerCase = r => GetAnswer(r, field).AnswerSingleLine;
                                 Func<IEnumerable<Response>, IEnumerable<string>> GetAnswersCase = rs => rs.Select(r => GetAnswerCase(r)).Where(a => a != null)!;
-                                <PropertyColumn Property="r => GetAnswerCase(r)" Title="@field.Title" AggregateDefinition="@(new AggregateDefinition<Response>())">
+                                <PropertyColumn Property="r => GetAnswerCase(r)" Title=@loc[field.Title] AggregateDefinition="@(new AggregateDefinition<Response>())">
                                     <AggregateTemplate>
                                         <MudSimpleTable Dense="true" Hover="true">
                                             <tbody style="white-space: break-spaces;">
                                                 <tr>
-                                                    <td>Count</td>
+                                                    <td>@loc["ANALYTICS_COUNT"]</td>
                                                     <td>@GetAnswersCase(context).Count()</td>
                                                 </tr>
                                                 <tr>
-                                                    <td>Count Unique</td>
+                                                    <td>@loc["ANALYTICS_COUNT_UNIQUE"]</td>
                                                     <td>@GetAnswersCase(context).ToHashSet().Count()</td>
                                                 </tr>
                                                 <tr>
-                                                    <td>Top @(TopN) Popular</td>
+                                                    <td>@loc["ANALYTICS_TOP_POPULAR", TopN]</td>
                                                     <td style="white-space: pre">@string.Join("\n", GetAnswersCase(context).GroupBy(x => x).OrderByDescending(x => x.Count()).Take(TopN).Select(g => $"{g.Key} (x{g.Count()})"))</td>
                                                 </tr>
                                             </tbody>
@@ -57,24 +59,24 @@ else
                             {
                                 Func<Response, string?> GetAnswerCase = r => GetAnswer(r, field).AnswerMultiLine;
                                 Func<IEnumerable<Response>, IEnumerable<string>> GetAnswersCase = rs => rs.Select(r => GetAnswerCase(r)).Where(a => a != null)!;
-                                <PropertyColumn Property="r => GetAnswerCase(r)" Title="@field.Title" AggregateDefinition="@(new AggregateDefinition<Response>())">
+                                <PropertyColumn Property="r => GetAnswerCase(r)" Title=@loc[field.Title] AggregateDefinition="@(new AggregateDefinition<Response>())">
                                     <AggregateTemplate>
                                         <MudSimpleTable Dense="true" Hover="true">
                                             <tbody>
                                                 <tr>
-                                                    <td>Count</td>
+                                                    <td>@loc["ANALYTICS_COUNT"]</td>
                                                     <td>@GetAnswersCase(context).Count()</td>
                                                 </tr>
                                                 <tr>
-                                                    <td>Count Unique</td>
+                                                    <td>@loc["ANALYTICS_COUNT_UNIQUE"]</td>
                                                     <td>@GetAnswersCase(context).ToHashSet().Count()</td>
                                                 </tr>
                                                 <tr>
-                                                    <td>Top @(TopN) Popular</td>
+                                                    <td>@loc["ANALYTICS_TOP_POPULAR", TopN]</td>
                                                     <td style="white-space: pre">@string.Join("\n", GetAnswersCase(context).GroupBy(x => x).OrderByDescending(x => x.Count()).Take(TopN).Select(g => $"{g.Key} (x{g.Count()})"))</td>
                                                 </tr>
                                                 <tr>
-                                                    <td>Top @(TopN) Longest</td>
+                                                    <td>@loc["ANALYTICS_TOP_LONGEST", TopN]</td>
                                                     <td style="white-space: pre">@string.Join("\n", GetAnswersCase(context).OrderByDescending(x => x.Length).Take(TopN).Select(x => $"{x} (x{x.Length})"))</td>
                                                 </tr>
                                             </tbody>
@@ -87,32 +89,32 @@ else
                             {
                                 Func<Response, int?> GetAnswerCase = r => GetAnswer(r, field).AnswerPositiveInt;
                                 Func<IEnumerable<Response>, IEnumerable<int>> GetAnswersCase = rs => rs.Select(r => GetAnswerCase(r)).Where(a => a != null).Select(a => a!.Value)!;
-                                <PropertyColumn Property="r => GetAnswerCase(r)" Title="@field.Title" AggregateDefinition="@(new AggregateDefinition<Response>())">
+                                <PropertyColumn Property="r => GetAnswerCase(r)" Title=@loc[field.Title] AggregateDefinition="@(new AggregateDefinition<Response>())">
                                     <AggregateTemplate>
                                         <MudSimpleTable Dense="true" Hover="true">
                                             <tbody>
                                                 <tr>
-                                                    <td>Count</td>
+                                                    <td>@loc["ANALYTICS_COUNT"]</td>
                                                     <td>@GetAnswersCase(context).Count()</td>
                                                 </tr>
                                                 <tr>
-                                                    <td>Count Unique</td>
+                                                    <td>@loc["ANALYTICS_COUNT_UNIQUE"]</td>
                                                     <td>@GetAnswersCase(context).ToHashSet().Count()</td>
                                                 </tr>
                                                 <tr>
-                                                    <td>Top @(TopN) Popular</td>
+                                                    <td>@loc["ANALYTICS_TOP_POPULAR", TopN]</td>
                                                     <td style="white-space: pre">@string.Join("\n", GetAnswersCase(context).GroupBy(x => x).OrderByDescending(x => x.Count()).Take(TopN).Select(g => $"{g.Key} (x{g.Count()})"))</td>
                                                 </tr>
                                                 <tr>
-                                                    <td>Average</td>
+                                                    <td>@loc["ANALYTICS_AVERAGE"]</td>
                                                     <td>@(GetAnswersCase(context).Count() == 0 ? "---" : GetAnswersCase(context).Average())</td>
                                                 </tr>
                                                 <tr>
-                                                    <td>Min</td>
+                                                    <td>@loc["ANALYTICS_MIN"]</td>
                                                     <td>@(GetAnswersCase(context).Count() == 0 ? "---" : GetAnswersCase(context).Min())</td>
                                                 </tr>
                                                 <tr>
-                                                    <td>Max</td>
+                                                    <td>@loc["ANALYTICS_MAX"]</td>
                                                     <td>@(GetAnswersCase(context).Count() == 0 ? "---" : GetAnswersCase(context).Max())</td>
                                                 </tr>
                                             </tbody>
@@ -125,7 +127,7 @@ else
                             {
                                 Func<Response, bool?> GetAnswerCase = r => GetAnswer(r, field).AnswerCheckedBox;
                                 Func<IEnumerable<Response>, IEnumerable<bool>> GetAnswersCase = rs => rs.Select(r => GetAnswerCase(r)).Where(a => a != null).Select(a => a!.Value)!;
-                                <PropertyColumn Property="r => GetAnswerCase(r)" Title="@field.Title" AggregateDefinition="@(new AggregateDefinition<Response>())">
+                                <PropertyColumn Property="r => GetAnswerCase(r)" Title=@loc[field.Title] AggregateDefinition="@(new AggregateDefinition<Response>())">
                                     <AggregateTemplate>
                                         @{
                                             var totalCount = GetAnswersCase(context).Count();
@@ -135,23 +137,29 @@ else
                                                     @if (totalCount > 0)
                                                     {
                                                         <MudChart ChartType="ChartType.Pie" Width="100px" Height="100px" InputData=@(dataDict.Values.ToArray()) InputLabels=@(dataDict.Keys.ToArray())/>
+                                                        <MudSimpleTable Dense="true" Hover="true">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>@loc["ANALYTICS_COUNT"]</td>
+                                                                    <td>@totalCount</td>
+                                                                </tr>
+                                                                @if(dataDict.ContainsKey("Y"))
+                                                                {
+                                                                    <tr>
+                                                                        <td>@loc["ANALYTICS_Y"]</td>
+                                                                        <td style="white-space: pre">@($"{dataDict["Y"]} ({(dataDict["Y"] / totalCount):0.0%})")</td>
+                                                                    </tr>
+                                                                }
+                                                                @if(dataDict.ContainsKey("N"))
+                                                                {
+                                                                    <tr>
+                                                                        <td>@loc["ANALYTICS_N"]</td>
+                                                                        <td style="white-space: pre">@($"{dataDict["N"]} ({(dataDict["N"] / totalCount):0.0%})")</td>
+                                                                    </tr>
+                                                                }
+                                                            </tbody>
+                                                        </MudSimpleTable>
                                                     }
-                                                    <MudSimpleTable Dense="true" Hover="true">
-                                                        <tbody>
-                                                            <tr>
-                                                                <td>Count</td>
-                                                                <td>@totalCount</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>Y:</td>
-                                                                <td style="white-space: pre">@($"{dataDict["Y"]} ({(dataDict["Y"] / totalCount):0.0%})")</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>N:</td>
-                                                                <td style="white-space: pre">@($"{dataDict["N"]} ({(dataDict["N"] / totalCount):0.0%})")</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </MudSimpleTable>
                                                 </MudItem>
                                             </MudGrid>
                                         }
@@ -164,8 +172,8 @@ else
             </Columns>
         </MudDataGrid>
         @if(fieldsHidden > 0)
-        { 
-            <MudText Typo="Typo.body2" Style="font-style: italic">Numder of fields omitted: @fieldsHidden</MudText>
+        {
+            <MudText Typo="Typo.body2" Style="font-style: italic">@loc["ANALYTICS_FIELDS_OMITTED_N", fieldsHidden]</MudText>
         }
     </PaperCenter>
 }

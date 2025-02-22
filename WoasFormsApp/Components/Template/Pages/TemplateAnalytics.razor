@@ -45,7 +45,7 @@ else
                                                 </tr>
                                                 <tr>
                                                     <td>Top @(TopN) Popular</td>
-                                                    <td>@string.Join(", ", GetAnswersCase(context).GroupBy(x => x).OrderByDescending(x => x.Count()).Take(TopN).Select(g => g.Key))</td>
+                                                    <td style="white-space: pre">@string.Join("\n", GetAnswersCase(context).GroupBy(x => x).OrderByDescending(x => x.Count()).Take(TopN).Select(g => $"{g.Key} (x{g.Count()})"))</td>
                                                 </tr>
                                             </tbody>
                                         </MudSimpleTable>
@@ -60,7 +60,7 @@ else
                                 <PropertyColumn Property="r => GetAnswerCase(r)" Title="@field.Title" AggregateDefinition="@(new AggregateDefinition<Response>())">
                                     <AggregateTemplate>
                                         <MudSimpleTable Dense="true" Hover="true">
-                                            <tbody style="white-space: break-spaces;">
+                                            <tbody>
                                                 <tr>
                                                     <td>Count</td>
                                                     <td>@GetAnswersCase(context).Count()</td>
@@ -71,11 +71,11 @@ else
                                                 </tr>
                                                 <tr>
                                                     <td>Top @(TopN) Popular</td>
-                                                    <td>@string.Join("\n", GetAnswersCase(context).GroupBy(x => x).OrderByDescending(x => x.Count()).Take(TopN).Select(g => $"{g.Key} (x{g.Count()})"))</td>
+                                                    <td style="white-space: pre">@string.Join("\n", GetAnswersCase(context).GroupBy(x => x).OrderByDescending(x => x.Count()).Take(TopN).Select(g => $"{g.Key} (x{g.Count()})"))</td>
                                                 </tr>
                                                 <tr>
                                                     <td>Top @(TopN) Longest</td>
-                                                    <td>@string.Join("\n", GetAnswersCase(context).OrderByDescending(x => x.Length).Take(TopN).Select(x => $"{x} (x{x.Length})"))</td>
+                                                    <td style="white-space: pre">@string.Join("\n", GetAnswersCase(context).OrderByDescending(x => x.Length).Take(TopN).Select(x => $"{x} (x{x.Length})"))</td>
                                                 </tr>
                                             </tbody>
                                         </MudSimpleTable>
@@ -90,7 +90,7 @@ else
                                 <PropertyColumn Property="r => GetAnswerCase(r)" Title="@field.Title" AggregateDefinition="@(new AggregateDefinition<Response>())">
                                     <AggregateTemplate>
                                         <MudSimpleTable Dense="true" Hover="true">
-                                            <tbody style="white-space: break-spaces;">
+                                            <tbody>
                                                 <tr>
                                                     <td>Count</td>
                                                     <td>@GetAnswersCase(context).Count()</td>
@@ -101,7 +101,7 @@ else
                                                 </tr>
                                                 <tr>
                                                     <td>Top @(TopN) Popular</td>
-                                                    <td>@string.Join(", ", GetAnswersCase(context).GroupBy(x => x).OrderByDescending(x => x.Count()).Take(TopN).Select(g => $"{g.Key} (x{g.Count()})"))</td>
+                                                    <td style="white-space: pre">@string.Join("\n", GetAnswersCase(context).GroupBy(x => x).OrderByDescending(x => x.Count()).Take(TopN).Select(g => $"{g.Key} (x{g.Count()})"))</td>
                                                 </tr>
                                                 <tr>
                                                     <td>Average</td>
@@ -137,18 +137,18 @@ else
                                                         <MudChart ChartType="ChartType.Pie" Width="100px" Height="100px" InputData=@(dataDict.Values.ToArray()) InputLabels=@(dataDict.Keys.ToArray())/>
                                                     }
                                                     <MudSimpleTable Dense="true" Hover="true">
-                                                        <tbody style="white-space: break-spaces;">
+                                                        <tbody>
                                                             <tr>
                                                                 <td>Count</td>
                                                                 <td>@totalCount</td>
                                                             </tr>
                                                             <tr>
                                                                 <td>Y:</td>
-                                                                <td>@($"{(dataDict["Y"] / totalCount):0.00%}")</td>
+                                                                <td style="white-space: pre">@($"{dataDict["Y"]} ({(dataDict["Y"] / totalCount):0.0%})")</td>
                                                             </tr>
                                                             <tr>
                                                                 <td>N:</td>
-                                                                <td>@($"{(dataDict["N"] / totalCount):0.00%}")</td>
+                                                                <td style="white-space: pre">@($"{dataDict["N"]} ({(dataDict["N"] / totalCount):0.0%})")</td>
                                                             </tr>
                                                         </tbody>
                                                     </MudSimpleTable>

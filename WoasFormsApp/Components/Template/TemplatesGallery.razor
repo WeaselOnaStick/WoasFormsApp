@@ -88,17 +88,15 @@ else
                                 <MudText Typo="Typo.h6">@TemplateTitleOrUnnamed(templateView.template)</MudText>
                                 @if(templateView.template.Owner != null)
                                 {
-                                    <MudText Typo="Typo.body2" style="font-style: italic;">
-                                        <UsernameClickable UserName="@templateView.template.Owner.UserName"/>
+                                    <MudText Inline="true" Typo="Typo.subtitle1" style="font-style: italic;">
+                                        <UsernameClickable UserName="@($"{templateView.template.Owner.UserName}\t")"/>
                                     </MudText>
+                                    <MudText Inline="true" Typo="Typo.subtitle1">@(templateView.template.CreatedAt.ToLocalTime().ToShortDateString())</MudText>
                                 }
                             </CardHeaderContent>
                         </MudCardHeader>
                         <MudCardMedia Style="width: 300px; height: 200px; align-self: center;"
                         Image="@(string.IsNullOrWhiteSpace(templateView.template.CoverImageUrl) ? Assets["BlankThumbnail.png"] : templateView.template.CoverImageUrl)" />
-                        <MudCardContent>
-                            <MudText Typo="Typo.subtitle1">@($"Created {templateView.template.CreatedAt.ToLocalTime().ToShortDateString()}")</MudText>
-                        </MudCardContent>
                         <MudCardActions Class="justify-space-around my-2">
                             <MudButton Class="rounded-pill" Variant="Variant.Filled" Color="Color.Info" Href="@($"/Template/{templateView.template.Id}")">View Template</MudButton>
                         </MudCardActions>

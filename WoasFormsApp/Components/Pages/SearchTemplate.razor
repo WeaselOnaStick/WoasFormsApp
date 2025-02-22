@@ -4,7 +4,7 @@
 @inject IDatabaseAccessorService dba
 
 
-<PaperCenter PageTitle="Template Search">
+<PaperCenter PageTitle="@headerText">
     <div style="display: grid; justify-items: center;">
         <MudMenu Label=@($"Search Options ({_modesCache[currentMode].DisplayName})") Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FilterList" Class="p-2">
             @foreach (var kv in _modesCache)
@@ -39,10 +39,27 @@
     [SupplyParameterFromQuery(Name = "topic")]
     public string searchTopic { get; set; }
 
+    private string headerText = "";
+
 
 
     protected override async Task OnInitializedAsync()
     {
+        headerText = "Template Search ({0})";
+        bool UseParamInHeader(string? x, string format)
+        {
+            bool use = !string.IsNullOrWhiteSpace(x);
+            if (use) headerText = string.Format(headerText, format);
+            return use;
+        }
+
+        if (!(
+            UseParamInHeader(searchString, $"\"{searchString}\"") ||
+            UseParamInHeader(searchAuthor, $"By user: {searchAuthor}") ||
+            UseParamInHeader(searchTag, $"By tag: {searchTag}") ||
+            UseParamInHeader(searchTopic, $"By topic: {searchTopic}")))
+            headerText = "Template Search";
+
         _modesCache = dba.GetTemplateOrdersData();
         currentMode = defaultMode;
         await FetchTemplates(defaultMode);

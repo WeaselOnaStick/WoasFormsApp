@@ -12,7 +12,16 @@ using WoasFormsApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddScoped<IThemeCacheService, ThemeCacheService>();
+builder.Services.AddLocalization();
+
+builder.Services.AddScoped<IUserPrefService<bool>,      ThemePrefsService>(factory =>
+{
+    return new ThemePrefsService(factory.GetRequiredService<ILocalStorageService>());
+});
+builder.Services.AddScoped<IUserPrefService<string>,    LocalePrefsService>(factory =>
+{
+    return new LocalePrefsService(factory.GetRequiredService<ILocalStorageService>());
+});
 
 builder.Services.AddFluentValidationAutoValidation();
 
@@ -96,6 +105,15 @@ builder.Services.AddIdentityCore<WoasFormsAppUser>(options =>
 builder.Services.AddBlazoredLocalStorage();
 
 var app = builder.Build();
+
+var supportedCultures = new string[]{ "en-US", "ru-RU" };
+
+var localizationOptions = new RequestLocalizationOptions()
+    .AddSupportedCultures(supportedCultures)
+    .AddSupportedUICultures(supportedCultures)
+    .SetDefaultCulture(supportedCultures[0]);
+
+app.UseRequestLocalization(localizationOptions);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

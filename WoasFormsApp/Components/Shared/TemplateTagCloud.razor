@@ -10,7 +10,7 @@
 @inject IConfiguration config
 
 <MudGrid Justify="Justify.Center" Class="py-8">
-    <MudItem xs="8">
+    <MudItem xs="8" Style="min-width: fit-content">
         <MudCard>
             <MudCardHeader Class="align-self-center">
                 <CardHeaderContent>
@@ -21,7 +21,7 @@
                 </CardHeaderContent>
             </MudCardHeader>
             <MudCardContent Class="align-self-center">
-                <svg width="@WIDTH" height="@HEIGHT">
+                <svg width="@WIDTH" height="@HEIGHT" preserveAspectRatio="xMinYMin slice">
                     <defs>
                         <filter id="textOutline" x="-50%" y="-50%" width="200%" height="200%">
                             <feMorphology in="SourceAlpha" operator="dilate" radius="3" result="dilated" />

@@ -54,7 +54,7 @@
         else if (!string.IsNullOrWhiteSpace(searchTag))
             headerText = loc["SEARCH_TEMPLATE_HEADER_TAG_FORMATTED", searchTag];
         else if (!string.IsNullOrWhiteSpace(searchTopic))
-            headerText = loc["SEARCH_TEMPLATE_HEADER_TOPIC_FORMATTED", searchTopic];
+            headerText = loc["SEARCH_TEMPLATE_HEADER_TOPIC_FORMATTED", loc[searchTopic]];
         else
             headerText = loc["SEARCH_TEMPLATE_HEADER_BLANK"];
 

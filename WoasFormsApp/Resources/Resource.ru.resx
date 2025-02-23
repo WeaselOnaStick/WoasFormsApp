@@ -231,9 +231,8 @@
   <data name="Education" xml:space="preserve">
     <value>Образование</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="EMAIL" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="EMAIL" xml:space="preserve">
+    <value>Электронная почта</value>
   </data>
   <data name="ERROR" xml:space="preserve">
     <value>Ошибка</value>
@@ -298,6 +297,9 @@
   <data name="Other" xml:space="preserve">
     <value>Другое</value>
   </data>
+  <data name="USER_OWNED_TEMPLATES_COUNT" xml:space="preserve">
+    <value>Количество имеющихся шаблонов</value>
+  </data>
   <data name="PASSWORD" xml:space="preserve">
     <value>Пароль</value>
   </data>
@@ -331,11 +333,47 @@
   <data name="RESPONSES" xml:space="preserve">
     <value>Формы</value>
   </data>
-  <data name="SEARCH_TEMPLATE_COMMENTS_A" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="SEARCH_TEMPLATE_COMMENTS_A" xml:space="preserve">
+    <value>Меньше комментариев</value>
   </data>
-  <data name="SEARCH_TEMPLATE_HEADER_BLANK" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="SEARCH_TEMPLATE_COMMENTS_D" xml:space="preserve">
+    <value>Больше комментариев</value>
+  </data>
+  <data name="SEARCH_TEMPLATE_CREATED_A" xml:space="preserve">
+    <value>Сначала старые</value>
+  </data>
+  <data name="SEARCH_TEMPLATE_CREATED_D" xml:space="preserve">
+    <value>Сначала новые</value>
+  </data>
+  <data name="SEARCH_TEMPLATE_FORMS_A" xml:space="preserve">
+    <value>Меньше форм</value>
+  </data>
+  <data name="SEARCH_TEMPLATE_FORMS_D" xml:space="preserve">
+    <value>Больше форм</value>
+  </data>
+  <data name="SEARCH_TEMPLATE_HEADER_BLANK" xml:space="preserve">
+    <value>Поиск шаблонов</value>
+  </data>
+  <data name="SEARCH_TEMPLATE_HEADER_FORMATTED" xml:space="preserve">
+    <value>Поиск шаблонов ({0})</value>
+  </data>
+  <data name="SEARCH_TEMPLATE_HEADER_QUERY_FORMATTED" xml:space="preserve">
+    <value>"{0}"</value>
+  </data>
+  <data name="SEARCH_TEMPLATE_HEADER_TAG_FORMATTED" xml:space="preserve">
+    <value>По тэгу: {0}</value>
+  </data>
+  <data name="SEARCH_TEMPLATE_HEADER_TOPIC_FORMATTED" xml:space="preserve">
+    <value>По теме: {0}</value>
+  </data>
+  <data name="SEARCH_TEMPLATE_HEADER_USER_FORMATTED" xml:space="preserve">
+    <value>Сделанные пользователем: {0}</value>
+  </data>
+  <data name="SEARCH_TEMPLATE_LIKES_A" xml:space="preserve">
+    <value>Меньше лайков</value>
+  </data>
+  <data name="SEARCH_TEMPLATE_LIKES_D" xml:space="preserve">
+    <value>Больше лайков</value>
   </data>
   <data name="SEARCH_TEMPLATE_OPTIONS" xml:space="preserve">
     <value>Поиск</value>
@@ -430,14 +468,14 @@
   <data name="USERNAME" xml:space="preserve">
     <value>Имя пользователя</value>
   </data>
-  <data name="USER_ACCOUNT_CREATED_AT" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="USER_ACCOUNT_CREATED_AT" xml:space="preserve">
+    <value>Создан</value>
   </data>
-  <data name="USER_BLOCKED_STATUS" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="USER_BLOCKED_STATUS" xml:space="preserve">
+    <value>Заблокирован</value>
   </data>
-  <data name="USER_EMAIL" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="USER_EMAIL" xml:space="preserve">
+    <value>Электронная почта</value>
   </data>
   <data name="USER_IS_BLOCKED" xml:space="preserve">
     <value>Пользователь заблокирован</value>
@@ -445,8 +483,8 @@
   <data name="USER_LOGGED_IN" xml:space="preserve">
     <value>Вход выполнен</value>
   </data>
-  <data name="USER_ROLES" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="USER_ROLES" xml:space="preserve">
+    <value>Роли</value>
   </data>
   <data name="VALID_FIELD_MISSING_TITLE" xml:space="preserve">
     <value>У поля №{0} отсутствует название!</value>
@@ -475,11 +513,11 @@
   <data name="WOASFORMS" xml:space="preserve">
     <value>WoasForms</value>
   </data>
-  <data name="WOASFORMS_HOME_TOP5" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="WOASFORMS_HOME_TOP5" xml:space="preserve">
+    <value>Топ 5 шаблонов (по формам)</value>
   </data>
-  <data name="WOASFORMS_TITLE" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="WOASFORMS_TITLE" xml:space="preserve">
+    <value>Weasel's Forms App</value>
   </data>
   <data name="ADMIN_ACTION_PROMOTE_ADMIN_DIALOG_HEADER" xml:space="preserve">
     <value>Подтвердите выдачу ролей</value>
@@ -526,8 +564,8 @@
   <data name="ADMIN_ACTION_DELETE_USERS_SUCCESS_F" xml:space="preserve">
     <value>{0} пользователей успешно удалены</value>
   </data>
-  <data name="PAGE_NOT_FOUND_404" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="PAGE_NOT_FOUND_404" xml:space="preserve">
+    <value>Страница не найдена (404)</value>
   </data>
   <data name="SEARCH" xml:space="preserve">
     <value>Поиск</value>
@@ -535,10 +573,31 @@
   <data name="SEARCH_TEMPLATE_PLACEHOLDER" xml:space="preserve">
     <value>Искать шаблоны</value>
   </data>
-  <data name="MY_FORMS_EMPTY" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="MY_FORMS_EMPTY" xml:space="preserve">
+    <value>Вы еще не заполнили формы</value>
   </data>
-  <data name="TEMPLATE_AUTHOR" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="TEMPLATE_AUTHOR" xml:space="preserve">
+    <value>Автор шаблона</value>
+  </data>
+  <data name="FORM_VIEW_HEADER_F" xml:space="preserve">
+    <value>Форма для шаблона {0}</value>
+  </data>
+  <data name="FORM_FILLED_ON" xml:space="preserve">
+    <value>Дата заполнения</value>
+  </data>
+  <data name="FORM_FILLING_HEADER_F" xml:space="preserve">
+    <value>Заполнение новой формы для шаблона {0}</value>
+  </data>
+  <data name="CREATED_BY_F" xml:space="preserve">
+    <value>Автор шаблона - {0}</value>
+  </data>
+  <data name="SUBMIT_FORM" xml:space="preserve">
+    <value>Отправить форму</value>
+  </data>
+  <data name="FORM_FILL_SUCCESS" xml:space="preserve">
+    <value>Форма успешно отправлена!</value>
+  </data>
+  <data name="FORM_FILL_FAIL" xml:space="preserve">
+    <value>При отправке формы произошла ошибка</value>
   </data>
 </root>

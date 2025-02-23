@@ -9,18 +9,16 @@
 
 @attribute [Authorize(Roles = "Admin")]
 
-<PageTitle>@loc["ADMIN_PANEL"]</PageTitle>
-
-<MudPaper Class="d-flex flex-column pa-4 mx-auto align-center gap-4 justify-center text-center" Style="max-width: fit-content">
-
-    <MudText Typo="Typo.h2" Align="Align.Center">@loc["ADMIN_PANEL"]</MudText>
-
-    <MudGrid>
+<PaperCenter PageTitle=@loc["ADMIN_PANEL"]>
+    <MudGrid Justify="Justify.Center">
         @foreach (var adminAction in adminActions)
         {
-            <MudButton OnClick=@(async () => await ExecuteAdminActionWithDialog(adminAction)) >
-                @adminAction.ButtonText
-            </MudButton>
+            <MudItem Class="p-2 m-1">
+                <MudButton OnClick=@(async () => await ExecuteAdminActionWithDialog(adminAction))
+                    Variant="Variant.Filled" Color="Color.Error" StartIcon=@adminAction.Icon>
+                    @adminAction.ButtonText
+                </MudButton>
+            </MudItem>
         }
     </MudGrid>
 
@@ -47,7 +45,7 @@
             <MudDataGridPager/>
         </PagerContent>
     </MudDataGrid>
-</MudPaper>
+</PaperCenter>
 
 @code {
     public class AdminActionInfo

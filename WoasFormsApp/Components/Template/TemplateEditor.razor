@@ -6,7 +6,7 @@
 @inject ISnackbar snack
 @inject IDialogService DialogService
 
-<PageTitle>Creating a Template</PageTitle>
+<PageTitle>@loc["TEMPLATE_CREATOR_HEADER"]</PageTitle>
 
 <MudGrid Justify="Justify.SpaceAround" Class="pa-4">
     <MudItem md="8" xs="12">
@@ -15,19 +15,19 @@
 
                 <MudTextField @bind-Value="templateModel.Title"
                 Class="p-2" Typo="Typo.h3" Variant="Variant.Outlined"
-                Label="Template Title"
+                Label=@loc["TEMPLATE_TITLE"]
                 For="@(() => templateModel.Title)" />
 
                 <MudPaper Elevation="3" Class="m-2 p-2 mb-6">
                     <MudTabs Rounded="true">
-                        <MudTabPanel Text="Edit Description">
+                        <MudTabPanel Text=@loc["EDIT_DESCRIPTION"]>
                             <MudTextField @bind-Value="templateModel.Description"
                             For="@(() => templateModel.Description)"
                             Lines="6" AutoGrow="true" MaxLines="24"
                             Class="p-2 mb-4" Typo="Typo.subtitle1" Variant="Variant.Outlined"
-                            Label="Template Description" />
+                            Label=@loc["TEMPLATE_DESCRIPTION"] />
                         </MudTabPanel>
-                        <MudTabPanel Text="Preview Markdown">
+                        <MudTabPanel Text=@loc["TEMPLATE_DESCRIPTION_PREVIEW_MARKDOWN"]>
                             <MudPaper Class="p-2 mb-4" Elevation="0">
                                 <MudMarkdown Value="@templateModel.Description" />
                             </MudPaper>
@@ -45,7 +45,10 @@
                         </MudDropZone>
                     </ChildContent>
                     <ItemRenderer>
-                        <TemplateFieldEdit Model="templateModel" Field="context" OnDelete="() => RemoveField(context.Position)" />
+                        <TemplateFieldEdit
+                        Model="templateModel"
+                        Field="context"
+                        OnDelete="() => RemoveField(context.Position)" />
                     </ItemRenderer>
                 </MudDropContainer>
             </MudForm>
@@ -56,7 +59,9 @@
         <MudPaper Class="pa-4" Style="position: sticky; top: 5rem;">
 
             <!-- META-TOPIC -->
-            <MudSelect @bind-Value="templateModel.TopicId" T="int" Variant="Variant.Outlined" Label="Topic" Required="true" RequiredError="Topic is required!">
+            <MudSelect @bind-Value="templateModel.TopicId" T="int"
+            Variant="Variant.Outlined" Label=@loc["TOPIC"]
+            Required="true" RequiredError=@loc["VALID_TOPIC_REQUIRED"]>
                 @foreach (var item in (_topicsCache ?? new()))
                 {
                     <MudSelectItem Value="item.Id">@item.Title</MudSelectItem>
@@ -65,7 +70,7 @@
 
             <!-- META-TAGS -->
             <MudAutocomplete @bind-Value=_userNewTag @bind-Text=_userNewTag
-            Label="Add Tag (optional)" Class="p-2 m-2"
+            Label=@loc["ADD_TAG"] Class="p-2 m-2"
             CoerceValue="true" SearchFunc="SearchTag" T="string"
             OnKeyDown="@(e => {if (e.Code == "Enter") AddUserTag();})"
             AdornmentIcon="@Icons.Material.Filled.AddCircleOutline" AdornmentColor="Color.Success" OnAdornmentClick=AddUserTag />
@@ -87,7 +92,7 @@
                             <MudButton Disabled="@(_fieldCounts[item.Id].CurAmount >= _fieldCounts[item.Id].MaxAmount)"
                             StartIcon="@Icons.Material.Outlined.AddCircleOutline"
                             OnClick="(e) => AddField(item.Id)">
-                                @($"Add {item.Name}")
+                                @loc["ADD_FIELD", loc[item.Name]]
 
                                 <MudSpacer />
 
@@ -98,13 +103,14 @@
                 </MudExpansionPanel>
 
                 <!-- PRIVACY -->
-                <MudExpansionPanel Text="Privacy">
-                    <MudCheckBox T="bool" Label="Public" @bind-Value="templateModel.Public" />
+                <MudExpansionPanel Text=@loc["PRIVACY"]>
+                    <MudCheckBox T="bool" Label=@loc["PUBLIC"] @bind-Value="templateModel.Public" />
                     @if (!templateModel.Public)
                     {
                         <MudAutocomplete @bind-Value="_autoFoundAllowedUser"
                         SearchFunc="@SearchUser"
-                        Label="Search for a user to whitelist" ShowProgressIndicator="true" Class="p-1" Variant="Variant.Filled"
+                        Label=@loc["SEARCH_USER_TO_WHITELIST"] 
+                        ShowProgressIndicator="true" Class="p-1" Variant="Variant.Filled"
                         AdornmentColor="Color.Success" AdornmentIcon="@Icons.Material.Filled.AddCircleOutline" OnAdornmentClick="() => AddAutoFoundUser()"
                         OnKeyDown="@(e => {if (e.Code == "Enter") AddAutoFoundUser();})" />
                         <MudDataGrid Items="@templateModel.AllowedUsers" Groupable="false" Dense="true">
@@ -197,6 +203,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        validator = new TemplateCreationValidator(loc);
         _topicsCache = await dba.GetTopics();
         _fieldTypesCache = await dba.GetTemplateFieldTypes();
         foreach (var fieldType in _fieldTypesCache)
@@ -244,28 +251,30 @@
         StateHasChanged();
     }
 
-    public TemplateCreationValidator validator = new TemplateCreationValidator();
+    public TemplateCreationValidator validator;
 
     public class TemplateCreationValidator : AbstractValidator<Template>
     {
-        public TemplateCreationValidator()
+        public TemplateCreationValidator(IStringLocalizer loc)
         {
-            RuleFor(t => t.Title).NotEmpty().WithMessage("Title is required!");
-            RuleFor(t => t.Fields).NotEmpty().WithMessage("Add at least 1 template field!");
+            RuleFor(t => t.Title).NotEmpty().WithMessage(loc["VALID_TITLE_REQUIRED"]) ;
+            RuleFor(t => t.Fields).NotEmpty().WithMessage(loc["VALID_NO_FIELDS"]);
 
             RuleFor(t => t.Fields).Must(
                 t => t.Count == 0 || t.GroupBy(f => f.Type.Id)
                 .Select(g => new { g.Key, Count = g.Count() })
                 .Max(g => g.Count) <= MaxQuestionPerType)
-                .WithMessage($"You can't have more than {MaxQuestionPerType} field per type!");
+                .WithMessage(loc["VALID_TOO_MANY_FIELDS_PER_TYPE", MaxQuestionPerType]);
 
             RuleForEach(t => t.Fields).ChildRules(f =>
                 {
-                    f.RuleFor(f => f.Title).NotEmpty().WithMessage((f, t) => $"Field #{f.Position} is missing a title!");
+                    f.RuleFor(f => f.Title)
+                    .NotEmpty()
+                    .WithMessage((f, t) => loc["VALID_FIELD_MISSING_TITLE", f.Position]);
                 });
 
 
-            RuleFor(t => t.TopicId).NotNull().WithMessage("Topic can't be empty");
+            RuleFor(t => t.TopicId).NotNull().WithMessage(loc["VALID_TOPIC_EMPTY"]);
 
 
         }
@@ -285,7 +294,7 @@
         if (!wholeCheck.IsValid)
         {
             formErrors = wholeCheck.Errors.Select(e => e.ErrorMessage).ToArray();
-            snack.Add("Form invalid", MudBlazor.Severity.Error);
+            snack.Add(loc["VALID_TEMPLATE_INVALID"], MudBlazor.Severity.Error);
             StateHasChanged();
             return false;
         }
@@ -303,10 +312,10 @@
         var newTemplate = await dba.CreateTemplate(templateModel);
 
         if (newTemplate == null)
-            snack.Add("There was an error creating the template", MudBlazor.Severity.Error);
+            snack.Add(loc["TEMPLATE_CREATE_ERROR"], MudBlazor.Severity.Error);
         else
         {
-            snack.Add($"Template \"{newTemplate.Title}\" created successfully!", MudBlazor.Severity.Success);
+            snack.Add(loc["TEMPLATE_CREATE_SUCCESS", newTemplate.Title], MudBlazor.Severity.Success);
             nav.NavigateTo($"/Template/{newTemplate.Id}");
         }
     }
@@ -319,10 +328,10 @@
             bool? confirm = await DialogService.ShowMessageBox(
                 new MessageBoxOptions()
                     {
-                        Title = "Confirm Edit",
-                        Message = "Current Template already received forms. Changing or deleting fields will keep respective data but could lead to data misinterpretation. Answers to deleted fields won't be visible until new fields of respective types are created.",
-                        YesText = "Confirm",
-                        CancelText = "Cancel",
+                        Title = loc["TEMPLATE_EDIT_CONFIRM"],
+                        Message = loc["TEMPLATE_EDIT_CONFIRM_DESC"],
+                        YesText = loc["CONFIRM"],
+                        CancelText = loc["CANCEL"],
                     }
             );
             if (confirm == null) { StateHasChanged(); return; }
@@ -330,10 +339,11 @@
         var newTemplate = await dba.UpdateTemplate(templateModel, templateModel.Id);
 
         if (newTemplate == null)
-            snack.Add("There was an error updating the template", MudBlazor.Severity.Error);
+            snack.Add(loc["TEMPLATE_EDIT_ERROR"], MudBlazor.Severity.Error);
         else
         {
-            snack.Add($"Template \"{newTemplate.Title}\" updated successfully!", MudBlazor.Severity.Success);
+            
+            snack.Add(loc["TEMPLATE_EDIT_SUCCESS", newTemplate.Title], MudBlazor.Severity.Success);
             nav.NavigateTo($"/Template/{newTemplate.Id}");
         }
     }

@@ -5,16 +5,16 @@
 
 @attribute [Authorize]
 
-<PaperCenter PageTitle="My Templates">
+<PaperCenter PageTitle=@loc["MY_TEMPLATES"]>
     <MudDataGrid T="Template" Items="_templates" Dense="true" Striped="true">
         <Columns>
             <HierarchyColumn />
-            <PropertyColumn Property="t => TemplateTitleOrUnnamed(t, default)" StickyLeft="true" Title="Template"/>
-            <PropertyColumn Property="t => t.LastModifiedAt" Title="Last Modified" InitialDirection="SortDirection.Descending" Sortable="true" />
-            <PropertyColumn Property="t => t.CreatedAt" Title="Created" />
-            <PropertyColumn Property="t => t.UsersWhoLiked.Count" Title="Likes" />
-            <PropertyColumn Property="t => t.Comments.Count" Title="Comments" />
-            <PropertyColumn Property="t => t.Responses.Count" Title="Responses" />
+            <PropertyColumn Property="t => TemplateTitleOrUnnamed(t, loc)" StickyLeft="true" Title=@loc["TEMPLATE"]/>
+            <PropertyColumn Property="t => t.LastModifiedAt" Title=@loc["LAST_MODIFIED"] InitialDirection="SortDirection.Descending" Sortable="true" />
+            <PropertyColumn Property="t => t.CreatedAt" Title=@loc["CREATED_AT"] />
+            <PropertyColumn Property="t => t.UsersWhoLiked.Count" Title=@loc["LIKES"] />
+            <PropertyColumn Property="t => t.Comments.Count" Title=@loc["COMMENTS"] />
+            <PropertyColumn Property="t => t.Responses.Count" Title=@loc["RESPONSES"] />
         </Columns>
         <ChildRowContent>
             <TemplateToolbar Item="context.Item" />
@@ -30,8 +30,6 @@
     protected override async Task OnInitializedAsync()
     {
         _templates = await dba.GetTemplatesByCurrentUser();
-        // _templates = _templates.OrderByDescending(t => t.LastModifiedAt);
-        await base.OnInitializedAsync();
         StateHasChanged();
     }
 }

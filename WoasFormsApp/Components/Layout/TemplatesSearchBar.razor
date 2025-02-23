@@ -4,12 +4,12 @@
 <MudTextField
 @bind-Value="searchText"
 @ref="searchField"
-Label="Search"
+Label=@loc["SEARCH"]
 Immediate="true"
 Variant="Variant.Filled"
 Adornment="Adornment.End"
 AdornmentIcon="@Icons.Material.Filled.Search"
-Placeholder="Search for templates"
+Placeholder=@loc["SEARCH_TEMPLATE_PLACEHOLDER"]
 OnAdornmentClick="Search"
 OnKeyDown="EnterKey"
 Color="@Color.Inherit"

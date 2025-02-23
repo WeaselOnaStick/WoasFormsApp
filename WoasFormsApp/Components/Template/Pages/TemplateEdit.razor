@@ -5,7 +5,7 @@
 
 @attribute [Authorize]
 
-<PageTitle>Template Editor - WoasForms</PageTitle>
+<PageTitle>@loc["TEMPLATE_EDITOR"] - @loc["WOASFORMS"]</PageTitle>
 
 @if (AccessDenied || template == null)
 {
@@ -13,7 +13,8 @@
 }
 else
 {
-    <MudText Typo="Typo.h3" Align="Align.Center">Editing Template <i>@TemplateTitleOrUnnamed(template)</i></MudText>
+
+    <MudText Typo="Typo.h3" Align="Align.Center">@loc["TEMPLATE_EDITING_NAMED", TemplateTitleOrUnnamed(template, loc)]</MudText>
     <TemplateEditor editorMode="TemplateEditor.EditorMode.Edit" templateModel="@template" />
 }
 

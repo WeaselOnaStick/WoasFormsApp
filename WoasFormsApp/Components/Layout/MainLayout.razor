@@ -19,15 +19,22 @@
         <TemplatesSearchBar />
         <MudSpacer />
         <a href="/" data-enhance-nav="true">
-            <MudText Typo="Typo.h6">WoasForms</MudText>
+            <MudText Typo="Typo.h6">@loc["WOASFORMS"]</MudText>
         </a>
     </MudAppBar>
 
-    <MudDrawer id="nav-drawer" Elevation="2" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Class="pa-4" data-enhance-nav="true">
+    <MudDrawer Width="300px" id="nav-drawer" Elevation="2" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Class="pa-4" data-enhance-nav="true">
         <MudStack>
-            <MudButton Href="/" StartIcon="@Icons.Material.Filled.Home" Variant="Variant.Filled">Browse Templates</MudButton>
+            <MudButton Href="/" StartIcon="@Icons.Material.Filled.Home" Variant="Variant.Filled">@loc["BROWSE_TEMPLATES"]</MudButton>
             <DrawerButtons @rendermode="InteractiveServer" />
-            <ThemeToggleButton @rendermode="InteractiveServer" />
+            <MudGrid Justify="Justify.SpaceAround" Class="px-4">
+                <MudItem xs="10" Class="px-2">
+                    <LocaleSelector />
+                </MudItem>
+                <MudItem xs="2" Class="px-2">
+                    <ThemeToggleButton @rendermode="InteractiveServer" />
+                </MudItem>
+            </MudGrid>
         </MudStack>
     </MudDrawer>
 

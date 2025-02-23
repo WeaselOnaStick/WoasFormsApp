@@ -4,18 +4,17 @@
     <MudStack Spacing="1">
 
         <MudTextField @bind-Value="Field.Title" 
-                    Variant="Variant.Filled" Class="p-2" Typo="Typo.h4" 
-                    Label="Field Title" 
-                    Required="true" RequiredError="Title is required!" 
-                    For="@(() => Field.Title)" />
+        Variant="Variant.Filled" Class="p-2" Typo="Typo.h4"
+        Label=@loc["FIELD_TITLE"]
+        For="@(() => Field.Title)" />
 
-        <MudTextField @bind-Value="Field.Description" 
-                      Variant="Variant.Filled" Class="p-2" Typo="Typo.subtitle2" 
-                      Label="Field Description" 
-                      For="@(() => Field.Description)" />
+        <MudTextField @bind-Value="Field.Description"
+        Variant="Variant.Filled" Class="p-2" Typo="Typo.subtitle2" 
+        Label=@loc["FIELD_DESCRIPTION"]
+        For="@(() => Field.Description)" />
 
 
-        @switch (@Field.Type.Name)
+        @switch (Field.Type.Name)
         {
             case "SingleLine":
                 <MudTextField Class="p-1" T="string" Disabled="true" Variant="Variant.Filled" Label="@FieldLabelText" />
@@ -27,7 +26,7 @@
                 <MudNumericField Class="p-1" T="int" Min="1" Disabled="true" Variant="Variant.Filled" Label="@FieldLabelText" />
                 break;
             case "CheckBox":
-                <MudCheckBox Class="p-1" T="bool" Disabled="true" Variant="Variant.Filled" Label="@FieldLabelText" />
+                <MudCheckBox Class="p-1" T="bool" Disabled="true" Label="@FieldLabelText" />
                 break;
         }
 
@@ -35,11 +34,11 @@
         <MudToolBar Class="justify-end">
             <MudButton OnClick="() => Field.ShowInAnalytics ^= true"
             StartIcon="@(Field.ShowInAnalytics ? Icons.Material.Filled.Visibility : @Icons.Material.Filled.VisibilityOff)">
-                @(Field.ShowInAnalytics ? "Analytics Enabled" : "Analytics Disabled")
+                @(Field.ShowInAnalytics ? loc["ANALYTICS_ENABLED"] : loc["ANALYTICS_DISABLED"])
             </MudButton>
             <MudIconButton 
-                Icon="@Icons.Material.Filled.Delete" Color="Color.Error"
-                OnClick="OnDelete" />
+            Icon="@Icons.Material.Filled.Delete" Color="Color.Error"
+            OnClick="OnDelete" />
         </MudToolBar>
     </MudStack>
 </MudPaper>
@@ -58,6 +57,6 @@
 
     protected override void OnInitialized()
     {
-        FieldLabelText = $"This field ({Field.Type.Name}) is to be filled by the respondent";
+        FieldLabelText = loc["FIELD_THIS_IS_FILLED_BY_RESPONDENT", loc[Field.Type.Name]];
     }
 }

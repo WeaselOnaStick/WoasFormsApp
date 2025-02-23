@@ -9,10 +9,12 @@ using WoasFormsApp;
 using WoasFormsApp.Components;
 using WoasFormsApp.Data;
 using WoasFormsApp.Services;
+using static WoasFormsApp.Utils.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddLocalization();
+builder.Services.AddControllers();
 
 builder.Services.AddScoped<IUserPrefService<bool>,      ThemePrefsService>(factory =>
 {
@@ -103,10 +105,10 @@ builder.Services.AddIdentityCore<WoasFormsAppUser>(options =>
     .AddDefaultTokenProviders();
 
 builder.Services.AddBlazoredLocalStorage();
-
 var app = builder.Build();
 
-var supportedCultures = new string[]{ "en-US", "ru-RU" };
+
+var supportedCultures = SupportedLocales.Select(l => l.CultureInfo.Name).ToArray();
 
 var localizationOptions = new RequestLocalizationOptions()
     .AddSupportedCultures(supportedCultures)
@@ -134,6 +136,8 @@ app.UseStatusCodePagesWithRedirects("/404");
 
 
 app.UseAntiforgery();
+
+app.MapControllers();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()

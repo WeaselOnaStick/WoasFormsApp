@@ -185,14 +185,14 @@ namespace WoasFormsApp.Services
 
         public static Dictionary<TemplateOrderMode, TemplateOrderModeData> TemplateOrdersData = new Dictionary<TemplateOrderMode, TemplateOrderModeData>
         {
-            {TemplateOrderMode.Newest,              new TemplateOrderModeData{ DisplayName="Newest",            Direction = SortDirection.Descending,   Selector = x => x.CreatedAt,            Icon = Icons.Material.Filled.History } },
-            {TemplateOrderMode.Oldest,              new TemplateOrderModeData{ DisplayName="Oldest",            Direction = SortDirection.Ascending,    Selector = x => x.CreatedAt,            Icon = Icons.Material.Filled.History } },
-            {TemplateOrderMode.MostLiked,           new TemplateOrderModeData{ DisplayName="Most Likes",        Direction = SortDirection.Descending,   Selector = x => x.UsersWhoLiked.Count,  Icon = Icons.Material.Filled.Favorite } },
-            {TemplateOrderMode.LeastLiked,          new TemplateOrderModeData{ DisplayName="Least Likes",       Direction = SortDirection.Ascending,    Selector = x => x.UsersWhoLiked.Count,  Icon = Icons.Material.Filled.HeartBroken } },
-            {TemplateOrderMode.MostCommented,       new TemplateOrderModeData{ DisplayName="Most Comments",     Direction = SortDirection.Descending,   Selector = x => x.Comments.Count,       Icon = Icons.Material.Filled.Comment } },
-            {TemplateOrderMode.LeastCommented,      new TemplateOrderModeData{ DisplayName="Least Comments",    Direction = SortDirection.Ascending,    Selector = x => x.Comments.Count,       Icon = Icons.Material.Filled.Comment } },
-            {TemplateOrderMode.MostResponded,       new TemplateOrderModeData{ DisplayName="Most Forms",        Direction = SortDirection.Descending,   Selector = x => x.Responses.Count,      Icon = Icons.Material.Filled.Description } },
-            {TemplateOrderMode.LeastResponded,      new TemplateOrderModeData{ DisplayName="Least Forms",       Direction = SortDirection.Ascending,    Selector = x => x.Responses.Count,      Icon = Icons.Material.Filled.Description } },
+            {TemplateOrderMode.Newest,              new TemplateOrderModeData{ DisplayName="SEARCH_TEMPLATE_CREATED_D",      Direction = SortDirection.Descending,   Selector = x => x.CreatedAt,            Icon = Icons.Material.Filled.History } },
+            {TemplateOrderMode.Oldest,              new TemplateOrderModeData{ DisplayName="SEARCH_TEMPLATE_CREATED_A",      Direction = SortDirection.Ascending,    Selector = x => x.CreatedAt,            Icon = Icons.Material.Filled.History } },
+            {TemplateOrderMode.MostLiked,           new TemplateOrderModeData{ DisplayName="SEARCH_TEMPLATE_LIKES_D",        Direction = SortDirection.Descending,   Selector = x => x.UsersWhoLiked.Count,  Icon = Icons.Material.Filled.Favorite } },
+            {TemplateOrderMode.LeastLiked,          new TemplateOrderModeData{ DisplayName="SEARCH_TEMPLATE_LIKES_A",        Direction = SortDirection.Ascending,    Selector = x => x.UsersWhoLiked.Count,  Icon = Icons.Material.Filled.HeartBroken } },
+            {TemplateOrderMode.MostCommented,       new TemplateOrderModeData{ DisplayName="SEARCH_TEMPLATE_COMMENTS_D",     Direction = SortDirection.Descending,   Selector = x => x.Comments.Count,       Icon = Icons.Material.Filled.Comment } },
+            {TemplateOrderMode.LeastCommented,      new TemplateOrderModeData{ DisplayName="SEARCH_TEMPLATE_COMMENTS_A",     Direction = SortDirection.Ascending,    Selector = x => x.Comments.Count,       Icon = Icons.Material.Filled.Comment } },
+            {TemplateOrderMode.MostResponded,       new TemplateOrderModeData{ DisplayName="SEARCH_TEMPLATE_FORMS_D",        Direction = SortDirection.Descending,   Selector = x => x.Responses.Count,      Icon = Icons.Material.Filled.Description } },
+            {TemplateOrderMode.LeastResponded,      new TemplateOrderModeData{ DisplayName="SEARCH_TEMPLATE_FORMS_A",        Direction = SortDirection.Ascending,    Selector = x => x.Responses.Count,      Icon = Icons.Material.Filled.Description } },
 
         };
 

@@ -2,8 +2,10 @@
 @using WoasFormsApp.Components.Template
 @rendermode InteractiveServer
 
-<PageTitle>Weasel's Forms App</PageTitle>
+<PageTitle>@loc["WOASFORMS_TITLE"]</PageTitle>
 
 <TemplateTagCloud />
 
-<TemplatesGallery Mode="TemplatesGallery.GalleryMode.GlobalPopular" TakeAmount="5" CustomHeaderText="Top 5 Templates (by forms)"/>
+<TemplatesGallery 
+    Mode="TemplatesGallery.GalleryMode.GlobalPopular"
+    TakeAmount="5" CustomHeaderText=@loc["WOASFORMS_HOME_TOP5"]/>

@@ -1,0 +1,41 @@
+﻿@using static WoasFormsApp.Utils.Localization
+@inject NavigationManager nav
+@rendermode @(new InteractiveServerRenderMode(prerender:false))
+
+<MudSelect @bind-Value=UserLocale>
+    @foreach (var suplocale in SupportedLocales)
+    {
+        <MudSelectItem Value=@(suplocale.CultureInfo)>
+            <MudImage Src=@(suplocale.FlagUrl) Height="14" Class="mr-1"/> @suplocale.CultureInfo.DisplayName
+        </MudSelectItem>
+    }
+</MudSelect>
+
+@code {
+    private CultureInfo _userLocale;
+    public CultureInfo UserLocale { 
+        get => _userLocale;
+        set
+        {
+            SetCulture(value);
+            _userLocale = value;
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        UserLocale = CultureInfo.CurrentCulture;
+        base.OnInitialized();
+    }
+
+    private void SetCulture(CultureInfo newCulture)
+    {
+        if (newCulture == CultureInfo.CurrentCulture) return;
+
+        var uri = new Uri(nav.Uri).GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
+        var cultureEscaped = Uri.EscapeDataString(newCulture.Name);
+        var uriEscaped = Uri.EscapeDataString(uri);
+
+        nav.NavigateTo($"/Culture/Set?culture={cultureEscaped}&redirectUri={uriEscaped}", true);
+    }
+}

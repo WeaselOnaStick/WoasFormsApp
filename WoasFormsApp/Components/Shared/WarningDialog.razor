@@ -14,8 +14,8 @@
         </MudText>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">@(CancelText ?? "Cacnel")</MudButton>
-        <MudButton OnClick="Confirm" Color="Color.Error">@(ConfirmText ?? "Confirm")</MudButton>
+        <MudButton OnClick="Cancel">@(CancelText ?? loc["CANCEL"])</MudButton>
+        <MudButton OnClick="Confirm" Color="Color.Error">@(ConfirmText ?? loc["CONFIRM"])</MudButton>
     </DialogActions>
 </MudDialog>
 

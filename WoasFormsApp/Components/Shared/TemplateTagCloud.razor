@@ -16,7 +16,7 @@
                 <CardHeaderContent>
                     <MudIcon Icon="@Icons.Material.Filled.Cloud" />
                     <MudText Inline="true" Style="vertical-align: middle">
-                        Tag Cloud
+                        @loc["TAG_CLOUD"]
                     </MudText>
                 </CardHeaderContent>
             </MudCardHeader>
@@ -36,13 +36,14 @@
                     </defs>
                     @foreach (var (item, fontSize) in items)
                     {
+                        const string format = "0.##";
                         var x = MathF.Round((float)(item.Location.X - item.Measured.Left),2);
                         var y = MathF.Round((float)(item.Location.Y - item.Measured.Top), 2);
                         var fs = MathF.Round((float)fontSize,0);
                         var color = wcg.GetColorHexString(item);
                         <text>
                             <a href=@($"/SearchTemplate?tag={item.Entry.Word}")>
-                                <text font-family="Roboto, Helvetica, Arial, sans-serif" transform="translate(@x, @y)" font-size="@fs" fill="#FFFFFF" filter="url(#textOutline)">@item.Entry.Word</text>
+                                <text font-family="Roboto, Helvetica, Arial, sans-serif" transform=@($"translate({x.ToString(format, CultureInfo.InvariantCulture)}, {y.ToString(format, CultureInfo.InvariantCulture)})") font-size="@fs" fill="#FFFFFF" filter="url(#textOutline)">@item.Entry.Word</text>
                             </a>
                         </text>
                     }
@@ -72,6 +73,7 @@
         HEIGHT = config.GetSection("WoasForms").GetValue<int?>("TagCloudHeight") ?? HEIGHT;
         MINFONTSIZE = config.GetSection("WoasForms").GetValue<int?>("TagCloudMinFontSize") ?? MINFONTSIZE;
         MAXFONTSIZE = config.GetSection("WoasForms").GetValue<int?>("TagCloudMaxFontSize") ?? MAXFONTSIZE;
+        var typeface = SKTypeface.FromFamilyName("Roboto, Helvetica, Arial, sans-serif", SKFontStyle.Normal);
 
         var _counts = await dba.GetTemplateCountsByTag();
         IEnumerable<WordCloudEntry> wordEntries = _counts.Select(p => new WordCloudEntry(p.Key.Title, p.Value));
@@ -84,7 +86,7 @@
                 ItemMargin = 4,
             };
         var sizer = new LogSizer(wordCloud);
-        var engine = new SkGraphicEngine(sizer, wordCloud);
+        var engine = new SkGraphicEngine(sizer, wordCloud, typeface);
         var layout = new SpiralLayout(wordCloud);
         var colorizer = new RandomColorizer(); // optional
         wcg = new WordCloudGenerator<SKBitmap>(wordCloud, engine, layout);

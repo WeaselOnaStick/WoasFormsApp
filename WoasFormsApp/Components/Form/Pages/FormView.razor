@@ -11,7 +11,8 @@
 }
 else
 {
-    <PaperCenter PageTitle=@($"Form for Template {TemplateTitleOrUnnamed(_template)}")>
+
+    <PaperCenter PageTitle=@loc["FORM_VIEW_HEADER_F", TemplateTitleOrUnnamed(_template, loc)]>
         <TemplateToolbar Item="@_template" />
         <TemplateMetaInfo Item="@_template" />
 

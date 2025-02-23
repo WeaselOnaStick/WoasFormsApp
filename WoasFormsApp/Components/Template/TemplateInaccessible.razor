@@ -1,11 +1,15 @@
-﻿<PageTitle>Template Missing</PageTitle>
+﻿<PageTitle>
+    @loc["TEMPLATE_MISSING"]
+</PageTitle>
 
 <MudGrid Justify="Justify.Center" Class="p-12 pt-15">
     <MudItem xs="10">
         <MudPaper Class="mb-50">
             <MudStack AlignItems="AlignItems.Center">
-                <MudText Align="Align.Center" Typo="Typo.h3" Class="pt-4">Template not found <br /> or you don't have permission</MudText>
-                <MudLink Typo="Typo.subtitle1" Href="/" Class="pb-8">Click here to return to home page</MudLink>
+                <MudText Align="Align.Center" Typo="Typo.h3" Class="pt-4">
+                    @loc["TEMPLATE_MISSING_DESC"]
+                </MudText>
+                <MudLink Typo="Typo.subtitle1" Href="/" Class="pb-8">@loc["CLICK_TO_GO_HOME"]</MudLink>
             </MudStack>
         </MudPaper>
     </MudItem>

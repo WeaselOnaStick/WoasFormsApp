@@ -3,21 +3,22 @@
 @inject NavigationManager nav
 @inject ISnackbar snack
 
+
 @if(Enabled)
 {
     @if (ShowViewButton)
     {
-        <MudFab Class="p-2 m-1" Href=@($"/Template/{Item.Id}") StartIcon="@Icons.Material.Filled.Description" Variant="Variant.Outlined" Color="Color.Info" Label="Template Page" />
+        <MudFab Class="p-2 m-1" Href=@($"/Template/{Item.Id}") StartIcon="@Icons.Material.Filled.Description" Variant="Variant.Outlined" Color="Color.Info" Label=@loc["TEMPLATE_PAGE"] />
     }
     @if(ShowEditButton)
     {
-        <MudFab Class="p-2 m-1" Href=@($"/Template/{Item.Id}/Edit") StartIcon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Secondary" Label="Edit"/>
+        <MudFab Class="p-2 m-1" Href=@($"/Template/{Item.Id}/Edit") StartIcon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Secondary" Label=@loc["EDIT_TEMPLATE"]/>
     }
     @if(ShowAnalyticsButton)
     {
-        <MudFab Class="p-2 m-1" Href=@($"/Template/{Item.Id}/Analytics") StartIcon="@Icons.Material.Filled.Analytics" Variant="Variant.Outlined" Color="Color.Tertiary" Label="Analytics"/>
+        <MudFab Class="p-2 m-1" Href=@($"/Template/{Item.Id}/Analytics") StartIcon="@Icons.Material.Filled.Analytics" Variant="Variant.Outlined" Color="Color.Tertiary" Label=@loc["ANALYTICS"]/>
     }
-        <MudFab Class="p-2 m-1" OnClick="DeleteTemplate" StartIcon="@Icons.Material.Filled.DeleteForever" Variant="Variant.Outlined" Color="Color.Error" Label="Delete Template" />
+        <MudFab Class="p-2 m-1" OnClick="DeleteTemplate" StartIcon="@Icons.Material.Filled.DeleteForever" Variant="Variant.Outlined" Color="Color.Error" Label=@loc["DELETE_TEMPLATE"] />
 
 }
 
@@ -45,8 +46,8 @@
     {
         var options = new DialogParameters<WarningDialog>
         {
-            {x => x.DialogTitle, "Confirm Delete" },
-            {x => x.DialogText, $"Are you sure you want to delete template ?"},
+            {x => x.DialogTitle, loc["CONFIRM_DELETE"] },
+            {x => x.DialogText, loc["CONFIRM_DELETE_DESC"]},
             {x => x.DialogIcon, Icons.Material.Filled.DeleteForever }
         };
         var dialog = await DialogService.ShowAsync<WarningDialog>(null, options);
@@ -54,7 +55,7 @@
         if (!res.Canceled)
         {
             await dba.DeleteTemplate(Item.Id);
-            snack.Add("Template Deleted", Severity.Success);
+            snack.Add(loc["TEMPLATE_DELETED"], Severity.Success);
             nav.Refresh(true);
         }
     }

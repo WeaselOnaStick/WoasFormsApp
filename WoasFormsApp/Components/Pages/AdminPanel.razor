@@ -9,28 +9,30 @@
 
 @attribute [Authorize(Roles = "Admin")]
 
-<PageTitle>Admin Control Panel</PageTitle>
+<PageTitle>@loc["ADMIN_PANEL"]</PageTitle>
 
 <MudPaper Class="d-flex flex-column pa-4 mx-auto align-center gap-4 justify-center text-center" Style="max-width: fit-content">
 
-    <MudText Typo="Typo.h2" Align="Align.Center">Admin Dashboard</MudText>
+    <MudText Typo="Typo.h2" Align="Align.Center">@loc["ADMIN_PANEL"]</MudText>
 
-    <MudButtonGroup Variant="Variant.Filled" Color="Color.Error">
-        <MudButton OnClick="GiveAdmins"     StartIcon="@Icons.Material.Filled.AddModerator">Give Admin</MudButton>
-        <MudButton OnClick="RevokeAdmins"   StartIcon="@Icons.Material.Filled.RemoveModerator">Remove Admin</MudButton>
-        <MudButton OnClick="DeleteUsers"    StartIcon="@Icons.Material.Filled.PersonOff">Delete Users</MudButton>
-        <MudButton OnClick="BlockUsers"     StartIcon="@Icons.Material.Filled.LockPerson">Block Users</MudButton>
-        <MudButton OnClick="UnblockUsers"   StartIcon="@Icons.Material.Filled.LockOpen">Unblock users</MudButton>
-    </MudButtonGroup>
+    <MudGrid>
+        @foreach (var adminAction in adminActions)
+        {
+            <MudButton OnClick=@(async () => await ExecuteAdminActionWithDialog(adminAction)) >
+                @adminAction.ButtonText
+            </MudButton>
+        }
+    </MudGrid>
+
     <MudDataGrid T="UserRoleModel" Items="_users" @bind-SelectedItems=_selected MultiSelection="true">
         <Columns>
             <SelectColumn />
-            <PropertyColumn Title="Username" Property="x => x.user.UserName" />
-            <PropertyColumn Title="Email" Property="x => x.user.Email" />
-            <PropertyColumn Title="Owned Templates" Property="x => x.user.OwnedTemplates.Count" />
-            <PropertyColumn Title="Blocked" Property="x => x.user.IsBlocked" />
-            <PropertyColumn Title="Account Created" Property="x => x.user.RegisteredAt" />
-            <TemplateColumn Title="Roles">
+            <PropertyColumn Title=@loc["USERNAME"] Property="x => x.user.UserName" />
+            <PropertyColumn Title=@loc["USER_EMAIL"] Property="x => x.user.Email" />
+            <PropertyColumn Title=@loc["USER_OWNED_TEMPLATES_COUNT"] Property="x => x.user.OwnedTemplates.Count" />
+            <PropertyColumn Title=@loc["USER_BLOCKED_STATUS"] Property="x => x.user.IsBlocked" />
+            <PropertyColumn Title=@loc["USER_ACCOUNT_CREATED_AT"] Property="x => x.user.RegisteredAt" />
+            <TemplateColumn Title=@loc["USER_ROLES"]>
                 <CellTemplate>
                     <MudChipSet ReadOnly="true" AllClosable="false">
                         @foreach (var item in context.Item.roles)
@@ -48,12 +50,71 @@
 </MudPaper>
 
 @code {
-    private HashSet<UserRoleModel> _selected;
+    public class AdminActionInfo
+    {
+        public required Func<UserRoleModel, Task> Action { get; init; }
+        public required string ButtonText { get; init; }
+        public string? Icon { get; init; }
+        public required string DialogTitleText { get; init; }
+        public required string DialogContentTextFormatted { get; init; }
+        public required string SuccessTextFormatted { get; init; }
+    }
+    private List<AdminActionInfo> adminActions = new();
+
+    private HashSet<UserRoleModel> _selected = new();
 
     private List<UserRoleModel> _users;
 
     protected override async Task OnInitializedAsync()
     {
+        adminActions = new(){
+            new AdminActionInfo // GIVE ADMIN
+                {
+                    Action = async view => await dba.GiveUserRole(view.user.Id, "admin"),
+                    ButtonText = loc["ADMIN_ACTION_PROMOTE_ADMIN"],
+                    Icon = Icons.Material.Filled.AddModerator,
+                    DialogTitleText = loc["ADMIN_ACTION_PROMOTE_ADMIN_DIALOG_HEADER"],
+                    DialogContentTextFormatted = loc["ADMIN_ACTION_PROMOTE_ADMIN_DIALOG_TEXT_F", _selected.Count],
+                    SuccessTextFormatted = loc["ADMIN_ACTION_PROMOTE_ADMIN_SUCCESS_F", _selected.Count],
+                },
+            new AdminActionInfo // REVOKE ADMIN
+                {
+                    Action = async view => await dba.RevokeUserRole(view.user.Id, "admin"),
+                    ButtonText = loc["ADMIN_ACTION_DEMOTE_ADMIN"],
+                    Icon = Icons.Material.Filled.RemoveModerator,
+                    DialogTitleText = loc["ADMIN_ACTION_DEMOTE_ADMIN_DIALOG_HEADER"],
+                    DialogContentTextFormatted = loc["ADMIN_ACTION_DEMOTE_ADMIN_DIALOG_TEXT_F", _selected.Count],
+                    SuccessTextFormatted = loc["ADMIN_ACTION_DEMOTE_ADMIN_SUCCESS_F", _selected.Count],
+                },
+            new AdminActionInfo // BLOCK
+                {
+                    Action = async view => await dba.BlockUser(view.user.Id),
+                    ButtonText = loc["ADMIN_ACTION_BLOCK_USERS"],
+                    Icon = Icons.Material.Filled.LockPerson,
+                    DialogTitleText = loc["ADMIN_ACTION_BLOCK_USERS_DIALOG_HEADER"],
+                    DialogContentTextFormatted = loc["ADMIN_ACTION_BLOCK_USERS_DIALOG_TEXT_F", _selected.Count],
+                    SuccessTextFormatted = loc["ADMIN_ACTION_BLOCK_USERS_SUCCESS_F", _selected.Count],
+                },
+            new AdminActionInfo // UNBLOCK
+                {
+                    Action = async view => await dba.UnblockUser(view.user.Id),
+                    ButtonText = loc["ADMIN_ACTION_UNBLOCK_USERS"],
+                    Icon = Icons.Material.Filled.LockOpen,
+                    DialogTitleText = loc["ADMIN_ACTION_UNBLOCK_USERS_DIALOG_HEADER"],
+                    DialogContentTextFormatted = loc["ADMIN_ACTION_UNBLOCK_USERS_DIALOG_TEXT_F", _selected.Count],
+                    SuccessTextFormatted = loc["ADMIN_ACTION_UNBLOCK_USERS_SUCCESS_F", _selected.Count],
+                },
+            new AdminActionInfo // DELETE
+                {
+                    Action = async view => await dba.DeleteUser(view.user.Id),
+                    ButtonText = loc["ADMIN_ACTION_DELETE_USERS"],
+                    Icon = Icons.Material.Filled.PersonOff,
+                    DialogTitleText = loc["ADMIN_ACTION_DELETE_USERS_DIALOG_HEADER"],
+                    DialogContentTextFormatted = loc["ADMIN_ACTION_DELETE_USERS_DIALOG_TEXT_F", _selected.Count],
+                    SuccessTextFormatted = loc["ADMIN_ACTION_DELETE_USERS_SUCCESS_F", _selected.Count],
+                },
+            };
+
         var formUsers = await dba.GetAllUsers();
         if (formUsers?.Any() != true) return; //Paradox
         _users = formUsers.Select(u => new UserRoleModel
@@ -69,59 +130,23 @@
         required public List<string> roles { get; set; }
     }
 
-    private async Task AdminAction(string DialogTitleText, string DialogContentTextFormatted, string? DialogIcon, string SuccessTextFormatted, Func<WoasFormsAppUser, Task> action)
+    private async Task ExecuteAdminActionWithDialog(AdminActionInfo actionInfo)
     {
-        DialogContentTextFormatted = string.Format(DialogContentTextFormatted, _selected.Count);
-        SuccessTextFormatted = string.Format(SuccessTextFormatted, _selected.Count);
+        if (_selected?.Count == 0) return;
         var options = new DialogParameters<WarningDialog>
         {
-            {x => x.DialogTitle, DialogTitleText },
-            {x => x.DialogText, DialogContentTextFormatted},
-            {x => x.DialogIcon, DialogIcon}
+            {x => x.DialogTitle, actionInfo.DialogTitleText },
+            {x => x.DialogText, actionInfo.DialogContentTextFormatted},
+            {x => x.DialogIcon, actionInfo.Icon}
         };
-        var dialog = await DialogService.ShowAsync<WarningDialog>(DialogTitleText, options);
+        var dialog = await DialogService.ShowAsync<WarningDialog>(actionInfo.DialogTitleText, options);
         var res = await dialog.Result;
         if (!res.Canceled)
         {
-            foreach (var user in _selected.Select(x=>x.user))
-                await action(user);
-            snack.Add(SuccessTextFormatted, Severity.Success);
+            foreach (var user in _selected) 
+                await actionInfo.Action(user);
+            snack.Add(actionInfo.SuccessTextFormatted, Severity.Success);
         }
         StateHasChanged();
-    }
-
-    private async Task GiveAdmins() => await AdminAction(
-        $"Confirm Giving Roles",
-        "Are you sure you want to give admin to {0} users?",
-        Icons.Material.Filled.AddModerator,
-        "Successfully gave admin to {0} users",
-        async x => await dba.GiveUserRole(x.Id, "admin"));
-
-    private async Task RevokeAdmins() => await AdminAction(
-        $"Confirm Revoking Roles",
-        "Are you sure you want to revoke admin from {0} users?",
-        Icons.Material.Filled.RemoveModerator,
-        "Successfully removed admin from {0} users",
-        async x => await dba.RevokeUserRole(x.Id, "admin"));
-
-    private async Task BlockUsers() => await AdminAction(
-        $"Confirm Block",
-        "Are you sure you want to block {0} users? Blocked users can't log in unless they're admins",
-        Icons.Material.Filled.LockPerson,
-        "Successfully blocked {0} users",
-        async x => await dba.BlockUser(x.Id));
-
-    private async Task UnblockUsers() => await AdminAction(
-        $"Confirm Unblock",
-        "Are you sure you want to unblock {0} users?",
-        Icons.Material.Filled.LockOpen,
-        "Successfully unblocked {0} users",
-        async x => await dba.UnblockUser(x.Id));
-
-    private async Task DeleteUsers() => await AdminAction(
-        $"Confirm Delete",
-        "Are you sure you want to delete {0} users?",
-        Icons.Material.Filled.PersonOff,
-        "Successfully deleted {0} users",
-        async x => await dba.DeleteUser(x.Id));
+    }   
 }

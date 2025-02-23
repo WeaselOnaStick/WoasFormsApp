@@ -11,13 +11,14 @@
 }
 else
 {
-    <PaperCenter PageTitle=@($"Filling Form for Template {_template.Title}")>
+
+    <PaperCenter PageTitle=@loc["FORM_FILLING_HEADER_F", TemplateTitleOrUnnamed(_template, loc)]>
         <MudForm Model="_response" @ref=form>
-            <MudText style="white-space: nowrap; max-width: fit-content" Class="pt-4 px-4 pb-1" Align="Align.Center" Typo="Typo.h2">@_template.Title</MudText>
-            <MudText Class="px-4" Typo="Typo.body1" style="font-style: italic;">Created by <b>@(_template.Owner.UserName ?? "(Orphan Template)")</b> on @(_template.CreatedAt.ToLocalTime().ToLongDateString()) @(_template.CreatedAt.ToLocalTime().ToShortTimeString()) </MudText>
+
+            <MudText Class="px-4" Typo="Typo.body1" style="font-style: italic;">@loc["CREATED_BY_F", (_template.Owner.UserName ?? "(Orphan Template)")] - @(_template.CreatedAt.ToLocalTime().ToLongDateString()) @(_template.CreatedAt.ToLocalTime().ToShortTimeString()) </MudText>
             <div class="p-4">
                 <MudPaper Class="p-4 m-6 mud-background-gray">
-                    <MudMarkdown Value="@(string.IsNullOrWhiteSpace(_template.Description) ? "__(No Description Provided)__" : _template.Description)"></MudMarkdown>
+                    <MudMarkdown Value="@(string.IsNullOrWhiteSpace(_template.Description) ? loc["NO_DESCRIPTION_MARKDOWN"] : _template.Description)"></MudMarkdown>
                 </MudPaper>
 
             </div>
@@ -28,7 +29,7 @@ else
                 }
             <div class="mt-6 px-4 m-4 align-self-center">
                 <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="SubmitForm" Class="rounded-5 flex-shrink">
-                    <MudText Typo="Typo.h6"> Submit Form </MudText>
+                    <MudText Typo="Typo.h6">@loc["SUBMIT_FORM"]</MudText>
                 </MudButton>
             </div>
         </MudForm>
@@ -63,11 +64,11 @@ else
         var res = await dba.CreateResponse(_response);
         if (res == null)
         {
-            snack.Add("There was an error submitting the form", Severity.Error);
+            snack.Add(loc["FORM_FILL_FAIL"], Severity.Error);
         }
         else
         {
-            snack.Add("Form submitted successfully", Severity.Success);
+            snack.Add(loc["FORM_FILL_SUCCESS"], Severity.Success);
             nav.NavigateTo($"/Form/{res.Id}");
         }
     }

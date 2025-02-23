@@ -6,13 +6,17 @@
 
 <PaperCenter PageTitle="@headerText">
     <div style="display: grid; justify-items: center;">
-        <MudMenu Label=@($"Search Options ({_modesCache[currentMode].DisplayName})") Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FilterList" Class="p-2">
+
+        <MudMenu Label=@(string.Format("{0} ({1})", loc["SEARCH_TEMPLATE_OPTIONS"], loc[_modesCache[currentMode].DisplayName])) 
+        Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FilterList" Class="p-2">
             @foreach (var kv in _modesCache)
             {
-                <MudMenuItem Label=@kv.Value.DisplayName OnClick="async () => await FetchTemplates(kv.Key)" ForceLoad="true" Icon="@kv.Value.Icon"/>
+                <MudMenuItem Label=@loc[kv.Value.DisplayName] OnClick="async () => await FetchTemplates(kv.Key)" ForceLoad="true" Icon="@kv.Value.Icon"/>
             }
         </MudMenu>
-        <TemplatesGallery Mode="Components.Template.TemplatesGallery.GalleryMode.CustomList" CustomTemplates="_searchResults"/>
+        <TemplatesGallery 
+        Mode="Components.Template.TemplatesGallery.GalleryMode.CustomList" 
+        CustomTemplates="_searchResults"/>
     </div>
 </PaperCenter>
 
@@ -21,7 +25,7 @@
     private List<Template>? _searchResults;
     private TemplateOrderMode defaultMode = TemplateOrderMode.Newest;
 
-    private TemplateOrderMode currentMode = default;
+    private TemplateOrderMode currentMode;
 
     [Parameter]
     [SupplyParameterFromQuery(Name = "search")]
@@ -41,24 +45,18 @@
 
     private string headerText = "";
 
-
-
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        headerText = "Template Search ({0})";
-        bool UseParamInHeader(string? x, string format)
-        {
-            bool use = !string.IsNullOrWhiteSpace(x);
-            if (use) headerText = string.Format(headerText, format);
-            return use;
-        }
-
-        if (!(
-            UseParamInHeader(searchString, $"\"{searchString}\"") ||
-            UseParamInHeader(searchAuthor, $"By user: {searchAuthor}") ||
-            UseParamInHeader(searchTag, $"By tag: {searchTag}") ||
-            UseParamInHeader(searchTopic, $"By topic: {searchTopic}")))
-            headerText = "Template Search";
+        if (!string.IsNullOrWhiteSpace(searchString))
+            headerText = loc["SEARCH_TEMPLATE_HEADER_QUERY_FORMATTED", searchString];
+        else if (!string.IsNullOrWhiteSpace(searchAuthor))
+            headerText = loc["SEARCH_TEMPLATE_HEADER_USER_FORMATTED", searchAuthor];
+        else if (!string.IsNullOrWhiteSpace(searchTag))
+            headerText = loc["SEARCH_TEMPLATE_HEADER_TAG_FORMATTED", searchTag];
+        else if (!string.IsNullOrWhiteSpace(searchTopic))
+            headerText = loc["SEARCH_TEMPLATE_HEADER_TOPIC_FORMATTED", searchTopic];
+        else
+            headerText = loc["SEARCH_TEMPLATE_HEADER_BLANK"];
 
         _modesCache = dba.GetTemplateOrdersData();
         currentMode = defaultMode;
@@ -67,8 +65,11 @@
 
     private async Task FetchTemplates(TemplateOrderMode order)
     {
-        currentMode = order;
-        _searchResults = new List<Template>(await dba.SearchTemplates(order, searchString, searchAuthor, searchTag, searchTopic));
-        StateHasChanged();
+        if (_searchResults == null || currentMode != order)
+        {
+            currentMode = order;
+            _searchResults = new List<Template>(await dba.SearchTemplates(order, searchString, searchAuthor, searchTag, searchTopic));
+            StateHasChanged();
+        }
     }
 }

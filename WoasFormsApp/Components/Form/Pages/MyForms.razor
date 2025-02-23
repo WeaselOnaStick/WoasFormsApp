@@ -4,22 +4,22 @@
 
 @attribute [Authorize]
 
-<PaperCenter PageTitle="My Forms">
+<PaperCenter PageTitle=@loc["MY_FORMS"]>
     @if (_responses == null || !_responses.Any()){
         <MudText>
-            You have not filled any forms yet.
+            @loc["MY_FORMS_EMPTY"]
         </MudText>
         <MudLink Href="/">
-            Browse Templates
+            @loc["BROWSE_TEMPLATES"]
         </MudLink>
     }
     else
     {
         <MudDataGrid T="Response" Items="_responses" Elevation="2" Striped="true" Dense="true">
             <Columns>
-                <PropertyColumn Property="@(r => (r.Template == null || r.Template.Owner == null) ? "No Owner (Orphan Template)" : r.Template.Owner.UserName)" Title="Template Author"/>
-                <PropertyColumn Property="@(r => (r.Template == null || string.IsNullOrWhiteSpace(r.Template.Title)) ? "Unnamed Template" : r.Template.Title )" Title="Template Title" />
-                <PropertyColumn Property="r => r.CreationDate" Title="Filled On" Sortable="true" InitialDirection="SortDirection.Descending"/>
+                <PropertyColumn Property="@(r => (r.Template == null || r.Template.Owner == null) ? "No Owner (Orphan Template)" : r.Template.Owner.UserName)" Title=@loc["TEMPLATE_AUTHOR"]/>
+                <PropertyColumn Property="@(r => (r.Template == null || string.IsNullOrWhiteSpace(r.Template.Title)) ? "Unnamed Template" : r.Template.Title )" Title=@loc["TEMPLATE_TITLE"] />
+                <PropertyColumn Property="r => r.CreationDate" Title=@loc["FORM_FILLED_ON"] Sortable="true" InitialDirection="SortDirection.Descending"/>
                 <TemplateColumn>
                     <CellTemplate>
                         <MudFab Size="Size.Small" Href="@($"/Form/{context.Item.Id}")" StartIcon="@Icons.Material.Filled.Visibility" Color="Color.Info" Disabled=@(context.Item.Template == null)/>

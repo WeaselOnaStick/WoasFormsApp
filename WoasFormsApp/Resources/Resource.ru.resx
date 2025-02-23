@@ -123,6 +123,21 @@
   <data name="ADD_TAG" xml:space="preserve">
     <value>Добавить тэг</value>
   </data>
+  <data name="ADMIN_ACTION_BLOCK_USERS" xml:space="preserve">
+    <value>Заблокировать пользователей</value>
+  </data>
+  <data name="ADMIN_ACTION_DELETE_USERS" xml:space="preserve">
+    <value>Удалить пользователей</value>
+  </data>
+  <data name="ADMIN_ACTION_DEMOTE_ADMIN" xml:space="preserve">
+    <value>Забрать права администратора</value>
+  </data>
+  <data name="ADMIN_ACTION_PROMOTE_ADMIN" xml:space="preserve">
+    <value>Выдать права администратора</value>
+  </data>
+  <data name="ADMIN_ACTION_UNBLOCK_USERS" xml:space="preserve">
+    <value>Разблокировать пользователей</value>
+  </data>
   <data name="ADMIN_PANEL" xml:space="preserve">
     <value>Администрация</value>
   </data>
@@ -215,6 +230,10 @@
   </data>
   <data name="Education" xml:space="preserve">
     <value>Образование</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="EMAIL" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
   </data>
   <data name="ERROR" xml:space="preserve">
     <value>Ошибка</value>
@@ -312,6 +331,15 @@
   <data name="RESPONSES" xml:space="preserve">
     <value>Формы</value>
   </data>
+  <data name="SEARCH_TEMPLATE_COMMENTS_A" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="SEARCH_TEMPLATE_HEADER_BLANK" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="SEARCH_TEMPLATE_OPTIONS" xml:space="preserve">
+    <value>Поиск</value>
+  </data>
   <data name="SEARCH_USER_TO_WHITELIST" xml:space="preserve">
     <value>Добавить пользователя в белый список</value>
   </data>
@@ -402,11 +430,23 @@
   <data name="USERNAME" xml:space="preserve">
     <value>Имя пользователя</value>
   </data>
+  <data name="USER_ACCOUNT_CREATED_AT" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="USER_BLOCKED_STATUS" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="USER_EMAIL" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
   <data name="USER_IS_BLOCKED" xml:space="preserve">
     <value>Пользователь заблокирован</value>
   </data>
   <data name="USER_LOGGED_IN" xml:space="preserve">
     <value>Вход выполнен</value>
+  </data>
+  <data name="USER_ROLES" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
   </data>
   <data name="VALID_FIELD_MISSING_TITLE" xml:space="preserve">
     <value>У поля №{0} отсутствует название!</value>
@@ -434,5 +474,71 @@
   </data>
   <data name="WOASFORMS" xml:space="preserve">
     <value>WoasForms</value>
+  </data>
+  <data name="WOASFORMS_HOME_TOP5" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="WOASFORMS_TITLE" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="ADMIN_ACTION_PROMOTE_ADMIN_DIALOG_HEADER" xml:space="preserve">
+    <value>Подтвердите выдачу ролей</value>
+  </data>
+  <data name="ADMIN_ACTION_PROMOTE_ADMIN_DIALOG_TEXT_F" xml:space="preserve">
+    <value>Вы уверены, что хотите выдать роль {0} пользователю? (-ям)</value>
+  </data>
+  <data name="ADMIN_ACTION_PROMOTE_ADMIN_SUCCESS_F" xml:space="preserve">
+    <value>Роли успешно выданы {0} пользователю (-ям)</value>
+  </data>
+  <data name="ADMIN_ACTION_DEMOTE_ADMIN_DIALOG_HEADER" xml:space="preserve">
+    <value>Подтвердите изъятие ролей</value>
+  </data>
+  <data name="ADMIN_ACTION_DEMOTE_ADMIN_SUCCESS_F" xml:space="preserve">
+    <value>{0} пользователей успешно лишены прав администратора</value>
+  </data>
+  <data name="ADMIN_ACTION_DEMOTE_ADMIN_DIALOG_TEXT_F" xml:space="preserve">
+    <value>Вы уверены, что хотите лишить {0} пользователей прав администратора?</value>
+  </data>
+  <data name="ADMIN_ACTION_BLOCK_USERS_DIALOG_HEADER" xml:space="preserve">
+    <value>Подтвердите блокировку пользователей</value>
+  </data>
+  <data name="ADMIN_ACTION_BLOCK_USERS_DIALOG_TEXT_F" xml:space="preserve">
+    <value>Вы уверены, что хотите удалить {0} пользователей?</value>
+  </data>
+  <data name="ADMIN_ACTION_BLOCK_USERS_SUCCESS_F" xml:space="preserve">
+    <value>{0} пользователей успешно заблокированы</value>
+  </data>
+  <data name="ADMIN_ACTION_UNBLOCK_USERS_DIALOG_HEADER" xml:space="preserve">
+    <value>Подтвердите разблокировку пользователей</value>
+  </data>
+  <data name="ADMIN_ACTION_UNBLOCK_USERS_DIALOG_TEXT_F" xml:space="preserve">
+    <value>Вы уверены, что хотите разблокировать {0} пользователей?</value>
+  </data>
+  <data name="ADMIN_ACTION_UNBLOCK_USERS_SUCCESS_F" xml:space="preserve">
+    <value>{0} пользователей успешно разблокированы</value>
+  </data>
+  <data name="ADMIN_ACTION_DELETE_USERS_DIALOG_HEADER" xml:space="preserve">
+    <value>Подтвердите удаление пользователей</value>
+  </data>
+  <data name="ADMIN_ACTION_DELETE_USERS_DIALOG_TEXT_F" xml:space="preserve">
+    <value>Вы уверены, что хотите удалить {0} пользователей?</value>
+  </data>
+  <data name="ADMIN_ACTION_DELETE_USERS_SUCCESS_F" xml:space="preserve">
+    <value>{0} пользователей успешно удалены</value>
+  </data>
+  <data name="PAGE_NOT_FOUND_404" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="SEARCH" xml:space="preserve">
+    <value>Поиск</value>
+  </data>
+  <data name="SEARCH_TEMPLATE_PLACEHOLDER" xml:space="preserve">
+    <value>Искать шаблоны</value>
+  </data>
+  <data name="MY_FORMS_EMPTY" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="TEMPLATE_AUTHOR" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
   </data>
 </root>

@@ -20,10 +20,12 @@ builder.Services.AddScoped<IUserPrefService<bool>,      ThemePrefsService>(facto
 {
     return new ThemePrefsService(factory.GetRequiredService<ILocalStorageService>());
 });
-builder.Services.AddScoped<IUserPrefService<string>,    LocalePrefsService>(factory =>
-{
-    return new LocalePrefsService(factory.GetRequiredService<ILocalStorageService>());
-});
+
+// .NET Localization handles this already
+//builder.Services.AddScoped<IUserPrefService<string>,    LocalePrefsService>(factory =>
+//{
+//    return new LocalePrefsService(factory.GetRequiredService<ILocalStorageService>());
+//});
 
 builder.Services.AddFluentValidationAutoValidation();
 

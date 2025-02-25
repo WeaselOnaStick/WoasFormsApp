@@ -59,50 +59,52 @@ else
                 var templateView = templates[realIndex];
 
                 <MudItem>
-                    <MudCard>
-                        <MudCardHeader>
-                            <CardHeaderActions> 
-                                <MudContainer Class="p-2">
-                                    <AuthorizeView>
-                                        <Authorized>
-                                            <MudChip T="int" OnClick="async () => await TemplateLike(templateView)"
-                                            Variant="@(templateView.liked ? Variant.Filled : Variant.Text)"
-                                            Color="@(templateView.liked ? Color.Primary : Color.Surface)"
-                                            Icon="@(templateView.liked ? Icons.Material.Filled.Favorite : Icons.Material.Outlined.FavoriteBorder)">@templateView.likes</MudChip>
-                                        </Authorized>
-                                        <NotAuthorized>
-                                            <MudChip T="int"
-                                            Variant="Variant.Filled"
-                                            Color="Color.Surface"
-                                            Icon="@Icons.Material.Filled.Favorite">@templateView.likes</MudChip>
-                                        </NotAuthorized>
-                                    </AuthorizeView>
+                    <MudBadge Elevation="3" Content=@loc[templateView.template.Topic.Title].Value Origin=Origin.TopCenter Color="Color.Secondary" Overlap="true" BadgeClass="template-gallery-topic-badge">
+                        <MudCard Elevation="3">
+                            <MudCardHeader>
+                                <CardHeaderActions> 
+                                    <MudContainer Class="p-2">
+                                        <AuthorizeView>
+                                            <Authorized>
+                                                <MudChip T="int" OnClick="async () => await TemplateLike(templateView)"
+                                                Variant="@(templateView.liked ? Variant.Filled : Variant.Text)"
+                                                Color="@(templateView.liked ? Color.Primary : Color.Surface)"
+                                                Icon="@(templateView.liked ? Icons.Material.Filled.Favorite : Icons.Material.Outlined.FavoriteBorder)">@templateView.likes</MudChip>
+                                            </Authorized>
+                                            <NotAuthorized>
+                                                <MudChip T="int"
+                                                Variant="Variant.Filled"
+                                                Color="Color.Surface"
+                                                Icon="@Icons.Material.Filled.Favorite">@templateView.likes</MudChip>
+                                            </NotAuthorized>
+                                        </AuthorizeView>
 
-                                    <MudChip T="int" Icon="@Icons.Material.Filled.Comment" Color="Color.Surface">@templateView.comments</MudChip>
+                                        <MudChip T="int" Icon="@Icons.Material.Filled.Comment" Color="Color.Surface">@templateView.comments</MudChip>
 
-                                    <MudChip T="int" Icon="@Icons.Material.Filled.Description" Color="Color.Surface">@templateView.responses</MudChip>
-                                </MudContainer>
+                                        <MudChip T="int" Icon="@Icons.Material.Filled.Description" Color="Color.Surface">@templateView.responses</MudChip>
+                                    </MudContainer>
 
-                            </CardHeaderActions>
-                            <CardHeaderContent>
-                                <MudText Typo="Typo.h6">@TemplateTitleOrUnnamed(templateView.template, loc)</MudText>
-                                @if(templateView.template.Owner != null)
-                                {
-                                    <MudText Inline="true" Typo="Typo.subtitle1" style="font-style: italic;">
-                                        <UsernameClickable UserName="@($"{templateView.template.Owner.UserName}\t")"/>
-                                    </MudText>
-                                    <MudText Inline="true" Typo="Typo.subtitle1">@(templateView.template.CreatedAt.ToLocalTime().ToShortDateString())</MudText>
-                                }
-                            </CardHeaderContent>
-                        </MudCardHeader>
-                        <MudCardMedia Style="width: 300px; height: 200px; align-self: center;"
-                        Image="@(string.IsNullOrWhiteSpace(templateView.template.CoverImageUrl) ? Assets["BlankThumbnail.png"] : templateView.template.CoverImageUrl)" />
-                        <MudCardActions Class="justify-space-around my-2">
-                            <MudButton 
-                                Class="rounded-pill" Variant="Variant.Filled" Color="Color.Info" 
-                                Href="@($"/Template/{templateView.template.Id}")">@loc["VIEW_TEMPLATE"]</MudButton>
-                        </MudCardActions>
-                    </MudCard>
+                                </CardHeaderActions>
+                                <CardHeaderContent>
+                                    <MudText Typo="Typo.h6">@TemplateTitleOrUnnamed(templateView.template, loc)</MudText>
+                                    @if(templateView.template.Owner != null)
+                                    {
+                                        <MudText Inline="true" Typo="Typo.subtitle1" style="font-style: italic;">
+                                            <UsernameClickable UserName="@($"{templateView.template.Owner.UserName}\t")"/>
+                                        </MudText>
+                                        <MudText Inline="true" Typo="Typo.subtitle1">@(templateView.template.CreatedAt.ToLocalTime().ToShortDateString())</MudText>
+                                    }
+                                </CardHeaderContent>
+                            </MudCardHeader>
+                            <MudCardMedia Style="width: 300px; height: 200px; align-self: center;"
+                            Image="@(string.IsNullOrWhiteSpace(templateView.template.CoverImageUrl) ? Assets["BlankThumbnail.png"] : templateView.template.CoverImageUrl)" />
+                            <MudCardActions Class="justify-space-around my-2">
+                                <MudButton 
+                                    Class="rounded-pill" Variant="Variant.Filled" Color="Color.Info" 
+                                    Href="@($"/Template/{templateView.template.Id}")">@loc["VIEW_TEMPLATE"]</MudButton>
+                            </MudCardActions>
+                        </MudCard>
+                    </MudBadge>
                 </MudItem>
             }
         }

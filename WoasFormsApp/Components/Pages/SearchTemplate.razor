@@ -7,12 +7,13 @@
 <PaperCenter PageTitle="@headerText">
     <div style="display: grid; justify-items: center;">
 
-        <MudMenu Label=@(string.Format("{0} ({1})", loc["SEARCH_TEMPLATE_OPTIONS"], loc[_modesCache[currentMode].DisplayName])) 
-        Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FilterList" Class="p-2">
-            @foreach (var kv in _modesCache)
-            {
-                <MudMenuItem Label=@loc[kv.Value.DisplayName] OnClick="async () => await FetchTemplates(kv.Key)" ForceLoad="true" Icon="@kv.Value.Icon"/>
-            }
+        <MudMenu 
+            Label=@(string.Format("{0} ({1})", loc["SEARCH_TEMPLATE_OPTIONS"], loc[_modesCache[currentMode].DisplayName])) 
+            Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FilterList" Class="p-2 mb-6">
+                @foreach (var kv in _modesCache)
+                {
+                    <MudMenuItem Label=@loc[kv.Value.DisplayName] OnClick="async () => await FetchTemplates(kv.Key)" ForceLoad="true" Icon="@kv.Value.Icon"/>
+                }
         </MudMenu>
         <TemplatesGallery 
         Mode="Components.Template.TemplatesGallery.GalleryMode.CustomList" 

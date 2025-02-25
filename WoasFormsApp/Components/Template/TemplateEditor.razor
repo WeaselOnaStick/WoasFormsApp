@@ -64,7 +64,7 @@
             Required="true" RequiredError=@loc["VALID_TOPIC_REQUIRED"]>
                 @foreach (var item in (_topicsCache ?? new()))
                 {
-                    <MudSelectItem Value="item.Id">@item.Title</MudSelectItem>
+                    <MudSelectItem Value="item.Id">@loc[@item.Title]</MudSelectItem>
                 }
             </MudSelect>
 

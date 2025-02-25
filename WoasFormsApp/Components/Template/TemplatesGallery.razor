@@ -100,8 +100,8 @@ else
                             Image="@(string.IsNullOrWhiteSpace(templateView.template.CoverImageUrl) ? Assets["BlankThumbnail.png"] : templateView.template.CoverImageUrl)" />
                             <MudCardActions Class="justify-space-around my-2">
                                 <MudButton 
-                                    Class="rounded-pill" Variant="Variant.Filled" Color="Color.Info" 
-                                    Href="@($"/Template/{templateView.template.Id}")">@loc["VIEW_TEMPLATE"]</MudButton>
+                                Class="rounded-pill" Variant="Variant.Filled" Color="Color.Info" 
+                                Href="@($"/Template/{templateView.template.Id}")">@loc["VIEW_TEMPLATE"]</MudButton>
                             </MudCardActions>
                         </MudCard>
                     </MudBadge>
@@ -194,7 +194,7 @@ else
                     responses = t.Responses.Count,
                 }
         ).ToList();
-        await base.OnInitializedAsync();
+        StateHasChanged();
     }
 
     public class TemplateView(){

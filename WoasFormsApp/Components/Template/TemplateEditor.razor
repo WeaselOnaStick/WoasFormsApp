@@ -41,7 +41,10 @@
                 ItemsSelector="@((_,_) => true)">
                     <ChildContent>
                         <MudDropZone T="TemplateField" AllowReorder="true" Identifier="Editor" Class="mud-black">
-                            <MudText Typo="Typo.h5" Align="Align.Center">Template Fields</MudText>
+                            <MudText 
+                                Typo="Typo.h5" Align="Align.Center">
+                                @loc["TEMPLATE_FIELDS"]
+                            </MudText>
                         </MudDropZone>
                     </ChildContent>
                     <ItemRenderer>
@@ -85,7 +88,7 @@
 
             <MudExpansionPanels>
                 <!-- AMMO -->
-                <MudExpansionPanel Text="Fields">
+                <MudExpansionPanel Text=@loc["TEMPLATE_FIELDS"]>
                     <MudButtonGroup Vertical="true" Variant="Variant.Outlined" Style="display: flex;">
                         @foreach (var item in (_fieldTypesCache ?? new()))
                         {

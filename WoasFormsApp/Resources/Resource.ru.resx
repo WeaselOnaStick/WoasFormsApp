@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ADD_FIELD" xml:space="preserve">
-    <value>Добавить {0}</value>
+    <value>{0}</value>
   </data>
   <data name="ADD_TAG" xml:space="preserve">
     <value>Добавить тэг</value>
@@ -304,7 +304,7 @@
     <value>Пароль</value>
   </data>
   <data name="PositiveInt" xml:space="preserve">
-    <value>Положительное целое число</value>
+    <value>Полож-ое целое число</value>
   </data>
   <data name="POST_A_COMMENT" xml:space="preserve">
     <value>Добавить комментарий</value>
@@ -602,5 +602,8 @@
   </data>
   <data name="FORM_FILL_REQUIRE_LOGIN" xml:space="preserve">
     <value>Перед заполнением формы войдите в аккаунт</value>
+  </data>
+  <data name="TEMPLATE_FIELDS" xml:space="preserve">
+    <value>Поля</value>
   </data>
 </root>

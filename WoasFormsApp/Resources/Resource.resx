@@ -603,4 +603,7 @@
   <data name="FORM_FILL_REQUIRE_LOGIN" xml:space="preserve">
     <value>Log in to Fill a Form</value>
   </data>
+  <data name="TEMPLATE_FIELDS" xml:space="preserve">
+    <value>Template Fields</value>
+  </data>
 </root>

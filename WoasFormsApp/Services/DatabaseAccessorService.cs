@@ -200,26 +200,26 @@ namespace WoasFormsApp.Services
 
         public async Task<IList<Template>> SearchTemplates(TemplateOrderMode order = TemplateOrderMode.Newest, string? query = default, string? username = default, string? tag = default, string? topic = default)
         {
-            var res = await GetAvailableTemplates();
+            var res = (await GetAvailableTemplates()).ToList();
 
             if (!string.IsNullOrWhiteSpace(query))
-                res = _ctx.Templates.Where(t =>
+                res = await _ctx.Templates.Where(t =>
                     (!string.IsNullOrWhiteSpace(t.Title) && (t.Title.Contains(query) || query.Contains(t.Title))) ||
                     (!string.IsNullOrWhiteSpace(t.Description) && (t.Description.Contains(query) || query.Contains(t.Description))) ||
                     t.Fields.Any(f => (!string.IsNullOrWhiteSpace(f.Title) &&  (f.Title.Contains(query) || query.Contains(f.Title)))) ||
                     t.Fields.Any(f => (!string.IsNullOrWhiteSpace(f.Description) && (f.Description.Contains(query) || query.Contains(f.Description))))
-                    );
+                    ).ToListAsync();
             
             if (!string.IsNullOrWhiteSpace(username))
-                res = res.Where(t => (t.Owner != null && t.Owner.UserName != null && t.Owner.UserName.Contains(username)));
+                res = res.Where(t => (t.Owner != null && t.Owner.UserName != null && t.Owner.UserName.Contains(username))).ToList();
 
             if (!string.IsNullOrWhiteSpace(tag))
                 res = res.Where(template => (template.Tags.Any(t => 
                 t.Title.Contains(tag) || tag.Contains(t.Title)
-                )));
+                ))).ToList();
 
             if (!string.IsNullOrWhiteSpace(topic))
-                res = res.Where(template => template.Topic.Title == topic);
+                res = res.Where(template => template.Topic.Title == topic).ToList();
 
             var curOrderModeData = TemplateOrdersData[order];
             return res.OrderByDirection(curOrderModeData.Direction, curOrderModeData.Selector).ToList();

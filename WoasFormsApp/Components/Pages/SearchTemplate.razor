@@ -8,12 +8,12 @@
     <div style="display: grid; justify-items: center;">
 
         <MudMenu 
-            Label=@(string.Format("{0} ({1})", loc["SEARCH_TEMPLATE_OPTIONS"], loc[_modesCache[currentMode].DisplayName])) 
-            Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FilterList" Class="p-2 mb-6">
-                @foreach (var kv in _modesCache)
-                {
-                    <MudMenuItem Label=@loc[kv.Value.DisplayName] OnClick="async () => await FetchTemplates(kv.Key)" ForceLoad="true" Icon="@kv.Value.Icon"/>
-                }
+        Label=@(string.Format("{0} ({1})", loc["SEARCH_TEMPLATE_OPTIONS"].Value, loc[_modesCache[currentMode].DisplayName].Value)) 
+        Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FilterList" Class="p-2 mb-6">
+            @foreach (var kv in _modesCache)
+            {
+                <MudMenuItem Label=@loc[kv.Value.DisplayName] OnClick="async () => await FetchTemplates(kv.Key)" ForceLoad="true" Icon="@kv.Value.Icon"/>
+            }
         </MudMenu>
         <TemplatesGallery 
         Mode="Components.Template.TemplatesGallery.GalleryMode.CustomList" 
@@ -23,7 +23,7 @@
 
 @code {
     private Dictionary<TemplateOrderMode, TemplateOrderModeData> _modesCache = new();
-    private List<Template>? _searchResults;
+    private List<Template> _searchResults = new();
     private TemplateOrderMode defaultMode = TemplateOrderMode.Newest;
 
     private TemplateOrderMode currentMode;
@@ -48,6 +48,9 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        _modesCache = dba.GetTemplateOrdersData();
+        currentMode = defaultMode;
+
         if (!string.IsNullOrWhiteSpace(searchString))
             headerText = loc["SEARCH_TEMPLATE_HEADER_QUERY_FORMATTED", searchString];
         else if (!string.IsNullOrWhiteSpace(searchAuthor))
@@ -59,14 +62,12 @@
         else
             headerText = loc["SEARCH_TEMPLATE_HEADER_BLANK"];
 
-        _modesCache = dba.GetTemplateOrdersData();
-        currentMode = defaultMode;
-        await FetchTemplates(defaultMode);
+        await FetchTemplates(defaultMode, force: true);
     }
 
-    private async Task FetchTemplates(TemplateOrderMode order)
+    private async Task FetchTemplates(TemplateOrderMode order, bool force = false)
     {
-        if (_searchResults == null || currentMode != order)
+        if (_searchResults == null || currentMode != order || force)
         {
             currentMode = order;
             _searchResults = new List<Template>(await dba.SearchTemplates(order, searchString, searchAuthor, searchTag, searchTopic));

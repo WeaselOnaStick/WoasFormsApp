@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-WoasFormsApp-76660ad1-c199-4b08-8d37-d9b9b9bda206</UserSecretsId>
+	<SatelliteResourceLanguages>en-US;ru-RU</SatelliteResourceLanguages>
   </PropertyGroup>
 
   <ItemGroup>

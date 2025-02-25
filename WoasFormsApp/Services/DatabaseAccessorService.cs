@@ -267,8 +267,9 @@ namespace WoasFormsApp.Services
         public async Task<Template?> UpdateTemplate(Template submittedTemplate, int? templateId = null)
         {
             if (!ValidateTemplate(submittedTemplate)) return null;
+            templateId ??= submittedTemplate.Id;
 
-            Template? obsoleteTemplate = await GetTemplate(templateId ?? submittedTemplate.Id);
+            Template? obsoleteTemplate = await _ctx.Templates.FindAsync(templateId);
             if (obsoleteTemplate == null) return null;
             if (!await TemplateAuthManage(obsoleteTemplate)) return null;
             obsoleteTemplate.LastModifiedAt = DateTime.UtcNow;
@@ -328,6 +329,14 @@ namespace WoasFormsApp.Services
                 obsoleteTemplate.Fields.First(of => of.Id == oldFieldToHideId).Hidden = true;
             
             await _ctx.TemplateFields.AddRangeAsync(newFieldsToAdd);
+
+            obsoleteTemplate.Title = submittedTemplate.Title;
+            obsoleteTemplate.Description = submittedTemplate.Description;
+            obsoleteTemplate.Public = submittedTemplate.Public;
+            obsoleteTemplate.Topic = submittedTemplate.Topic;
+            obsoleteTemplate.AllowedUsers = submittedTemplate.AllowedUsers;
+            obsoleteTemplate.CoverImageUrl = submittedTemplate.CoverImageUrl;
+            
             
             try
             {

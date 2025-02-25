@@ -54,6 +54,7 @@ else
                     Type = ff.Type,
                 }).ToList(),
                 TopicId = foundTemplate.TopicId,
+                Topic = foundTemplate.Topic,
                 Tags = new List<TemplateTag>(foundTemplate.Tags),
             };
         StateHasChanged();

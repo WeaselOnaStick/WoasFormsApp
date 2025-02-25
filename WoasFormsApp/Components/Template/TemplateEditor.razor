@@ -167,6 +167,7 @@
     public static int MaxQuestionPerType = 4;
 
     private HashSet<TemplateFieldType>? _fieldTypesCache;
+    private HashSet<WoasFormsAppUser>? _usersCache;
     private HashSet<TemplateTopic>? _topicsCache;
     private HashSet<TemplateTag>? _tagsCache;
 
@@ -177,7 +178,6 @@
     }
     private Dictionary<int, FieldCounts> _fieldCounts = new();
 
-    private HashSet<WoasFormsAppUser> _usersCache = new();
     private WoasFormsAppUser _autoFoundAllowedUser = new();
 
     private string _userNewTag = "";
@@ -353,9 +353,9 @@
     async Task<IEnumerable<WoasFormsAppUser>> SearchUser(string searchText, CancellationToken cancellationToken)
     {
         await CacheUsers();
-        var res = _usersCache.ExceptBy(templateModel.AllowedUsers.Select(au => au.UserName), u => u.UserName, StringComparer.InvariantCultureIgnoreCase);
-        if (string.IsNullOrWhiteSpace(searchText)) return _usersCache;
-        return _usersCache.Where(u => u.UserName.Contains(searchText, StringComparison.InvariantCultureIgnoreCase));
+        var res = _usersCache!.ExceptBy(templateModel.AllowedUsers.Select(au => au.UserName), u => u.UserName, StringComparer.InvariantCultureIgnoreCase);
+        if (string.IsNullOrWhiteSpace(searchText)) return res;
+        return res.Where(u => u.UserName.Contains(searchText, StringComparison.InvariantCultureIgnoreCase));
     }
 
     void AddAutoFoundUser()

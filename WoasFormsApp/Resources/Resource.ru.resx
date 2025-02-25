@@ -154,10 +154,10 @@
     <value>Количество уникальных</value>
   </data>
   <data name="ANALYTICS_DISABLED" xml:space="preserve">
-    <value>Включить в аналитику</value>
+    <value>Без Аналитики</value>
   </data>
   <data name="ANALYTICS_ENABLED" xml:space="preserve">
-    <value>Без Аналитики</value>
+    <value>Аналитика</value>
   </data>
   <data name="ANALYTICS_FIELDS_OMITTED_N" xml:space="preserve">
     <value>Количество пропущеных полей - {0}</value>

@@ -600,4 +600,7 @@
   <data name="FORM_FILL_FAIL" xml:space="preserve">
     <value>There was an error submitting the form</value>
   </data>
+  <data name="FORM_FILL_REQUIRE_LOGIN" xml:space="preserve">
+    <value>Log in to Fill a Form</value>
+  </data>
 </root>

@@ -2,8 +2,29 @@
 
 <MudGrid Justify="Justify.SpaceEvenly">
     <MudItem md="8" xs="12">
-        <MudText style="max-width: fit-content; display: inline; vertical-align: middle;" Class="pb-2 pr-4" Typo="Typo.h3">@TemplateTitleOrUnnamed(Item, loc)</MudText>
-        <MudButton StartIcon="@Icons.Material.Filled.Checklist" IconSize="Size.Large" Class="rounded-pill mx-1" Color="Color.Info" Variant="Variant.Filled" Href=@($"/Template/{Item.Id}/Fill")>@loc["FORM_FILL"]</MudButton>
+        <MudText 
+            style="max-width: fit-content; display: inline; vertical-align: middle;" 
+            Class="pb-2 pr-4" Typo="Typo.h3">
+            @TemplateTitleOrUnnamed(Item, loc)
+        </MudText>
+        <AuthorizeView>
+            <Authorized>
+                <MudButton 
+                    StartIcon="@Icons.Material.Filled.Checklist" IconSize="Size.Large" 
+                    Class="rounded-pill mx-1 my-2" Color="Color.Info" Variant="Variant.Filled" 
+                    Href=@($"/Template/{Item.Id}/Fill")>
+                    @loc["FORM_FILL"]
+                </MudButton>
+            </Authorized>
+            <NotAuthorized>
+                <MudButton 
+                    StartIcon="@Icons.Material.Filled.Checklist" IconSize="Size.Large"
+                    Class="rounded-pill mx-1 my-2" Color="Color.Info" Variant="Variant.Filled" 
+                    Disabled="true">
+                    @loc["FORM_FILL_REQUIRE_LOGIN"]
+                </MudButton>
+            </NotAuthorized>
+        </AuthorizeView>
 
         <MudText Typo="Typo.body1" Style="font-style: italic;"> 
             @if(Item.Owner != null)

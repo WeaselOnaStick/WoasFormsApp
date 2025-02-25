@@ -600,4 +600,7 @@
   <data name="FORM_FILL_FAIL" xml:space="preserve">
     <value>При отправке формы произошла ошибка</value>
   </data>
+  <data name="FORM_FILL_REQUIRE_LOGIN" xml:space="preserve">
+    <value>Перед заполнением формы войдите в аккаунт</value>
+  </data>
 </root>

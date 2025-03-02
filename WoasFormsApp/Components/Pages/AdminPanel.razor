@@ -72,8 +72,8 @@
                     ButtonText = loc["ADMIN_ACTION_PROMOTE_ADMIN"],
                     Icon = Icons.Material.Filled.AddModerator,
                     DialogTitleText = loc["ADMIN_ACTION_PROMOTE_ADMIN_DIALOG_HEADER"],
-                    DialogContentTextFormatted = loc["ADMIN_ACTION_PROMOTE_ADMIN_DIALOG_TEXT_F", _selected.Count],
-                    SuccessTextFormatted = loc["ADMIN_ACTION_PROMOTE_ADMIN_SUCCESS_F", _selected.Count],
+                    DialogContentTextFormatted = loc["ADMIN_ACTION_PROMOTE_ADMIN_DIALOG_TEXT_F"],
+                    SuccessTextFormatted = loc["ADMIN_ACTION_PROMOTE_ADMIN_SUCCESS_F"],
                 },
             new AdminActionInfo // REVOKE ADMIN
                 {
@@ -81,8 +81,8 @@
                     ButtonText = loc["ADMIN_ACTION_DEMOTE_ADMIN"],
                     Icon = Icons.Material.Filled.RemoveModerator,
                     DialogTitleText = loc["ADMIN_ACTION_DEMOTE_ADMIN_DIALOG_HEADER"],
-                    DialogContentTextFormatted = loc["ADMIN_ACTION_DEMOTE_ADMIN_DIALOG_TEXT_F", _selected.Count],
-                    SuccessTextFormatted = loc["ADMIN_ACTION_DEMOTE_ADMIN_SUCCESS_F", _selected.Count],
+                    DialogContentTextFormatted = loc["ADMIN_ACTION_DEMOTE_ADMIN_DIALOG_TEXT_F"],
+                    SuccessTextFormatted = loc["ADMIN_ACTION_DEMOTE_ADMIN_SUCCESS_F"],
                 },
             new AdminActionInfo // BLOCK
                 {
@@ -90,8 +90,8 @@
                     ButtonText = loc["ADMIN_ACTION_BLOCK_USERS"],
                     Icon = Icons.Material.Filled.LockPerson,
                     DialogTitleText = loc["ADMIN_ACTION_BLOCK_USERS_DIALOG_HEADER"],
-                    DialogContentTextFormatted = loc["ADMIN_ACTION_BLOCK_USERS_DIALOG_TEXT_F", _selected.Count],
-                    SuccessTextFormatted = loc["ADMIN_ACTION_BLOCK_USERS_SUCCESS_F", _selected.Count],
+                    DialogContentTextFormatted = loc["ADMIN_ACTION_BLOCK_USERS_DIALOG_TEXT_F"],
+                    SuccessTextFormatted = loc["ADMIN_ACTION_BLOCK_USERS_SUCCESS_F"],
                 },
             new AdminActionInfo // UNBLOCK
                 {
@@ -99,8 +99,8 @@
                     ButtonText = loc["ADMIN_ACTION_UNBLOCK_USERS"],
                     Icon = Icons.Material.Filled.LockOpen,
                     DialogTitleText = loc["ADMIN_ACTION_UNBLOCK_USERS_DIALOG_HEADER"],
-                    DialogContentTextFormatted = loc["ADMIN_ACTION_UNBLOCK_USERS_DIALOG_TEXT_F", _selected.Count],
-                    SuccessTextFormatted = loc["ADMIN_ACTION_UNBLOCK_USERS_SUCCESS_F", _selected.Count],
+                    DialogContentTextFormatted = loc["ADMIN_ACTION_UNBLOCK_USERS_DIALOG_TEXT_F"],
+                    SuccessTextFormatted = loc["ADMIN_ACTION_UNBLOCK_USERS_SUCCESS_F"],
                 },
             new AdminActionInfo // DELETE
                 {
@@ -108,8 +108,8 @@
                     ButtonText = loc["ADMIN_ACTION_DELETE_USERS"],
                     Icon = Icons.Material.Filled.PersonOff,
                     DialogTitleText = loc["ADMIN_ACTION_DELETE_USERS_DIALOG_HEADER"],
-                    DialogContentTextFormatted = loc["ADMIN_ACTION_DELETE_USERS_DIALOG_TEXT_F", _selected.Count],
-                    SuccessTextFormatted = loc["ADMIN_ACTION_DELETE_USERS_SUCCESS_F", _selected.Count],
+                    DialogContentTextFormatted = loc["ADMIN_ACTION_DELETE_USERS_DIALOG_TEXT_F"],
+                    SuccessTextFormatted = loc["ADMIN_ACTION_DELETE_USERS_SUCCESS_F"],
                 },
             };
 
@@ -130,11 +130,11 @@
 
     private async Task ExecuteAdminActionWithDialog(AdminActionInfo actionInfo)
     {
-        if (_selected?.Count == 0) return;
+        if (_selected.Count == 0) return;
         var options = new DialogParameters<WarningDialog>
         {
             {x => x.DialogTitle, actionInfo.DialogTitleText },
-            {x => x.DialogText, actionInfo.DialogContentTextFormatted},
+            {x => x.DialogText, string.Format(actionInfo.DialogContentTextFormatted,_selected.Count)},
             {x => x.DialogIcon, actionInfo.Icon}
         };
         var dialog = await DialogService.ShowAsync<WarningDialog>(actionInfo.DialogTitleText, options);
@@ -143,7 +143,7 @@
         {
             foreach (var user in _selected) 
                 await actionInfo.Action(user);
-            snack.Add(actionInfo.SuccessTextFormatted, Severity.Success);
+            snack.Add(string.Format(actionInfo.SuccessTextFormatted,_selected.Count), Severity.Success);
         }
         StateHasChanged();
     }   

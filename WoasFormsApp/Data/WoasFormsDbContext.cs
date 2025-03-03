@@ -21,6 +21,7 @@ namespace WoasFormsApp.Data
         {
             builder.Entity<WoasFormsAppUser>().HasMany(u => u.OwnedTemplates).WithOne(t => t.Owner);
             builder.Entity<WoasFormsAppUser>().HasMany(u => u.Responses).WithOne(r => r.Respondent);
+            builder.Entity<WoasFormsAppUser>().HasMany<TemplateComment>().WithOne(c => c.User);
 
             builder.Entity<Template>().HasMany(t => t.Tags).WithMany();
             builder.Entity<Template>().HasMany(t => t.UsersWhoLiked).WithMany();

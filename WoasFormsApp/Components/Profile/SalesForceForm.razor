@@ -1,0 +1,17 @@
+﻿@inject ISFContactManager sf
+
+<div>
+    @sfUserView?.Username
+    @sfUserView?.Email
+    @sfUserView?.BirthDay
+    @sfUserView?.About
+</div>
+
+@code {
+    private sfUserDataView? sfUserView = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        sfUserView = await sf.GetCurrentUserSFContact();
+    }
+}

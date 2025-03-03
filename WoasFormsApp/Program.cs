@@ -72,6 +72,26 @@ builder.Services.Configure<SecurityStampValidatorOptions>(options =>
 });
 
 
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddClientCredentialsTokenManagement()
+    .AddClient("salesforce", client =>
+    {
+        client.TokenEndpoint = "https://woascom-dev-ed.develop.my.salesforce.com/services/oauth2/token";
+        client.ClientId = builder.Configuration["SalesForce:CLEINT_ID"];
+        client.ClientSecret = builder.Configuration["SalesForce:CLIENT_SECRET"];
+        client.Parameters.Add("username", builder.Configuration["SalesForce:USERNAME"]!);
+        client.Parameters.Add("password", builder.Configuration["SalesForce:PASSWORD"]!);
+        client.ClientCredentialStyle = Duende.IdentityModel.Client.ClientCredentialStyle.PostBody;
+        client.Scope = "api";
+    });
+
+builder.Services.AddHttpClient("salesforce", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["SalesForceClient:BaseAddress"]??"");
+});
+
+builder.Services.AddScoped<ISFContactManager, SFContactManager>();
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContext<WoasFormsDbContext>(options =>

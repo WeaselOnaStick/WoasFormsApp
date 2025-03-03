@@ -12,18 +12,12 @@
 
 <AuthorizeView>
     <Authorized>
-        <MudStack Row="true">
-            <MudIcon Icon="@Icons.Material.Filled.Person"/>
-            <MudText Align="Align.Center">@loc["LOGGED_AS", @context.User.Identity.Name!]</MudText>
-        </MudStack>
+        <MudButton Href="/Profile/" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Person" Class="p-2">@loc["LOGGED_AS", @context.User.Identity!.Name!]</MudButton>
         <form action="Account/Logout" method="post">
             <button type="submit" style="width: 100%">
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.TwoTone.Logout" Class="p-2" Style="width: 100%">@loc["LOG_OUT"]</MudButton>
             </button>
         </form>
-        <MudButton Href="/MyTemplates" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Inventory" Style="p-2">@loc["MY_TEMPLATES"]</MudButton>
-        <MudButton Href="/Template/Create" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Style="p-2" Color="Color.Primary">@loc["CREATE_TEMPLATE"]</MudButton>
-        <MudButton Href="/MyForms/" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Description" Style="p-2">@loc["MY_FORMS"]</MudButton>
     </Authorized>
 
     <NotAuthorized>

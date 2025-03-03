@@ -3,7 +3,7 @@
     <PageTitle>@PageTitle - @loc["WOASFORMS"]</PageTitle>
 }
 
-<MudGrid Justify="Justify.Center" Class="pt-12">
+<MudGrid Justify="Justify.Center" Class=@($"pt-{PaddingTop}")>
     @if (RenderPageTitle)
     {
         <MudItem xs="12">
@@ -11,7 +11,7 @@
         </MudItem>
     }
     <MudItem xs="10">
-        <MudPaper Class="p-4">
+        <MudPaper Class=@($"p-{PaddingPaper}")>
             @ChildContent
         </MudPaper>
     </MudItem>
@@ -26,4 +26,10 @@
 
     [Parameter]
     public bool RenderPageTitle { get; set; } = true;
+
+    [Parameter]
+    public int PaddingTop { get; set; } = 12;
+
+    [Parameter]
+    public int PaddingPaper { get; set; } = 4;
 }

@@ -1,0 +1,32 @@
+﻿@page "/Profile/"
+
+@rendermode InteractiveServer
+
+@attribute [Authorize]
+
+<PaperCenter PageTitle=@loc["MY_PROFILE"] PaddingPaper="1">
+    <ProfileMeta />
+
+    <MudTabs PanelClass="p-4" Color="Color.Primary" Centered="true" Outlined="true">
+        <MudTabPanel Text=@loc["SETTINGS"] Icon="@Icons.Material.Filled.Settings">
+
+        </MudTabPanel>
+
+        <MudTabPanel Text=@loc["MY_TEMPLATES"] Icon="@Icons.Material.Filled.Inventory">
+            <MudButton Href="/Template/Create"
+                       Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add"
+                       Class="my-6" Color="Color.Primary">
+                @loc["CREATE_TEMPLATE"]
+            </MudButton>
+
+            <MyTemplates @rendermode="InteractiveAuto"/>
+        </MudTabPanel>
+        <MudTabPanel Text=@loc["MY_FORMS"] Icon="@Icons.Material.Filled.Description">
+            <MyForms @rendermode="InteractiveAuto" />
+        </MudTabPanel>
+    </MudTabs>
+</PaperCenter>
+
+@code {
+
+}

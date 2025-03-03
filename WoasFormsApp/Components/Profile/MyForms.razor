@@ -1,0 +1,40 @@
+﻿@inject IDatabaseAccessorService dba
+
+@attribute [Authorize]
+
+@if (_responses == null || !_responses.Any()){
+    <MudText>
+        @loc["MY_FORMS_EMPTY"]
+    </MudText>
+    <MudLink Href="/">
+        @loc["BROWSE_TEMPLATES"]
+    </MudLink>
+}
+else
+{
+    <MudDataGrid T="Response" Items="_responses" Elevation="2" Striped="true" Dense="true">
+        <Columns>
+            <PropertyColumn Property="@(r => (r.Template == null || r.Template.Owner == null) ? "No Owner (Orphan Template)" : r.Template.Owner.UserName)" Title=@loc["TEMPLATE_AUTHOR"]/>
+            <PropertyColumn Property="@(r => (r.Template == null || string.IsNullOrWhiteSpace(r.Template.Title)) ? "Unnamed Template" : r.Template.Title )" Title=@loc["TEMPLATE_TITLE"] />
+            <PropertyColumn Property="r => r.CreationDate" Title=@loc["FORM_FILLED_ON"] Sortable="true" InitialDirection="SortDirection.Descending"/>
+            <TemplateColumn>
+                <CellTemplate>
+                    <MudFab Size="Size.Small" Href="@($"/Form/{context.Item.Id}")" StartIcon="@Icons.Material.Filled.Visibility" Color="Color.Info" Disabled=@(context.Item.Template == null)/>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager/>
+        </PagerContent>
+    </MudDataGrid>
+}
+
+@code{
+    private IEnumerable<Response> _responses = new List<Response>();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _responses = await dba.GetResponsesByCurrentUser();
+        StateHasChanged();
+    }
+}

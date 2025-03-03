@@ -1,0 +1,33 @@
+﻿@using WoasFormsApp.Components.Template
+@inject IDatabaseAccessorService dba
+
+@attribute [Authorize]
+
+<MudDataGrid T="Template" Items="_templates" Dense="true" Striped="true">
+    <Columns>
+        <HierarchyColumn />
+        <PropertyColumn Property="t => TemplateTitleOrUnnamed(t, loc)" StickyLeft="true" Title=@loc["TEMPLATE"]/>
+        <PropertyColumn Property="t => t.LastModifiedAt" Title=@loc["LAST_MODIFIED"] InitialDirection="SortDirection.Descending" Sortable="true" />
+        <PropertyColumn Property="t => t.CreatedAt" Title=@loc["CREATED_AT"] />
+        <PropertyColumn Property="t => t.UsersWhoLiked.Count" Title=@loc["LIKES"] />
+        <PropertyColumn Property="t => t.Comments.Count" Title=@loc["COMMENTS"] />
+        <PropertyColumn Property="t => t.Responses.Count" Title=@loc["RESPONSES"] />
+    </Columns>
+    <ChildRowContent>
+        <TemplateToolbar Item="context.Item" />
+    </ChildRowContent>
+    <PagerContent>
+        <MudDataGridPager/>
+    </PagerContent>
+</MudDataGrid>
+
+@code{
+    private IEnumerable<Template> _templates = new List<Template>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _templates = await dba.GetTemplatesByCurrentUser();
+        StateHasChanged();
+    }
+
+}

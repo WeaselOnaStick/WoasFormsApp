@@ -606,4 +606,16 @@
   <data name="TEMPLATE_FIELDS" xml:space="preserve">
     <value>Поля</value>
   </data>
+  <data name="MY_PROFILE" xml:space="preserve">
+    <value>Мой профиль</value>
+  </data>
+  <data name="OWNED_FORMS_COUNT_F" xml:space="preserve">
+    <value>Заполнено форм: {0}</value>
+  </data>
+  <data name="OWNED_TEMPLATES_COUNT_F" xml:space="preserve">
+    <value>Создано шаблонов: {0}</value>
+  </data>
+  <data name="SETTINGS" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
 </root>

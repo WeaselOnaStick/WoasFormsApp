@@ -1,0 +1,39 @@
+﻿@inject IDatabaseAccessorService dba
+
+<MudPaper Elevation="0" Class="m-4 p-2">
+    <MudGrid>
+        <MudItem xs="12">
+            <MudText Typo="Typo.h4">@_view.UserName</MudText>
+            <MudText Typo="Typo.body1">@loc["OWNED_TEMPLATES_COUNT_F", _view.OwnedTemplatesCount]</MudText>
+            <MudText Typo="Typo.body1">@loc["OWNED_FORMS_COUNT_F", _view.OwnedFormsCount]</MudText>
+            <MudText Typo="Typo.body1">@(loc["USER_ACCOUNT_CREATED_AT"] + " " + _view.Registered.ToShortDateString() + " " + _view.Registered.ToShortTimeString())</MudText>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
+@code {
+    public class UserView
+    {
+        public string UserName { get; init; } = "";
+        public int OwnedTemplatesCount { get; init; } = 0;
+        public int OwnedFormsCount { get; init; } = 0;
+        public DateTime Registered { get; init; } = new();
+    }
+
+    private UserView _view = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await dba.GetCurrentUser();
+        var templates = await dba.GetTemplatesByCurrentUser();
+        var responses = await dba.GetResponsesByCurrentUser();
+        if (user == null) return;
+        _view = new UserView
+            {
+                UserName = user.UserName,
+                OwnedFormsCount = responses.Count(),
+                OwnedTemplatesCount = templates.Count(),
+                Registered = (user.RegisteredAt ?? DateTime.UnixEpoch).ToLocalTime(),
+            };
+    }
+}

@@ -103,16 +103,17 @@ namespace WoasFormsApp.Services
         private async Task<sfUserDataView?> GetUserSFContact(string id)
         {
             var Client = await GetClient();
-            var response = await Client.GetFromJsonAsync<GetContactResponse>($"/services/data/{_ver}/sobjects/Contact/{id}");
-            if (response == null) return null;
+            var response = await Client.GetAsync($"/services/data/{_ver}/sobjects/Contact/{id}");
+            if (!response.IsSuccessStatusCode) return null;
+            var responseData = await response.Content.ReadFromJsonAsync<GetContactResponse>();
             sfUserDataView res = new sfUserDataView
             {
                 SalesForceContactID = id,
-                FirstName = response.FirstName,
-                LastName = response.LastName,
-                Email = response.Email ?? "",
-                About = response.Description ?? "",
-                BirthDay = response.Birthdate,
+                FirstName = responseData.FirstName,
+                LastName = responseData.LastName,
+                Email = responseData.Email ?? "",
+                About = responseData.Description ?? "",
+                BirthDay = responseData.Birthdate,
             };
             return res;
         }

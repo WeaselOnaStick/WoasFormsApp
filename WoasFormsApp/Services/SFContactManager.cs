@@ -1,5 +1,6 @@
 ﻿using Duende.AccessTokenManagement;
 using Duende.IdentityModel.Client;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using WoasFormsApp.Data;    
 
@@ -23,35 +24,70 @@ namespace WoasFormsApp.Services
             return client;
         }
 
-        public class CreateContactResponse
+        public class CreateResponse
         {
-            public string id { get; set; } = "";
-            public bool success { get; set; }
+            public class ResponseItem
+            {
+                public class Body
+                {
+                    public string id { get; set; }
+                    public bool success { get; set; }
+                }
+                public Body body { get; set; }
+                public required int httpStatusCode { get; set; }
+                public required string referenceId { get; set; }
+            }
+
+            public List<ResponseItem> compositeResponse { get; set; }
         }
 
         public async Task<sfUserDataView?> CreateCurrentUserSFContact()
         {
             var curUser = await dba.GetCurrentUser();
             if (curUser == null) return null;
-            var request = new HttpRequestMessage(HttpMethod.Post, $"/services/data/{_ver}/sobjects/contact");
+            var request = new HttpRequestMessage(HttpMethod.Post, $"/services/data/{_ver}/composite");
+
+            var actions = new List<dynamic>();
+            actions.Add(new
+            {
+                method = "POST",
+                url = $"/services/data/{_ver}/sobjects/Account",
+                referenceId = "NewAccount",
+                body = new
+                {
+                    Name = curUser.UserName
+                }
+            });
+            actions.Add(new
+            {
+                method = "POST",
+                url = $"/services/data/{_ver}/sobjects/Contact",
+                referenceId = "NewContact",
+                body = new
+                {
+                    AccountId = "@{NewAccount.id}",
+                    LastName = curUser.UserName ?? "",
+                    Email = curUser.Email ?? "",
+                }
+            });
 
             var contentJson = new
             {
-                LastName = curUser.UserName ?? "",
-                Email = curUser.Email ?? "",
+                allOrNone = true,
+                compositeRequest = actions.ToArray(),
             };
 
             request.Content = JsonContent.Create(contentJson);
             var Client = await GetClient();
             var response = await Client.SendAsync(request);
+
             try {response.EnsureSuccessStatusCode();} catch (Exception) { return null;}
+            var responseRead = await response.Content.ReadFromJsonAsync<CreateResponse>();
 
-            var responseRead = await response.Content.ReadFromJsonAsync<CreateContactResponse>();
-            if (responseRead == null || !responseRead.success) return null;
-
-            curUser.SalesForceContactId = responseRead.id;
+            curUser.SalesForceAccountId = responseRead.compositeResponse.First(x => x.referenceId == "NewAccount").body.id;
+            curUser.SalesForceContactId = responseRead.compositeResponse.First(x => x.referenceId == "NewContact").body.id;
             await ctx.SaveChangesAsync();
-            return await GetUserSFContact(responseRead.id);
+            return await GetUserSFContact(curUser.SalesForceContactId);
         }
 
         public class GetContactResponse

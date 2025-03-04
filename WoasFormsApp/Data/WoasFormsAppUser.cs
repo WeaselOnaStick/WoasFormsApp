@@ -11,5 +11,7 @@ namespace WoasFormsApp.Data
         public ICollection<Response> Responses { get; set; }
 
         public ICollection<Template> OwnedTemplates { get; set; }
+
+        public string SalesForceContactId { get; set; } = "";
     }
 }

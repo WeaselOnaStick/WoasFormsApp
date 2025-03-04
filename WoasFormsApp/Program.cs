@@ -21,12 +21,6 @@ builder.Services.AddScoped<IUserPrefService<bool>,      ThemePrefsService>(facto
     return new ThemePrefsService(factory.GetRequiredService<ILocalStorageService>());
 });
 
-// .NET Localization handles this already
-//builder.Services.AddScoped<IUserPrefService<string>,    LocalePrefsService>(factory =>
-//{
-//    return new LocalePrefsService(factory.GetRequiredService<ILocalStorageService>());
-//});
-
 builder.Services.AddFluentValidationAutoValidation();
 
 builder.Services.AddMudServices(config =>
@@ -71,7 +65,6 @@ builder.Services.Configure<SecurityStampValidatorOptions>(options =>
     options.ValidationInterval = TimeSpan.Zero;
 });
 
-
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddClientCredentialsTokenManagement()
     .AddClient("salesforce", client =>
@@ -79,10 +72,7 @@ builder.Services.AddClientCredentialsTokenManagement()
         client.TokenEndpoint = "https://woascom-dev-ed.develop.my.salesforce.com/services/oauth2/token";
         client.ClientId = builder.Configuration["SalesForce:CLEINT_ID"];
         client.ClientSecret = builder.Configuration["SalesForce:CLIENT_SECRET"];
-        client.Parameters.Add("username", builder.Configuration["SalesForce:USERNAME"]!);
-        client.Parameters.Add("password", builder.Configuration["SalesForce:PASSWORD"]!);
-        client.ClientCredentialStyle = Duende.IdentityModel.Client.ClientCredentialStyle.PostBody;
-        client.Scope = "api";
+        client.Parameters.Add("grant_type", "client_credentials");
     });
 
 builder.Services.AddHttpClient("salesforce", client =>

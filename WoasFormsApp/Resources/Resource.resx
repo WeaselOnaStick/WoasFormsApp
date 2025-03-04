@@ -618,4 +618,22 @@
   <data name="SETTINGS" xml:space="preserve">
     <value>Settings</value>
   </data>
+  <data name="PROFILE_ADD_SALESFORCE" xml:space="preserve">
+    <value>Add SalesForce Contact</value>
+  </data>
+  <data name="PROFILE_ADD_SALESFORCE_SUCCESS" xml:space="preserve">
+    <value>SalesForce contact created successfully</value>
+  </data>
+  <data name="PROFILE_ADD_SALESFORCE_FAIL" xml:space="preserve">
+    <value>There was an error creating your SalesForce contact</value>
+  </data>
+  <data name="BIRTHDAY" xml:space="preserve">
+    <value>Birthday</value>
+  </data>
+  <data name="PROFILE_DESCRIPTION_LABEL" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="PROFILE_SALESFORCE_CONTACT_LABEL" xml:space="preserve">
+    <value>SalesForce Contact</value>
+  </data>
 </root>

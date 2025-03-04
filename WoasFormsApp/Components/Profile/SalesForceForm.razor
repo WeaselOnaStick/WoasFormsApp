@@ -1,17 +1,53 @@
 ﻿@inject ISFContactManager sf
+@inject ISnackbar snack
 
-<div>
-    @sfUserView?.Username
-    @sfUserView?.Email
-    @sfUserView?.BirthDay
-    @sfUserView?.About
-</div>
+@if(Loading)
+{
+    <MudProgressCircular Color="Color.Info" Indeterminate="true" />
+}
+
+@if(!Loading)
+{
+    @if(sfUserView == null)
+    {
+        <MudButton Variant="Variant.Outlined" Color="Color.Info" EndIcon="@Icons.Material.Filled.Cloud" OnClick="async () => await CreateSF()">
+            @loc["PROFILE_ADD_SALESFORCE"]
+        </MudButton>
+    }
+
+    @if(sfUserView != null)
+    {
+        <MudText Typo="Typo.h4" Class="my-4">@loc["PROFILE_SALESFORCE_CONTACT_LABEL"]</MudText>
+        <MudTextField Class="p-2" ReadOnly="true" @bind-Value=sfUserView.Username Label=@loc["USERNAME"]/>
+        <MudTextField Class="p-2" ReadOnly="true" @bind-Value=sfUserView.Email Label=@loc["EMAIL"] />
+        <MudTextField Class="p-2" ReadOnly="true" @bind-Value=sfUserView.BirthDay Label=@loc["BIRTHDAY"] />
+        <MudTextField Class="p-2" ReadOnly="true" @bind-Value=sfUserView.About Lines="3" Label=@loc["PROFILE_DESCRIPTION_LABEL"] />
+    }
+}
+
 
 @code {
-    private sfUserDataView? sfUserView = new();
+    private sfUserDataView? sfUserView = null;
+
+    private bool Loading = true;
 
     protected override async Task OnInitializedAsync()
     {
         sfUserView = await sf.GetCurrentUserSFContact();
+        Loading = false;
+        StateHasChanged();
+    }
+
+    private async Task CreateSF()
+    {
+        Loading = true;
+        StateHasChanged();
+        sfUserView = await sf.CreateCurrentUserSFContact();
+        if (sfUserView == null)
+            snack.Add(loc["PROFILE_ADD_SALESFORCE_FAIL"], Severity.Error);
+        else
+            snack.Add(loc["PROFILE_ADD_SALESFORCE_SUCCESS"], Severity.Success);
+        Loading = false;
+        StateHasChanged();
     }
 }

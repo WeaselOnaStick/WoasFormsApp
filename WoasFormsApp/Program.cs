@@ -13,6 +13,8 @@ using static WoasFormsApp.Utils.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddEnvironmentVariables();
+
 builder.Services.AddLocalization();
 builder.Services.AddControllers();
 
@@ -64,6 +66,7 @@ builder.Services.Configure<SecurityStampValidatorOptions>(options =>
 {
     options.ValidationInterval = TimeSpan.Zero;
 });
+
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddClientCredentialsTokenManagement()

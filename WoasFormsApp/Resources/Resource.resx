@@ -636,4 +636,16 @@
   <data name="PROFILE_SALESFORCE_CONTACT_LABEL" xml:space="preserve">
     <value>SalesForce Contact</value>
   </data>
+  <data name="FIRSTNAME" xml:space="preserve">
+    <value>First Name</value>
+  </data>
+  <data name="LASTNAME" xml:space="preserve">
+    <value>Last Name</value>
+  </data>
+  <data name="UPDATE" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="SUCCESS" xml:space="preserve">
+    <value>Success</value>
+  </data>
 </root>

@@ -2,7 +2,9 @@
 {
     public class sfUserDataView
     {
-        public string Username { get; set; } = "";
+        public required string SalesForceContactID { get; init; }
+        public string FirstName { get; set; } = "";
+        public string LastName { get; set; } = "";
         public string Email { get; set; } = "";
         public string About { get; set; } = "";
         public DateOnly? BirthDay { get; set; } 
@@ -12,6 +14,6 @@
     {
         public Task<sfUserDataView?> CreateCurrentUserSFContact();
         public Task<sfUserDataView?> GetCurrentUserSFContact();
-        public Task UpdateCurrentUserSFContact(sfUserDataView sfUserDataView);
+        public Task<bool> UpdateCurrentUserSFContact(sfUserDataView sfUserDataView);
     }
 }

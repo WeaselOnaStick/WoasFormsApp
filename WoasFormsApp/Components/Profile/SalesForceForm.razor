@@ -17,19 +17,44 @@
 
     @if(sfUserView != null)
     {
-        <MudText Typo="Typo.h4" Class="my-4">@loc["PROFILE_SALESFORCE_CONTACT_LABEL"]</MudText>
-        <MudTextField Class="p-2" ReadOnly="true" @bind-Value=sfUserView.Username Label=@loc["USERNAME"]/>
-        <MudTextField Class="p-2" ReadOnly="true" @bind-Value=sfUserView.Email Label=@loc["EMAIL"] />
-        <MudTextField Class="p-2" ReadOnly="true" @bind-Value=sfUserView.BirthDay Label=@loc["BIRTHDAY"] />
-        <MudTextField Class="p-2" ReadOnly="true" @bind-Value=sfUserView.About Lines="3" Label=@loc["PROFILE_DESCRIPTION_LABEL"] />
+        <MudPaper Elevation="2">
+            <MudText Typo="Typo.h4" Class="my-4 p-2 m-2">@loc["PROFILE_SALESFORCE_CONTACT_LABEL"]</MudText>
+            <MudTextField Class="p-2" @bind-Value=sfUserView.Email Label=@loc["EMAIL"] />
+            <MudTextField Class="p-2" @bind-Value=sfUserView.FirstName Label=@loc["FIRSTNAME"] />
+            <MudTextField Class="p-2" @bind-Value=sfUserView.LastName Label=@loc["LASTNAME"] />
+            <MudDatePicker Class="p-2" @bind-Date=birthdayDateTime Label=@loc["BIRTHDAY"] />
+            <MudTextField Class="p-2" @bind-Value=sfUserView.About Lines="3" Label=@loc["PROFILE_DESCRIPTION_LABEL"] />
+            <MudButton Class="mt-2 mb-6 mx-4" Color="Color.Info" Variant="Variant.Filled" @bind-Disabled=Updating OnClick="async () => await UpdateSF()">
+                @if (Updating)
+                {
+                    <MudProgressCircular Class="ms-n1 me-2" Size="Size.Small" Indeterminate="true" />
+                }
+                @loc["UPDATE"]
+            </MudButton>
+        </MudPaper>
     }
 }
 
 
 @code {
-    private sfUserDataView? sfUserView = null;
+    protected sfUserDataView? sfUserView = null;
+
+
+    private DateTime? birthdayDateTime {
+        get
+        {
+            return sfUserView?.BirthDay?.ToDateTime(new TimeOnly(12, 0, 0));
+        }
+        set
+        {
+            if (sfUserView != null)
+                sfUserView.BirthDay = value.HasValue ? DateOnly.FromDateTime(value.Value) : null;
+        }
+    }
 
     private bool Loading = true;
+
+    private bool Updating = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -48,6 +73,19 @@
         else
             snack.Add(loc["PROFILE_ADD_SALESFORCE_SUCCESS"], Severity.Success);
         Loading = false;
+        StateHasChanged();
+    }
+
+    private async Task UpdateSF()
+    {
+        Updating = true;
+        StateHasChanged();
+        bool success = await sf.UpdateCurrentUserSFContact(sfUserView!);
+        if (success)
+            snack.Add(loc["SUCCESS"], Severity.Success);
+        else
+            snack.Add(loc["ERROR"], Severity.Error);
+        Updating = false;
         StateHasChanged();
     }
 }

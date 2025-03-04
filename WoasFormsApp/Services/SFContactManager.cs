@@ -69,7 +69,9 @@ namespace WoasFormsApp.Services
             if (response == null) return null;
             sfUserDataView res = new sfUserDataView
             {
-                Username = response.Name,
+                SalesForceContactID = id,
+                FirstName = response.FirstName,
+                LastName = response.LastName,
                 Email = response.Email ?? "",
                 About = response.Description ?? "",
                 BirthDay = response.Birthdate,
@@ -84,9 +86,22 @@ namespace WoasFormsApp.Services
             return await GetUserSFContact(curUser.SalesForceContactId);
         }
 
-        public async Task UpdateCurrentUserSFContact(sfUserDataView sfUserDataView)
+        public async Task<bool> UpdateCurrentUserSFContact(sfUserDataView view)
         {
-            throw new NotImplementedException();
+            var Client = await GetClient();
+            var request = new HttpRequestMessage(HttpMethod.Patch, $"/services/data/{_ver}/sobjects/Contact/{view.SalesForceContactID}");
+            var contentDict = new Dictionary<string, object?>()
+            {
+                {"Email", view.Email},
+                {"Description",view.About },
+                {"Birthdate", view.BirthDay},
+                {"FirstName", view.FirstName },
+                {"LastName", view.LastName },
+            };
+            request.Content = JsonContent.Create(contentDict);
+            
+            var response = await Client.SendAsync(request);
+            return response.StatusCode == System.Net.HttpStatusCode.NoContent;
         }
     }
 }

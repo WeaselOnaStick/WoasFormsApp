@@ -13,6 +13,8 @@ using static WoasFormsApp.Utils.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddEnvironmentVariables();
+
 builder.Services.AddLocalization();
 builder.Services.AddControllers();
 
@@ -20,12 +22,6 @@ builder.Services.AddScoped<IUserPrefService<bool>,      ThemePrefsService>(facto
 {
     return new ThemePrefsService(factory.GetRequiredService<ILocalStorageService>());
 });
-
-// .NET Localization handles this already
-//builder.Services.AddScoped<IUserPrefService<string>,    LocalePrefsService>(factory =>
-//{
-//    return new LocalePrefsService(factory.GetRequiredService<ILocalStorageService>());
-//});
 
 builder.Services.AddFluentValidationAutoValidation();
 
@@ -71,6 +67,23 @@ builder.Services.Configure<SecurityStampValidatorOptions>(options =>
     options.ValidationInterval = TimeSpan.Zero;
 });
 
+
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddClientCredentialsTokenManagement()
+    .AddClient("salesforce", client =>
+    {
+        client.TokenEndpoint = "https://woascom-dev-ed.develop.my.salesforce.com/services/oauth2/token";
+        client.ClientId = builder.Configuration["SalesForce:CLEINT_ID"];
+        client.ClientSecret = builder.Configuration["SalesForce:CLIENT_SECRET"];
+        client.Parameters.Add("grant_type", "client_credentials");
+    });
+
+builder.Services.AddHttpClient("salesforce", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["SalesForceClient:BaseAddress"]??"");
+});
+
+builder.Services.AddScoped<ISFContactManager, SFContactManager>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WoasFormsApp.Data;
 
@@ -10,9 +11,11 @@ using WoasFormsApp.Data;
 namespace WoasFormsApp.Migrations
 {
     [DbContext(typeof(WoasFormsDbContext))]
-    partial class WoasFormsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250304092418_SalesForceContact")]
+    partial class SalesForceContact
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.1");
@@ -445,10 +448,6 @@ namespace WoasFormsApp.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("RegisteredAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("SalesForceAccountId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SalesForceContactId")

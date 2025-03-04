@@ -1,6 +1,7 @@
 ﻿using Duende.AccessTokenManagement;
 using Duende.IdentityModel.Client;
-using WoasFormsApp.Data;
+using System.Text.Json.Nodes;
+using WoasFormsApp.Data;    
 
 namespace WoasFormsApp.Services
 {
@@ -33,13 +34,14 @@ namespace WoasFormsApp.Services
             var curUser = await dba.GetCurrentUser();
             if (curUser == null) return null;
             var request = new HttpRequestMessage(HttpMethod.Post, $"/services/data/{_ver}/sobjects/contact");
-            var contentDict = new Dictionary<string, string>()
+
+            var contentJson = new
             {
-                {"LastName",curUser.UserName ?? "" },
-                {"Email",curUser.Email ?? "" },
+                LastName = curUser.UserName ?? "",
+                Email = curUser.Email ?? "",
             };
 
-            request.Content = JsonContent.Create(contentDict);
+            request.Content = JsonContent.Create(contentJson);
             var Client = await GetClient();
             var response = await Client.SendAsync(request);
             try {response.EnsureSuccessStatusCode();} catch (Exception) { return null;}
@@ -90,13 +92,13 @@ namespace WoasFormsApp.Services
         {
             var Client = await GetClient();
             var request = new HttpRequestMessage(HttpMethod.Patch, $"/services/data/{_ver}/sobjects/Contact/{view.SalesForceContactID}");
-            var contentDict = new Dictionary<string, object?>()
+            var contentDict = new
             {
-                {"Email", view.Email},
-                {"Description",view.About },
-                {"Birthdate", view.BirthDay},
-                {"FirstName", view.FirstName },
-                {"LastName", view.LastName },
+                view.Email,
+                Description = view.About,
+                Birthdate = view.BirthDay,
+                view.FirstName,
+                view.LastName,
             };
             request.Content = JsonContent.Create(contentDict);
             

@@ -21,7 +21,7 @@
             <MudText Typo="Typo.h4" Class="my-4 p-2 m-2">@loc["PROFILE_SALESFORCE_CONTACT_LABEL"]</MudText>
             <MudTextField Class="p-2" @bind-Value=sfUserView.Email Label=@loc["EMAIL"] />
             <MudTextField Class="p-2" @bind-Value=sfUserView.FirstName Label=@loc["FIRSTNAME"] />
-            <MudTextField Class="p-2" @bind-Value=sfUserView.LastName Label=@loc["LASTNAME"] />
+            <MudTextField Required="true" Class="p-2" @bind-Value=sfUserView.LastName Label=@loc["LASTNAME"] />
             <MudDatePicker Class="p-2" @bind-Date=birthdayDateTime Label=@loc["BIRTHDAY"] />
             <MudTextField Class="p-2" @bind-Value=sfUserView.About Lines="3" Label=@loc["PROFILE_DESCRIPTION_LABEL"] />
             <MudButton Class="mt-2 mb-6 mx-4" Color="Color.Info" Variant="Variant.Filled" @bind-Disabled=Updating OnClick="async () => await UpdateSF()">

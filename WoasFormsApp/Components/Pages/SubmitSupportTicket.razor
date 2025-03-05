@@ -1,0 +1,53 @@
+﻿@page "/Support"
+@using System.ComponentModel.DataAnnotations
+
+@inject IDatabaseAccessorService dba
+@inject IJiraTicketsService jira
+@inject ISnackbar snack
+
+@rendermode InteractiveServer
+
+<AuthorizeView Context="authContext">
+    <Authorized>
+        <PaperCenter PageTitle=@loc["SUPPORT_HEADER"]>
+            <EditForm Model="_ticket" OnValidSubmit="submitTicket">
+                <DataAnnotationsValidator />
+                <MudTextField Class="my-4" Variant="Variant.Filled" @bind-Value=_ticket.ContactEmail For=@(()=>_ticket.ContactEmail) Label=@loc["EMAIL"]/>
+                <MudTextField Class="my-4" Lines="8" Variant="Variant.Filled" @bind-Value=_ticket.Description For=@(()=>_ticket.Description) Label=@loc["DESCRIPTION"] />
+                <MudButton Class="my-4" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Info">@loc["SUBMIT"]</MudButton>
+            </EditForm>
+        </PaperCenter>
+    </Authorized>
+    <NotAuthorized>
+        <MudText Typo="Typo.h3" Align="Align.Center">
+            @loc["LOGIN_TO_CONTINUE"]
+        </MudText>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    public bool formValid;
+
+    public class NewTicketModel 
+    {
+        [Required]
+        [EmailAddress] 
+        public string ContactEmail { get; set; } = "";
+
+        [Required]
+        public string Description { get; set; } = "";
+    }
+
+    public NewTicketModel _ticket = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _ticket.ContactEmail = (await dba.GetCurrentUser())?.Email ?? "";
+        StateHasChanged();
+    }
+
+    private async Task submitTicket()
+    {
+
+    }
+}

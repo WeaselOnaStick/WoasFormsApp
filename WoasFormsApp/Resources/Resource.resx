@@ -648,4 +648,16 @@
   <data name="SUCCESS" xml:space="preserve">
     <value>Success</value>
   </data>
+  <data name="SUPPORT_HEADER" xml:space="preserve">
+    <value>Submit Support Ticket</value>
+  </data>
+  <data name="SUPPORT_BUTTON" xml:space="preserve">
+    <value>Help</value>
+  </data>
+  <data name="LOGIN_TO_CONTINUE" xml:space="preserve">
+    <value>Action unavailable.\nPlease log in to continue.</value>
+  </data>
+  <data name="SUBMIT" xml:space="preserve">
+    <value>Submit</value>
+  </data>
 </root>

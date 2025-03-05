@@ -92,6 +92,8 @@ builder.Services.AddHttpClient("jira", client =>
 
 builder.Services.AddScoped<ISFContactManager, SFContactManager>();
 
+builder.Services.AddScoped<IJiraTicketsService, JiraTicketsService>();
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContext<WoasFormsDbContext>(options =>

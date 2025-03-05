@@ -1,4 +1,5 @@
 ﻿using Duende.IdentityModel.Client;
+using System.ComponentModel.DataAnnotations;
 
 namespace WoasFormsApp.Services
 {
@@ -7,7 +8,6 @@ namespace WoasFormsApp.Services
         public string Id { get; set; } = "";
         public string Status { get; set; } = "UNDEFINED";
         public string Summary { get; set; } = "";
-        public DateTime FiledOn { get; set; }
     }
 
     public class JiraCustomerView
@@ -18,11 +18,22 @@ namespace WoasFormsApp.Services
         public List<JiraTicketView> Tickets { get; set; } = new List<JiraTicketView>();
     }
 
+    public class NewTicketModel
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = "";
+
+        [Required]
+        public string Summary { get; set; } = "";
+    }
+
     public interface IJiraTicketsService
     {
-        public Task<JiraCustomerView?> CreateCustomerFromCurrentUser();
+        public Task<JiraCustomerView?> CreateCustomerFromCurrentUser(string? overrideEmail = null);
         public Task<JiraCustomerView?> GetCustomerFromCurrentUser();
 
-        public Task<JiraTicketView?> CreateTicket(JiraTicketView model);
+        public Task<JiraTicketView?> CreateTicketByCurrentUser(NewTicketModel model);
+        public Task<JiraTicketView?> GetTicketById(string ticketId);
     }
 }

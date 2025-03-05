@@ -660,4 +660,10 @@
   <data name="SUBMIT" xml:space="preserve">
     <value>Submit</value>
   </data>
+  <data name="MY_SUPPORT_TICKETS" xml:space="preserve">
+    <value>My Support Tickets</value>
+  </data>
+  <data name="MY_PROFILE_NO_SUPPORT_PROFILE" xml:space="preserve">
+    <value>No support profile found. It is automatically created when you submit a support ticket.</value>
+  </data>
 </root>

@@ -87,7 +87,13 @@ builder.Services.AddHttpClient("salesforce", client =>
 builder.Services.AddHttpClient("jira", client =>
 {
     client.BaseAddress = new Uri("https://woasforms.atlassian.net/rest/api/latest/");
-    client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(builder.Configuration["Jira:LOGIN"]??"", builder.Configuration["Jira:PASSWORD"]??"");
+    client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(builder.Configuration["Jira:LOGIN"] ?? "", builder.Configuration["Jira:PASSWORD"] ?? "");
+});
+
+builder.Services.AddHttpClient("jira_servicedesk", client =>
+{
+    client.BaseAddress = new Uri("https://woasforms.atlassian.net/rest/servicedeskapi/");
+    client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(builder.Configuration["Jira:LOGIN"] ?? "", builder.Configuration["Jira:PASSWORD"] ?? "");
 });
 
 builder.Services.AddScoped<ISFContactManager, SFContactManager>();

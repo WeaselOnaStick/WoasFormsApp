@@ -10,29 +10,22 @@ namespace WoasFormsApp.Services
         IDatabaseAccessorService dba,
         WoasFormsDbContext ctx) : IJiraTicketsService
     {
-        private HttpClient GetClient()
-        {
-            var client = factory.CreateClient("jira");
-            return client;
-        }
+        private HttpClient GetClient() => factory.CreateClient("jira");    
+        private HttpClient GetClientDesk() => factory.CreateClient("jira_servicedesk");
 
-        public class CustomerCreateResponse
-        {
-            public string accountId { get; set; } = "";
-        }
+        public record CustomerCreateResponse (string accountId);
 
-        public async Task<JiraCustomerView?> CreateCustomerFromCurrentUser()
+        public async Task<JiraCustomerView?> CreateCustomerFromCurrentUser(string? overrideEmail = null)
         {
-            var client = GetClient();
+            var client = GetClientDesk();
             var curUser = await dba.GetCurrentUser();
             if (curUser == null) return null;
-
-            var request = new HttpRequestMessage(HttpMethod.Post, "https://woasforms.atlassian.net/rest/servicedeskapi/customer");
+            var request = new HttpRequestMessage(HttpMethod.Post,"customer/");
             request.Content = JsonContent.Create(
                 new
                 {
                     displayName = curUser.UserName,
-                    email = curUser.Email,
+                    email = overrideEmail ?? curUser.Email,
                 }
                 );
             var response = await client.SendAsync(request);
@@ -41,35 +34,43 @@ namespace WoasFormsApp.Services
             var responseRead = await response.Content.ReadFromJsonAsync<CustomerCreateResponse>();
             curUser.JiraAccountId = responseRead.accountId;
             await ctx.SaveChangesAsync();
-            throw new NotImplementedException();
+            return await GetCustomerById(responseRead.accountId);
         }
 
-        public class SearchIssueResponseItem
+        public record IssueGetResponse(
+            string id,
+            IssueGetResponseFields fields
+        );
+
+        public record IssueGetResponseFields(
+            string summary,
+            IssueGetResponseStatus status,
+            IssueGetResponseReporter reporter
+        );
+
+        public record IssueGetResponseStatus(string name);
+        public record IssueGetResponseReporter(string accountId);
+
+        public async Task<JiraTicketView?> GetTicketById(string ticketId)
         {
-            public string id { get; set; }
+            var client = GetClient();
+            var ticketRequest = new HttpRequestMessage(HttpMethod.Get, $"issue/{ticketId}");
+            var ticketResponse = await client.SendAsync(ticketRequest);
+
+            try { ticketResponse.EnsureSuccessStatusCode(); } catch (Exception) { return null; }
+
+            var ticketResponseRead = await ticketResponse.Content.ReadFromJsonAsync<IssueGetResponse>();
+            if (ticketResponseRead == null) return null;
+            return new JiraTicketView
+            {
+                Id = ticketId,
+                Status = ticketResponseRead.fields.status.name,
+                Summary = ticketResponseRead.fields.summary,
+            };
         }
 
-        public class SearchIssuesByUserResponse
-        {
-            public List<SearchIssueResponseItem> issues { get; set; } = new List<SearchIssueResponseItem>();
-        }
-
-        public record IssueGetResponse
-        {
-            public string id { get; init; }
-            public IssueGetResponseFields fields { get; init; }
-        }
-
-        public record IssueGetResponseFields
-        {
-            public DateTime created { get; init; }
-            public string summary { get; init; }
-            public IssueGetResponseStatus status { get; init; }
-            public IssueGetResponseReporter reporter { get; init; }
-        }
-
-        public record IssueGetResponseStatus { public string name { get; init; } }
-        public record IssueGetResponseReporter { public string accountId { get; init; } }
+        public record SearchIssueResponseItem(string id);
+        public record SearchIssuesByUserResponse(List<SearchIssueResponseItem> issues);
 
         private async Task<List<JiraTicketView>> GetTicketsByUser(string userId)
         {
@@ -81,33 +82,21 @@ namespace WoasFormsApp.Services
 
             var responseRead = await response.Content.ReadFromJsonAsync<SearchIssuesByUserResponse>();
 
-            foreach (var ticketId in responseRead.issues)
+            foreach (var ticketId in responseRead!.issues)
             {
-                var ticketRequest = new HttpRequestMessage(HttpMethod.Get, $"issue/{ticketId.id}");
-                var ticketResponse = await client.SendAsync(ticketRequest);
-
-                try { ticketResponse.EnsureSuccessStatusCode(); } catch (Exception) { continue; }
-
-                var ticketResponseRead = await ticketResponse.Content.ReadFromJsonAsync<IssueGetResponse>();
-                if (ticketResponseRead == null) continue;
-                res.Append(new JiraTicketView
-                {
-                    Id = ticketId.id,
-                    Status = ticketResponseRead.fields.status.name,
-                    Summary = ticketResponseRead.fields.summary,
-                    FiledOn = ticketResponseRead.fields.created,
-                });
+                var foundTicket = await GetTicketById(ticketId.id);
+                if (foundTicket != null)
+                    res.Add(foundTicket);
             }
 
             return res;
         }
 
-        public class JiraCustomerGetResponse
-        {
-            public string accountId { get; set; }
-            public string displayName { get; set; }
-            public string emailAddress { get; set; }
-        }
+        public record JiraCustomerGetResponse(  
+            string accountId,
+            string displayName,
+            string emailAddress
+        );
 
         private async Task<JiraCustomerView?> GetCustomerById(string userId)
         {
@@ -120,13 +109,16 @@ namespace WoasFormsApp.Services
             var responseRead = await response.Content.ReadFromJsonAsync<JiraCustomerGetResponse>();
             if (responseRead == null) return null;
 
-            return new JiraCustomerView
+            var tickets = await GetTicketsByUser(responseRead.accountId);
+            var result = new JiraCustomerView
             {
                 AccountId = responseRead.accountId,
                 DisplayName = responseRead.displayName,
                 Email = responseRead.emailAddress,
-                Tickets = await GetTicketsByUser(responseRead.accountId),
+                Tickets = tickets,
             };
+
+            return result;
         }
 
         public async Task<JiraCustomerView?> GetCustomerFromCurrentUser()
@@ -137,9 +129,42 @@ namespace WoasFormsApp.Services
             return await GetCustomerById(curUser.JiraAccountId);
         }
 
-        public async Task<JiraTicketView?> CreateTicket(JiraTicketView model)
+        public record IssueCreateResponse(string id);
+
+        public async Task<JiraTicketView?> CreateTicketByCurrentUser(NewTicketModel model)
         {
-            throw new NotImplementedException();
+            var curUser = await dba.GetCurrentUser();
+            if (curUser == null) return null;
+            var reporterId = curUser.JiraAccountId;
+
+            if (string.IsNullOrWhiteSpace(reporterId))
+            {
+                var newSupportCustomer = await CreateCustomerFromCurrentUser(overrideEmail: model.Email);
+                if (newSupportCustomer == null) return null;
+                reporterId = newSupportCustomer.AccountId; 
+            }
+
+            var payload = new
+            {
+                fields = new
+                {
+                    project = new { key = "SUP" },
+                    issuetype = new { id = "10006" },
+                    summary = model.Summary,
+                    reporter = new { id = reporterId}
+                }
+            };
+
+            var client = GetClient();
+            var request = new HttpRequestMessage(HttpMethod.Post, "issue");
+            request.Content = JsonContent.Create(payload);
+
+            var response = await client.SendAsync(request);
+            try { response.EnsureSuccessStatusCode(); } catch (Exception) { return null; }
+            var newTicketId = (await response.Content.ReadFromJsonAsync<IssueCreateResponse>())!.id;
+
+            return await GetTicketById(newTicketId);
         }
+
     }
 }

@@ -12,9 +12,15 @@
         <PaperCenter PageTitle=@loc["SUPPORT_HEADER"]>
             <EditForm Model="_ticket" OnValidSubmit="submitTicket">
                 <DataAnnotationsValidator />
-                <MudTextField Class="my-4" Variant="Variant.Filled" @bind-Value=_ticket.ContactEmail For=@(()=>_ticket.ContactEmail) Label=@loc["EMAIL"]/>
-                <MudTextField Class="my-4" Lines="8" Variant="Variant.Filled" @bind-Value=_ticket.Description For=@(()=>_ticket.Description) Label=@loc["DESCRIPTION"] />
-                <MudButton Class="my-4" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Info">@loc["SUBMIT"]</MudButton>
+                <MudTextField Class="my-4" Variant="Variant.Filled" @bind-Value=_ticket.Email For=@(()=>_ticket.Email) Label=@loc["EMAIL"]/>
+                <MudTextField Class="my-4" Lines="8" Variant="Variant.Filled" @bind-Value=_ticket.Summary For=@(()=>_ticket.Summary) Label=@loc["DESCRIPTION"] />
+                <MudButton @bind-Disabled=processing Class="my-4" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Info">
+                    @if (processing)
+                    {
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2"/>
+                    }
+                    @loc["SUBMIT"]
+                </MudButton>
             </EditForm>
         </PaperCenter>
     </Authorized>
@@ -28,26 +34,26 @@
 @code {
     public bool formValid;
 
-    public class NewTicketModel 
-    {
-        [Required]
-        [EmailAddress] 
-        public string ContactEmail { get; set; } = "";
-
-        [Required]
-        public string Description { get; set; } = "";
-    }
+    public bool processing = false;
 
     public NewTicketModel _ticket = new();
 
     protected override async Task OnInitializedAsync()
     {
-        _ticket.ContactEmail = (await dba.GetCurrentUser())?.Email ?? "";
+        _ticket.Email = (await dba.GetCurrentUser())?.Email ?? "";
         StateHasChanged();
     }
 
     private async Task submitTicket()
     {
-
+        processing = true;
+        StateHasChanged();
+        var res = await jira.CreateTicketByCurrentUser(_ticket);
+        if (res != null)
+            snack.Add(loc["SUCCESS"], Severity.Success);
+        else
+            snack.Add(loc["ERROR"], Severity.Error);
+        processing = false;
+        StateHasChanged();
     }
 }

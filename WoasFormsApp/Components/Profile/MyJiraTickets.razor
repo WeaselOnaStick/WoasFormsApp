@@ -1,5 +1,43 @@
-﻿
+﻿@inject IJiraTicketsService jira
+
+@if (Loading)
+{
+    <MudProgressCircular Color="Color.Info" Indeterminate="true" />
+}
+
+
+@if (!Loading)
+{
+    @if(customerView == null)
+    {
+        <MudText Typo="Typo.h5">@loc["MY_PROFILE_NO_SUPPORT_PROFILE"]</MudText>
+    }
+    else
+    {
+        <MudDataGrid Items="customerView.Tickets" ReadOnly="true" Hover="true">
+            <Columns>
+                <HierarchyColumn />
+                <PropertyColumn Property="x => x.Id" Title="ID" />
+                <PropertyColumn Property="x => x.Status" Title=@loc["STATUS"] />
+            </Columns>
+            <ChildRowContent>
+                <MudText Typo="Typo.body1">@context.Item.Summary</MudText>
+            </ChildRowContent>
+        </MudDataGrid>
+    }
+}
 
 @code {
+    private bool Loading = true;
 
+    private JiraCustomerView? customerView;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Loading = true;
+        StateHasChanged();
+        customerView = await jira.GetCustomerFromCurrentUser();
+        Loading = false;
+        StateHasChanged();
+    }
 }

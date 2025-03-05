@@ -14,5 +14,7 @@ namespace WoasFormsApp.Data
 
         public string SalesForceAccountId { get; set; } = "";
         public string SalesForceContactId { get; set; } = "";
+
+        public string JiraAccountId { get; set; } = "";
     }
 }

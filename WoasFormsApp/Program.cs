@@ -1,4 +1,5 @@
 using Blazored.LocalStorage;
+using Duende.IdentityModel.Client;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -81,6 +82,12 @@ builder.Services.AddClientCredentialsTokenManagement()
 builder.Services.AddHttpClient("salesforce", client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["SalesForceClient:BaseAddress"]??"");
+});
+
+builder.Services.AddHttpClient("jira", client =>
+{
+    client.BaseAddress = new Uri("https://woasforms.atlassian.net/rest/api/latest/");
+    client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(builder.Configuration["Jira:LOGIN"]??"", builder.Configuration["Jira:PASSWORD"]??"");
 });
 
 builder.Services.AddScoped<ISFContactManager, SFContactManager>();

@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using Azure.Core;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Web;
 using WoasFormsApp.Data;
@@ -75,6 +76,8 @@ namespace WoasFormsApp.Services
         public record SearchIssueResponseItem(string id);
         public record SearchIssuesByUserResponse(List<SearchIssueResponseItem> issues);
 
+        public record FetchIssuesResponse(IssueGetResponse[] issues);
+
         private async Task<List<JiraTicketView>> GetTicketsByUser(string userId)
         {
             var res = new List<JiraTicketView>();
@@ -84,14 +87,27 @@ namespace WoasFormsApp.Services
             try { response.EnsureSuccessStatusCode(); } catch (Exception) { return null; }
 
             var responseRead = await response.Content.ReadFromJsonAsync<SearchIssuesByUserResponse>();
+            responseRead ??= new SearchIssuesByUserResponse(new());
+            var ticketIds = responseRead.issues.Select(i => i.id);
 
-            foreach (var ticketId in responseRead!.issues)
+            var requestFetch = new HttpRequestMessage(HttpMethod.Post, $"issue/bulkfetch");
+            requestFetch.Content = JsonContent.Create(new { 
+                expand = new[] {"names"},
+                fields = new[] {"summary", "status", "priority"},
+                issueIdsOrKeys = ticketIds.ToArray(),
+            });
+
+            var responseFetch = await client.SendAsync(requestFetch);
+            try { responseFetch.EnsureSuccessStatusCode(); } catch (Exception) { return null; }
+            var responseFetchRead = await responseFetch.Content.ReadFromJsonAsync<FetchIssuesResponse>();
+
+            res.AddRange(responseFetchRead.issues.Select(fetched => new JiraTicketView
             {
-                var foundTicket = await GetTicketById(ticketId.id);
-                if (foundTicket != null)
-                    res.Add(foundTicket);
-            }
-
+                Id = fetched.id,
+                Status = fetched.fields.status.name,
+                Priority = fetched.fields.priority.name,
+                Summary = fetched.fields.summary,
+            }));
             return res;
         }
 

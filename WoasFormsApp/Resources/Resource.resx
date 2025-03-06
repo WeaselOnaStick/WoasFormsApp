@@ -669,4 +669,7 @@
   <data name="PRIORITY" xml:space="preserve">
     <value>Priority</value>
   </data>
+  <data name="OPEN_PROFILE_TO_SEE_TICKETS" xml:space="preserve">
+    <value>See tickets in profile</value>
+  </data>
 </root>

@@ -50,7 +50,13 @@
         StateHasChanged();
         var res = await jira.CreateTicketByCurrentUser(_ticket);
         if (res != null)
-            snack.Add(loc["SUCCESS"], Severity.Success);
+        {
+            var successFragment = new RenderFragment(@<div>
+                @loc["SUCCESS"] <MudLink Color="Color.Primary" Typo="Typo.body1" Href="/Profile">@loc["OPEN_PROFILE_TO_SEE_TICKETS"]</MudLink>
+                </div>);
+            snack.Add(successFragment, Severity.Success);
+            _ticket.Summary = "";
+        }
         else
             snack.Add(loc["ERROR"], Severity.Error);
         processing = false;

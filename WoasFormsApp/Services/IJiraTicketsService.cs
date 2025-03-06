@@ -7,6 +7,7 @@ namespace WoasFormsApp.Services
     {
         public string Id { get; set; } = "";
         public string Status { get; set; } = "UNDEFINED";
+        public string Priority { get; set; } = "UNDEFINED";
         public string Summary { get; set; } = "";
     }
 

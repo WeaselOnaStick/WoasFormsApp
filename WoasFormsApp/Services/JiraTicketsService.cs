@@ -45,10 +45,12 @@ namespace WoasFormsApp.Services
         public record IssueGetResponseFields(
             string summary,
             IssueGetResponseStatus status,
+            IssueGetResponsePriority priority,
             IssueGetResponseReporter reporter
         );
 
         public record IssueGetResponseStatus(string name);
+        public record IssueGetResponsePriority(string name);
         public record IssueGetResponseReporter(string accountId);
 
         public async Task<JiraTicketView?> GetTicketById(string ticketId)
@@ -65,6 +67,7 @@ namespace WoasFormsApp.Services
             {
                 Id = ticketId,
                 Status = ticketResponseRead.fields.status.name,
+                Priority = ticketResponseRead.fields.priority.name,
                 Summary = ticketResponseRead.fields.summary,
             };
         }
@@ -98,6 +101,32 @@ namespace WoasFormsApp.Services
             string emailAddress
         );
 
+
+        private async Task<JiraCustomerView?> GetCustomerByEmail(string email)
+        {
+            var client = GetClient();
+            var request = new HttpRequestMessage(HttpMethod.Get, $"user/search/?query={email}");
+            var response = await client.SendAsync(request);
+
+            try { response.EnsureSuccessStatusCode(); } catch (Exception) { return null; }
+
+            var responseRead = await response.Content.ReadFromJsonAsync<JiraCustomerGetResponse[]>();
+            if (responseRead == null || responseRead.Count() == 0) return null;
+
+            var foundUser = responseRead.First();
+            var tickets = await GetTicketsByUser(foundUser.accountId);
+            var result = new JiraCustomerView
+            {
+                AccountId = foundUser.accountId,
+                DisplayName = foundUser.displayName,
+                Email = foundUser.emailAddress,
+                Tickets = tickets,
+            };
+
+            return result;
+
+        }
+
         private async Task<JiraCustomerView?> GetCustomerById(string userId)
         {
             var client = GetClient();
@@ -124,25 +153,44 @@ namespace WoasFormsApp.Services
         public async Task<JiraCustomerView?> GetCustomerFromCurrentUser()
         {
             var curUser = await dba.GetCurrentUser();
-            if (curUser == null || string.IsNullOrWhiteSpace(curUser.JiraAccountId)) return null;
+            if (curUser == null) return null;
+            if (!await CreateCustomerIfNeeded()) return null;
+            ctx.Update(curUser);
 
             return await GetCustomerById(curUser.JiraAccountId);
         }
+
+        private async Task<bool> CreateCustomerIfNeeded(string? overrideEmail = null)
+        {
+            var curUser = await dba.GetCurrentUser();
+            if (curUser == null) return false;
+
+            if (string.IsNullOrWhiteSpace(curUser.JiraAccountId))
+            {
+                var foundCustomer = await GetCustomerByEmail(curUser.Email??"");
+                if (foundCustomer != null)
+                {
+                    curUser.JiraAccountId = foundCustomer.AccountId;
+                    await ctx.SaveChangesAsync();
+                }
+                else
+                {
+                    var newSupportCustomer = await CreateCustomerFromCurrentUser(overrideEmail);
+                    if (newSupportCustomer == null) return false;
+                }
+            }
+            return true;
+        }
+
 
         public record IssueCreateResponse(string id);
 
         public async Task<JiraTicketView?> CreateTicketByCurrentUser(NewTicketModel model)
         {
+            await CreateCustomerIfNeeded(overrideEmail: model.Email);
             var curUser = await dba.GetCurrentUser();
             if (curUser == null) return null;
             var reporterId = curUser.JiraAccountId;
-
-            if (string.IsNullOrWhiteSpace(reporterId))
-            {
-                var newSupportCustomer = await CreateCustomerFromCurrentUser(overrideEmail: model.Email);
-                if (newSupportCustomer == null) return null;
-                reporterId = newSupportCustomer.AccountId; 
-            }
 
             var payload = new
             {

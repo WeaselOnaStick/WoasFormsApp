@@ -655,7 +655,7 @@
     <value>Help</value>
   </data>
   <data name="LOGIN_TO_CONTINUE" xml:space="preserve">
-    <value>Action unavailable.\nPlease log in to continue.</value>
+    <value>Action unavailable. Please log in to continue.</value>
   </data>
   <data name="SUBMIT" xml:space="preserve">
     <value>Submit</value>
@@ -665,5 +665,8 @@
   </data>
   <data name="MY_PROFILE_NO_SUPPORT_PROFILE" xml:space="preserve">
     <value>No support profile found. It is automatically created when you submit a support ticket.</value>
+  </data>
+  <data name="PRIORITY" xml:space="preserve">
+    <value>Priority</value>
   </data>
 </root>
